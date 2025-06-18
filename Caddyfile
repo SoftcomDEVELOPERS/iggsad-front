@@ -1,0 +1,17 @@
+https://localhost:3443 {
+  root * dist
+  file_server
+  encode gzip zstd
+
+  header {
+    Strict-Transport-Security "max-age=31536000;"
+    X-Content-Type-Options "nosniff"
+    X-Frame-Options "DENY"
+    Referrer-Policy "strict-origin-when-cross-origin"
+  }
+
+  reverse_proxy /api/* http://localhost:5116 {
+    header_up Host {host}
+    header_up X-Real-IP {remote_host}
+  }
+}
