@@ -1,3 +1,4 @@
+// primevue-theme.js
 import { definePreset } from '@primeuix/themes';
 import Nora from '@primeuix/themes/nora';
 
@@ -113,37 +114,77 @@ export const GestionProcesalTheme = definePreset(Nora, {
                 }
             }
         },
-        password: {
-            meter: {
-                background: '{surface.100}',
-                borderRadius: '3px',
-                height: '.75rem'
-            },
-            icon: {
-                color: '{surface.500}'
+        datepicker: {
+            root: {
+                background: '{surface.0}',
+                disabledBackground: '{surface.200}',
+                filledBackground: '{surface.50}',
+                filledFocusBackground: '{surface.50}',
+                borderColor: '{surface.300}',
+                hoverBorderColor: '{primary.400}',
+                focusBorderColor: '{primary.500}',
+                invalidBorderColor: '{red.400}',
+                color: '{surface.700}',
+                disabledColor: '{surface.500}',
+                placeholderColor: '{surface.500}',
+                shadow: 'inset 0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                paddingX: '0.875rem',
+                paddingY: '0.625rem',
+                borderRadius: '6px',
+                focusRing: {
+                    width: '2px',
+                    style: 'solid',
+                    color: '{primary.500}',
+                    offset: '-1px'
+                }
+            }
+        },
+        select: {
+            root: {
+                background: '{surface.0}',
+                disabledBackground: '{surface.200}',
+                filledBackground: '{surface.50}',
+                filledFocusBackground: '{surface.50}',
+                borderColor: '{surface.300}',
+                hoverBorderColor: '{primary.400}',
+                focusBorderColor: '{primary.500}',
+                invalidBorderColor: '{red.400}',
+                color: '{surface.700}',
+                disabledColor: '{surface.500}',
+                placeholderColor: '{surface.500}',
+                shadow: 'inset 0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                paddingX: '0.875rem',
+                paddingY: '0.625rem',
+                borderRadius: '6px',
+                focusRing: {
+                    width: '2px',
+                    style: 'solid',
+                    color: '{primary.500}',
+                    offset: '-1px'
+                }
             }
         },
         menubar: {
             root: {
-                background: '{primary.600}',
-                borderColor: '{primary.600}',
-                color: '{primary.50}',
+                background: 'transparent', // Cambiado a transparente
+                borderColor: 'transparent', // Sin borde
+                color: '{surface.700}',     // Texto gris oscuro
                 borderRadius: '0px',
-                padding: '0.75rem 1rem'
+                padding: '0'               // Sin padding
             },
             item: {
-                focusBackground: '{primary.700}',
-                activeBackground: '{primary.800}',
-                color: '{primary.50}',
-                focusColor: '{primary.50}',
-                activeColor: '{primary.50}',
-                padding: '0.75rem 1rem',
+                focusBackground: '{primary.600}',    // Fondo azul sólido en hover
+                activeBackground: '{primary.700}',   // Activo azul más oscuro
+                color: '{surface.700}',              // Texto gris oscuro normal
+                focusColor: '#ffffff',               // Texto blanco en hover
+                activeColor: '#ffffff',              // Texto blanco cuando activo
+                padding: '0.5rem 1rem',
                 borderRadius: '6px',
                 gap: '0.5rem',
                 icon: {
-                    color: '{primary.100}',
-                    focusColor: '{primary.50}',
-                    activeColor: '{primary.50}'
+                    color: '{surface.600}',     // Icono gris normal
+                    focusColor: '#ffffff',      // Icono blanco en hover
+                    activeColor: '#ffffff'      // Icono blanco cuando activo
                 }
             },
             submenu: {

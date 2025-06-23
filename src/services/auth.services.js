@@ -66,6 +66,7 @@ export async function logout() {
       credentials: "include",
       headers: { "Content-Type": "application/json" }
     });
+    console.log("Respuesta del logout:", res);
     
     // No importa si falla, las cookies se limpian de todos modos
     return res.ok;
@@ -86,7 +87,7 @@ export async function refreshToken() {
       credentials: "include",
       headers: { "Content-Type": "application/json" }
     });
-    
+      console.log("Respuesta del refresh token:", res);
     if (res.ok) {
       const data = await res.json();
       return data.success;

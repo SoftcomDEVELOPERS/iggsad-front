@@ -12,12 +12,25 @@ export const useAuthStore = defineStore('auth', {
   
   getters: {
     isAuthenticated: (s) => !!s.user,
-    canAccess: (s) => (routeName) =>
-      s.frontPermissions.includes('*') ||
-      s.frontPermissions.includes(routeName),
-    // Verificar si tenemos token en cookies
-    hasToken: () => {
-      return !!Cookies.get('access_token')
+    /**
+     * Comprueba si el usuario tiene este permiso
+     * - Comodín '*'
+     * - Permiso exacto ('user-readView')
+     * - Permiso 'entity-allView' cubre cualquier acción de esa entidad
+     */
+    canAccess: (s) => (permission) => {
+      const fps = s.frontPermissions || []
+      if (fps.includes('*')) {
+        return true
+      }
+      if (fps.includes(permission)) {
+        return true
+      }
+      const [entity] = permission.split('-')
+      return fps.some(fp => {
+        const [fpEntity, fpAction] = fp.split('-')
+        return fpEntity === entity && fpAction === 'allView'
+      })
     }
   },
   
@@ -99,16 +112,9 @@ export const useAuthStore = defineStore('auth', {
      * Verifica si el usuario está autenticado (útil al iniciar la app)
      */
     async checkAuth() {
-      // Primero verificar si hay token en cookies
-      if (!this.hasToken) {
-        console.log('No hay token en cookies')
-        this.user = null
-        this.frontPermissions = []
-        return false
-      }
       
+      this.isLoading = true
       try {
-        this.isLoading = true
         
         const { user, frontPermissions } = await authService.fetchMe()
         this.user = user
@@ -118,7 +124,18 @@ export const useAuthStore = defineStore('auth', {
         return true
         
       } catch (error) {
-        console.log('Usuario no autenticado:', error.message)
+        console.log('Error al verificar autenticación:', error);
+        
+        if (error.response?.status === 401) {
+          const refreshed = await authService.refreshToken().catch(() => false)
+          if (refreshed) {
+            const { user, frontPermissions } = await authService.fetchMe()
+            this.user = user
+            this.frontPermissions = frontPermissions
+            return true
+          }
+        }
+        // demás errores o refresh fallido
         this.user = null
         this.frontPermissions = []
         return false

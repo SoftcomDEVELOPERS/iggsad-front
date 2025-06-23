@@ -5,78 +5,73 @@ import router from './router'
 import { createPinia } from 'pinia'
 import { GestionProcesalTheme } from './themes/primevue-theme.js'
 
-// Importa Tailwind (creado por ti en assets)
+// Importa Tailwind
 import './assets/tailwind.css'
 
 // PrimeVue core
 import PrimeVue from 'primevue/config'
-
+import TooltipDirective from 'primevue/tooltip'
 // PrimeVue componentes globales
 import 'primeicons/primeicons.css'
-
-// Forms (plugin oficial)
+// Forms plugin
 import { Form } from '@primevue/forms';
-
-// Toast (servicio + componente visual)
+// Toast
 import ToastService from 'primevue/toastservice'
 import Toast from 'primevue/toast'
-
 // Otros componentes
 import Message from 'primevue/message';
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
 
-// ✨ NUEVO: Importar interceptor HTTP y store de auth
+// HTTP interceptor
 import { initializeHttpInterceptor } from '@/services/httpInterceptor'
 import { useAuthStore } from '@/stores/auth'
 
 const app = createApp(App)
 const pinia = createPinia()
-
 app.use(pinia)
 
-// ✨ NUEVO: Inicializar el interceptor HTTP antes que todo
+// Inicializar interceptor antes de todo
 initializeHttpInterceptor()
 
-// Función para inicializar la aplicación
-const initializeApp = async () => {
+// Registrar PrimeVue y plugins
+app.use(PrimeVue, {
+  theme: {
+    preset: GestionProcesalTheme,
+    options: {
+      prefix: 'p',
+      darkModeSelector: '.p-dark',
+      cssLayer: false
+    }
+  }
+})
+
+// Registrar directiva tooltip
+app.directive('tooltip', TooltipDirective)
+
+app.component('Form', Form)
+app.component('Message', Message)
+app.component('Toast', Toast)
+app.component('IconField', IconField)
+app.component('InputIcon', InputIcon)
+app.use(ToastService)
+
+// Conectar router y montar tras estar listo
+app.use(router)
+router.isReady().then(async () => {
+  // Verificar autenticación antes de mostrar la App
   try {
-    // ✨ NUEVO: Verificar autenticación al iniciar la app
     const authStore = useAuthStore()
     await authStore.checkAuth()
-    console.log('🔐 Verificación de autenticación completada')
-    
-  } catch (error) {
-    console.error('❌ Error al inicializar autenticación:', error)
-  } finally {
-    // Continuar con la inicialización normal
-    app.use(router)
+    console.log('🔐 Verificación de autenticación completada. isAuthenticated ->', authStore.isAuthenticated)
 
-    // Configuración de PrimeVue + tema personalizado
-    app.use(PrimeVue, {
-        theme: {
-            preset: GestionProcesalTheme,
-            options: {
-                prefix: 'p',
-                darkModeSelector: '.p-dark',
-                cssLayer: false
-            }
-        }
-    })
-
-    // registra globalmente los componentes de Forms
-    app.component('Form', Form)
-    app.component('Message', Message)
-    app.component('Toast', Toast)
-    app.component('IconField', IconField)
-    app.component('InputIcon', InputIcon)
-
-    app.use(ToastService)
-
-    app.mount('#app')
-    console.log('🚀 Aplicación montada exitosamente')
+    if (authStore.isAuthenticated) {
+      router.push({ name: 'Landing Page' })
+    } 
+  } catch (e) {
+    console.error('❌ Error al verificar autenticación:', e)
   }
-}
 
-// Inicializar la aplicación
-initializeApp()
+  app.mount('#app')
+  console.log('🚀 Aplicación montada exitosamente tras router.isReady()')
+})

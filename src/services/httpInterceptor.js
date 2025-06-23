@@ -1,4 +1,3 @@
-// services/httpInterceptor.js
 import { useAuthStore } from '@/stores/auth'
 import router from '@/router'
 
@@ -8,7 +7,7 @@ const isApiUrl = (url) => {
     import.meta.env.VITE_SSO_URL,
     '/api'
   ].filter(Boolean)
-  
+
   return apiUrls.some(apiUrl => url.includes(apiUrl))
 }
 
@@ -21,116 +20,88 @@ let isRefreshing = false
 // Interceptor para peticiones y respuestas
 window.fetch = async function(...args) {
   const [url, options = {}] = args
-  
-  // Solo interceptar peticiones a nuestras APIs
+  const auth = useAuthStore()
+
+  // Excluir logout y refresh antes de any intercept
+  if (typeof url === 'string' && (url.includes('/api/auth/logout') || url.includes('/api/auth/refresh'))) {
+    return await originalFetch.apply(this, [url, options])
+  }
+
+  // Si no hay usuario (store vacío) y no es logout/refresh, no interceptar
+  if (typeof url === 'string' && isApiUrl(url) && !auth.user) {
+    return await originalFetch.apply(this, [url, options])
+  }
+
+  // Solo interceptar peticiones a nuestras APIs cuando hay usuario
   if (typeof url === 'string' && isApiUrl(url)) {
-    // Asegurar que las cookies se envíen siempre
     options.credentials = 'include'
-    
-    // Agregar headers por defecto si no existen
     options.headers = {
       'Content-Type': 'application/json',
       ...options.headers
     }
   }
 
-  // Realizar la petición original
+  // Realizar petición original
   const response = await originalFetch.apply(this, [url, options])
 
-  // Interceptor para respuestas
+  // Interceptor de respuestas de la API
   if (typeof url === 'string' && isApiUrl(url)) {
-    const auth = useAuthStore()
-    
-    // Si es error 401, el token ha expirado o es inválido
+    // Excluir logout/refresh en respuesta
+    if (url.includes('/api/auth/logout') || url.includes('/api/auth/refresh')) {
+      return response
+    }
+
+    // 401 -> intentar refresh
     if (response.status === 401 && !isRefreshing) {
       console.warn('Token expirado o inválido, intentando refresh...')
-      
-      // Evitar llamadas múltiples al refresh
       isRefreshing = true
-      
       try {
-        // Intentar refresh token
         const refreshed = await auth.tryRefreshToken()
-        
         if (refreshed) {
           console.log('Token renovado exitosamente')
-          // Reintentar la petición original
-          const retryResponse = await originalFetch.apply(this, [url, {
-            ...options,
-            credentials: 'include'
-          }])
-          return retryResponse
+          return await originalFetch.apply(this, [url, { ...options, credentials: 'include' }])
         }
       } catch (error) {
         console.error('Error al renovar token:', error)
       } finally {
         isRefreshing = false
       }
-      
-      // Si no se pudo renovar, hacer logout y redirigir
-      console.log('No se pudo renovar el token, cerrando sesión...')
+
+      console.log('No se pudo renovar el token, haciendo logout...')
       await auth.logout()
+      // Desactivar interceptor y restaurar fetch original
+      window.fetch = originalFetch
       if (router.currentRoute.value.path !== '/login') {
         router.push('/login')
       }
     }
-    
-    // Si es error 403, no hay permisos
+
+    // 403 -> acceso denegado
     if (response.status === 403) {
       console.warn('Acceso denegado - Sin permisos suficientes')
-      // Aquí podrías mostrar un toast o redirigir a una página de error
     }
   }
 
   return response
 }
 
-// Cliente HTTP simplificado (opcional)
+// Cliente HTTP simplificado
 export const httpClient = {
   async get(url, options = {}) {
-    return await fetch(url, {
-      method: 'GET',
-      credentials: 'include',
-      ...options
-    })
+    return await fetch(url, { method: 'GET', credentials: 'include', ...options })
   },
-
   async post(url, data, options = {}) {
-    return await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-      },
-      credentials: 'include',
-      body: JSON.stringify(data),
-      ...options
-    })
+    return await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', ...options.headers }, credentials: 'include', body: JSON.stringify(data), ...options })
   },
-
   async put(url, data, options = {}) {
-    return await fetch(url, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-      },
-      credentials: 'include',
-      body: JSON.stringify(data),
-      ...options
-    })
+    return await fetch(url, { method: 'PUT', headers: { 'Content-Type': 'application/json', ...options.headers }, credentials: 'include', body: JSON.stringify(data), ...options })
   },
-
   async delete(url, options = {}) {
-    return await fetch(url, {
-      method: 'DELETE',
-      credentials: 'include',
-      ...options
-    })
+    return await fetch(url, { method: 'DELETE', credentials: 'include', ...options })
   }
 }
 
-// Función para inicializar el interceptor
+// Inicializar interceptor
 export const initializeHttpInterceptor = () => {
   console.log('🔧 HTTP Interceptor inicializado - Usando cookies del backend')
 }
