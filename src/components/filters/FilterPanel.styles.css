@@ -1,0 +1,260 @@
+/* FilterPanel.styles.css */
+
+/* Estilos para el panel de filtros optimizado */
+.filter-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Scrollbar personalizado para filtros activos */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 2px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 2px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Headers con gradiente - sticky mejorado */
+.filter-panel .sticky {
+  z-index: 20;
+}
+
+/* Hacer inputs más pequeños globalmente dentro del FilterPanel */
+.filter-panel :deep(.p-inputtext),
+.filter-panel :deep(.p-select),
+.filter-panel :deep(.p-datepicker-input),
+.filter-panel :deep(.p-inputnumber-input) {
+  padding: 0.375rem 0.5rem !important;
+  font-size: 0.75rem !important;
+  min-height: 28px !important;
+}
+
+/* Labels más pequeños */
+.filter-panel :deep(.filter-field label) {
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+  margin-bottom: 0.25rem !important;
+  color: #475569 !important;
+}
+
+/* Selectores múltiples más compactos */
+.filter-panel :deep(.p-select-multiple .p-select-label) {
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.75rem !important;
+}
+
+/* Botones más pequeños */
+.filter-panel :deep(.p-button-small) {
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.75rem !important;
+}
+
+/* Contenedores de filtros */
+.filter-panel .filter-field {
+  margin-bottom: 0.5rem;
+}
+
+/* Grid responsive mejorado */
+@media (min-width: 768px) {
+  .filter-panel .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .filter-panel .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1280px) {
+  .filter-panel .grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Cards de filtros con hover sutil */
+.filter-panel .bg-white {
+  transition: all 0.2s ease;
+  transform: translateZ(0);
+}
+
+.filter-panel .bg-white:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Headers de sección con mejor contraste */
+.filter-panel h3 {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Campos de fecha en rango - más compactos */
+.filter-panel :deep(.grid.grid-cols-2) {
+  gap: 0.5rem;
+}
+
+/* Placeholders más sutiles */
+.filter-panel :deep(.p-inputtext::placeholder),
+.filter-panel :deep(.p-select-placeholder) {
+  color: #94a3b8 !important;
+  font-size: 0.75rem !important;
+}
+
+/* Botones de limpiar en campos */
+.filter-panel :deep(.filter-field button) {
+  right: 0.5rem !important;
+}
+
+/* Optimización para pantallas pequeñas */
+@media (max-width: 640px) {
+  .filter-panel .grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .filter-panel .sticky.top-16 {
+    top: 60px;
+  }
+}
+
+/* Mejoras para el resumen de filtros activos */
+.filter-panel .custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+/* Estados focus mejorados */
+.filter-panel :deep(.p-inputtext:focus),
+.filter-panel :deep(.p-select:focus) {
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+  border-color: #3b82f6 !important;
+}
+
+/* Estilos específicos para headers de secciones */
+.section-header-blue {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+  color: white !important;
+}
+
+.section-header-green {
+  background: linear-gradient(135deg, #059669, #047857) !important;
+  color: white !important;
+}
+
+.section-header-purple {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
+  color: white !important;
+}
+
+.section-header-orange {
+  background: linear-gradient(135deg, #ea580c, #c2410c) !important;
+  color: white !important;
+}
+
+.section-header-indigo {
+  background: linear-gradient(135deg, #4f46e5, #4338ca) !important;
+  color: white !important;
+}
+
+/* Contenedores con colores pastel correspondientes */
+.filter-panel .section-container-blue {
+  background: linear-gradient(135deg, #dbeafe, #eff6ff) !important;
+}
+
+.filter-panel .section-container-green {
+  background: linear-gradient(135deg, #d1fae5, #ecfdf5) !important;
+}
+
+.filter-panel .section-container-purple {
+  background: linear-gradient(135deg, #e9d5ff, #f3e8ff) !important;
+}
+
+.filter-panel .section-container-orange {
+  background: linear-gradient(135deg, #fed7aa, #fef3c7) !important;
+}
+
+.filter-panel .section-container-indigo {
+  background: linear-gradient(135deg, #e0e7ff, #eef2ff) !important;
+}
+
+/* Arreglar problema de botón clear y dropdown */
+.filter-panel :deep(.p-select) {
+  position: relative;
+}
+
+.filter-panel :deep(.p-select .p-select-clear-icon) {
+  right: 2.5rem !important; /* Mover botón clear para no solapar con dropdown */
+}
+
+.filter-panel :deep(.p-select .p-select-dropdown) {
+  right: 0.5rem !important;
+  z-index: 1;
+}
+
+/* Hacer selectores más pequeños */
+.filter-panel :deep(.p-select) {
+  min-height: 28px !important;
+}
+
+.filter-panel :deep(.p-select .p-select-label) {
+  padding: 0.375rem 2.5rem 0.375rem 0.5rem !important;
+  font-size: 0.75rem !important;
+  line-height: 1rem !important;
+}
+
+/* Animaciones para filtros activos */
+.filter-active-enter-from {
+  opacity: 0;
+  transform: translateX(-10px);
+}
+
+.filter-active-enter-to {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.filter-active-enter-active {
+  transition: all 0.2s ease;
+}
+
+.filter-active-leave-from {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.filter-active-leave-to {
+  opacity: 0;
+  transform: translateX(10px);
+}
+
+.filter-active-leave-active {
+  transition: all 0.2s ease;
+}
+
+/* Mejoras para el contador de filtros */
+.filter-counter {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+  animation: pulse-soft 2s infinite;
+}
+
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}

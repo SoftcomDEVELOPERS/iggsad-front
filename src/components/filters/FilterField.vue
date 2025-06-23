@@ -1,10 +1,10 @@
 <template>
-  <div class="filter-field" :class="containerClass">
+  <div class="filter-field" :class="[containerClass, `size-${size}`]">
     <label 
       v-if="label" 
       :for="fieldId" 
       class="block text-sm font-medium text-slate-700 mb-2"
-      :class="labelClass"
+      :class="[labelClass, getSizeLabelClass()]"
     >
       {{ label }}
       <span v-if="required" class="text-red-500 ml-1">*</span>
@@ -18,6 +18,7 @@
         :isDisabled="disabled"
         :placeholder="placeholder"
         :options="options"
+        :size="size"
       />
       
       <!-- Botón de limpiar campo -->
@@ -28,17 +29,17 @@
         type="button"
         :title="`Limpiar ${label}`"
       >
-        <i class="pi pi-times text-sm"></i>
+        <i class="pi pi-times" :class="getSizeIconClass()"></i>
       </button>
     </div>
     
     <!-- Mensaje de error -->
-    <div v-if="error" class="mt-1 text-sm text-red-600">
+    <div v-if="error" :class="getSizeErrorClass()">
       {{ error }}
     </div>
     
     <!-- Texto de ayuda -->
-    <div v-if="help" class="mt-1 text-sm text-slate-500">
+    <div v-if="help" :class="getSizeHelpClass()">
       {{ help }}
     </div>
   </div>
@@ -122,6 +123,41 @@ const clearValue = () => {
   const clearedValue = Array.isArray(props.modelValue) ? [] : null
   emit('update:modelValue', clearedValue)
   emit('clear')
+}
+
+// Métodos para obtener clases según el tamaño
+const getSizeLabelClass = () => {
+  switch (props.size) {
+    case 'small': return 'text-xs mb-1'
+    case 'large': return 'text-base mb-3'
+    default: return 'text-sm mb-2'
+  }
+}
+
+const getSizeIconClass = () => {
+  switch (props.size) {
+    case 'small': return 'text-xs'
+    case 'large': return 'text-base'
+    default: return 'text-sm'
+  }
+}
+
+const getSizeErrorClass = () => {
+  const baseClass = 'mt-1 text-red-600'
+  switch (props.size) {
+    case 'small': return `${baseClass} text-xs`
+    case 'large': return `${baseClass} text-base`
+    default: return `${baseClass} text-sm`
+  }
+}
+
+const getSizeHelpClass = () => {
+  const baseClass = 'mt-1 text-slate-500'
+  switch (props.size) {
+    case 'small': return `${baseClass} text-xs`
+    case 'large': return `${baseClass} text-base`
+    default: return `${baseClass} text-sm`
+  }
 }
 
 // Exponer métodos para componentes padre
