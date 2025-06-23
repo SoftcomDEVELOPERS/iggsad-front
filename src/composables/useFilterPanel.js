@@ -2,12 +2,12 @@
 import { ref, computed } from 'vue'
 
 export function useFilterPanel() {
-  // Estado de todos los filtros
+  // Estado de todos los filtros - CORREGIR tipos de datos
   const filters = ref({
-    // Filtros por Procedimiento
+    // Filtros por Procedimiento - Arrays para MultiSelect
     cliente: [],
     cartera: [],
-    estadoExpediente: [],
+    estadoExpediente: [], // ❌ CAMBIAR: era [] pero se inicializaba como string
     fechaExpediente: [null, null],
     desdeNumGestiones: null,
     referencia: '',
@@ -15,9 +15,9 @@ export function useFilterPanel() {
     codigoPago: '',
     desdeDefDate: null,
     nig: '',
-    hito: [],
-    estadoDemanda: [],
-    estadoSubrogacion: [],
+    hito: [], // Array para MultiSelect
+    estadoDemanda: [], // Array para MultiSelect
+    estadoSubrogacion: [], // Array para MultiSelect
     diasSinGestJudicial: '',
     segmentoTDX: '',
     fechaPrimeraAsignacion: [null, null],
@@ -27,15 +27,15 @@ export function useFilterPanel() {
     fechaPresentacion: [null, null],
     fechaAdmision: [null, null],
     desdePrincipal: '',
-    tGestExt: null,
-    tipoDemanda: [],
-    estadoContactacion: [],
-    conIngresos: [],
-    estadoProcedimiento: [],
+    tGestExt: null, // Select simple
+    tipoDemanda: [], // Array para MultiSelect
+    estadoContactacion: [], // Array para MultiSelect
+    conIngresos: [], // Array para MultiSelect
+    estadoProcedimiento: [], // Array para MultiSelect
     autos: '',
     autosMonitorio: '',
-    letrado: [],
-    gestor: [],
+    letrado: [], // Array para MultiSelect
+    gestor: [], // Array para MultiSelect
     
     // Filtros Intervinientes
     nombreApellidos: '',
@@ -45,7 +45,7 @@ export function useFilterPanel() {
     telefono: '',
     email: '',
     dniCifNie: '',
-    localizados: [],
+    localizados: [], // Array para MultiSelect
     observaciones: '',
     numRegistros: null,
     
@@ -54,7 +54,7 @@ export function useFilterPanel() {
     fechaAgenda: [null, null],
     
     // Filtros Costas
-    tipoCostas: [],
+    tipoCostas: [], // Array para MultiSelect
     fechaCostas: [null, null],
     
     // Filtros Adicionales
@@ -63,8 +63,8 @@ export function useFilterPanel() {
     assignmentID: '',
     accountID: '',
     campanasVocalcom: '',
-    gestExt: null,
-    conAcuerdoPago: null
+    gestExt: null, // Select simple
+    conAcuerdoPago: null // Select simple
   })
 
   // Computed para filtros activos
@@ -74,10 +74,13 @@ export function useFilterPanel() {
     Object.entries(filters.value).forEach(([key, value]) => {
       if (value !== null && value !== '' && value !== undefined) {
         if (Array.isArray(value)) {
-          if (value.some(v => v !== null && v !== '')) {
-            active[key] = value
+          // Para arrays, verificar que tengan elementos válidos
+          const validItems = value.filter(v => v !== null && v !== '' && v !== undefined)
+          if (validItems.length > 0) {
+            active[key] = validItems
           }
         } else {
+          // Para valores simples
           active[key] = value
         }
       }
@@ -149,9 +152,14 @@ export function useFilterPanel() {
 
   const getFilterValue = (value) => {
     if (Array.isArray(value)) {
-      const filtered = value.filter(v => v !== null && v !== '')
+      const filtered = value.filter(v => v !== null && v !== '' && v !== undefined)
       if (filtered.length === 0) return ''
-      if (filtered.length === 1) return filtered[0]
+      if (filtered.length === 1) {
+        // Si es un objeto con label, mostrar el label
+        return typeof filtered[0] === 'object' && filtered[0]?.label 
+          ? filtered[0].label 
+          : String(filtered[0])
+      }
       return `${filtered.length} seleccionados`
     }
     if (typeof value === 'object' && value?.label) {
@@ -170,7 +178,12 @@ export function useFilterPanel() {
         filters.value[key] = []
       }
     } else {
-      filters.value[key] = null
+      // Para valores simples (string, number, null)
+      if (typeof filters.value[key] === 'string') {
+        filters.value[key] = ''
+      } else {
+        filters.value[key] = null
+      }
     }
     emit('filter-change', filters.value)
   }
@@ -178,16 +191,51 @@ export function useFilterPanel() {
   const clearAllFilters = (emit) => {
     Object.keys(filters.value).forEach(key => {
       if (Array.isArray(filters.value[key])) {
+        // Arrays de fecha
         if (key.includes('fecha')) {
           filters.value[key] = [null, null]
         } else {
+          // MultiSelect arrays
           filters.value[key] = []
         }
       } else {
-        filters.value[key] = null
+        // Valores simples
+        if (typeof filters.value[key] === 'string') {
+          filters.value[key] = ''
+        } else {
+          filters.value[key] = null
+        }
       }
     })
     emit('clear-filters')
+  }
+
+  // Función para normalizar un valor para MultiSelect
+  const normalizeMultiSelectValue = (value) => {
+    if (value === null || value === undefined || value === '') {
+      return []
+    }
+    if (Array.isArray(value)) {
+      return value
+    }
+    // Si es un string, convertir a array
+    return [value]
+  }
+
+  // Función para normalizar todos los valores de filtros
+  const normalizeFilters = () => {
+    // Lista de campos que deben ser arrays (MultiSelect)
+    const multiSelectFields = [
+      'cliente', 'cartera', 'estadoExpediente', 'hito', 'estadoDemanda', 
+      'estadoSubrogacion', 'tipoDemanda', 'estadoContactacion', 'conIngresos', 
+      'estadoProcedimiento', 'letrado', 'gestor', 'localizados', 'tipoCostas'
+    ]
+
+    multiSelectFields.forEach(field => {
+      if (filters.value[field] !== undefined) {
+        filters.value[field] = normalizeMultiSelectValue(filters.value[field])
+      }
+    })
   }
 
   const applyFilters = (emit) => {
@@ -201,6 +249,8 @@ export function useFilterPanel() {
     getFilterValue,
     clearFilter,
     clearAllFilters,
-    applyFilters
+    applyFilters,
+    normalizeFilters,
+    normalizeMultiSelectValue
   }
 }

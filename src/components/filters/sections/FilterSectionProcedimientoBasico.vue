@@ -4,7 +4,7 @@
     <div class="section-container-blue">
       <div class="section-header-blue px-4 py-3">
         <h3 class="text-sm font-semibold uppercase tracking-wide">
-          FILTROS POR PROCEDIMIENTO
+          FILTROS BÁSICOS
         </h3>
       </div>
       
@@ -36,25 +36,6 @@
           container-class="mb-2"
         />
         
-        <FilterDateRange
-          v-model="filters.fechaExpediente"
-          label="Rango Expediente:"
-          split-inputs
-          from-placeholder="desde"
-          to-placeholder="hasta"
-          size="small"
-          container-class="mb-2"
-        />
-        
-        <FilterNumber
-          v-model="filters.desdeNumGestiones"
-          label="Desde Nº Gestiones:"
-          placeholder="desde"
-          :min="0"
-          size="small"
-          container-class="mb-2"
-        />
-        
         <FilterText
           v-model="filters.referencia"
           label="Referencia:"
@@ -79,13 +60,6 @@
           container-class="mb-2"
         />
         
-        <FilterDate
-          v-model="filters.desdeDefDate"
-          label="Desde Def.Date:"
-          size="small"
-          container-class="mb-2"
-        />
-        
         <FilterText
           v-model="filters.nig"
           label="NIG:"
@@ -93,7 +67,18 @@
           size="small"
           container-class="mb-2"
         />
-        
+      </div>
+    </div>
+
+    <!-- Estados y clasificaciones -->
+    <div class="section-container-blue">
+      <div class="section-header-blue px-4 py-3">
+        <h3 class="text-sm font-semibold uppercase tracking-wide">
+          ESTADOS Y CLASIFICACIONES
+        </h3>
+      </div>
+      
+      <div class="p-4 space-y-3">
         <FilterMultiSelect
           v-model="filters.hito"
           label="Hito:"
@@ -121,98 +106,6 @@
           container-class="mb-2"
         />
         
-        <FilterText
-          v-model="filters.diasSinGestJudicial"
-          label="Días sin Gest Judicial:"
-          input-type="number"
-          size="small"
-          container-class="mb-2"
-        />
-        
-        <FilterText
-          v-model="filters.segmentoTDX"
-          label="Segmento (Solo TDX):"
-          placeholder="Segmento"
-          size="small"
-          container-class="mb-2"
-        />
-      </div>
-    </div>
-
-    <!-- Fechas y gestiones -->
-    <div class="section-container-blue">
-      <div class="section-header-blue px-4 py-3">
-        <h3 class="text-sm font-semibold uppercase tracking-wide">
-          FECHAS Y GESTIONES
-        </h3>
-      </div>
-      
-      <div class="p-4 space-y-3">
-        <FilterDateRange
-          v-model="filters.fechaPrimeraAsignacion"
-          label="Primera Asignación:"
-          split-inputs
-          size="small"
-          container-class="mb-2"
-        />
-        
-        <FilterDateRange
-          v-model="filters.fechaUltimaAgenda"
-          label="Última Agenda Jud.:"
-          split-inputs
-          size="small"
-          container-class="mb-2"
-        />
-        
-        <FilterDateRange
-          v-model="filters.fechaUltimaGestion"
-          label="Última Gestión:"
-          split-inputs
-          size="small"
-          container-class="mb-2"
-        />
-        
-        <FilterDateRange
-          v-model="filters.fechaEnvio"
-          label="Fecha Envío:"
-          split-inputs
-          size="small"
-          container-class="mb-2"
-        />
-        
-        <FilterDateRange
-          v-model="filters.fechaPresentacion"
-          label="Fecha Presentación:"
-          split-inputs
-          size="small"
-          container-class="mb-2"
-        />
-        
-        <FilterDateRange
-          v-model="filters.fechaAdmision"
-          label="Fecha Admisión:"
-          split-inputs
-          size="small"
-          container-class="mb-2"
-        />
-        
-        <FilterText
-          v-model="filters.desdePrincipal"
-          label="Desde Principal:"
-          input-type="number"
-          size="small"
-          container-class="mb-2"
-        />
-        
-        <FilterSelect
-          v-model="filters.tGestExt"
-          label="T.Gest Ext.:"
-          :options="options.tGestExtOptions.value"
-          placeholder="Sin Clasificar"
-          size="small"
-          container-class="mb-2"
-        />
-        
         <FilterMultiSelect
           v-model="filters.tipoDemanda"
           label="Tipo Demanda:"
@@ -232,15 +125,6 @@
         />
         
         <FilterMultiSelect
-          v-model="filters.conIngresos"
-          label="Con Ingresos:"
-          :options="options.conIngresosOptions.value"
-          placeholder="Todos"
-          size="small"
-          container-class="mb-2"
-        />
-        
-        <FilterMultiSelect
           v-model="filters.estadoProcedimiento"
           label="Estado Procedimiento:"
           :options="options.estadoProcedimientoOptions.value"
@@ -248,21 +132,18 @@
           size="small"
           container-class="mb-2"
         />
-        
-        <FilterText
-          v-model="filters.autos"
-          label="Autos:"
-          size="small"
-          container-class="mb-2"
-        />
-        
-        <FilterText
-          v-model="filters.autosMonitorio"
-          label="Autos Monitorio:"
-          size="small"
-          container-class="mb-2"
-        />
-        
+      </div>
+    </div>
+
+    <!-- Responsables -->
+    <div class="section-container-blue">
+      <div class="section-header-blue px-4 py-3">
+        <h3 class="text-sm font-semibold uppercase tracking-wide">
+          RESPONSABLES
+        </h3>
+      </div>
+      
+      <div class="p-4 space-y-3">
         <FilterMultiSelect
           v-model="filters.letrado"
           label="Letrado:"
@@ -280,18 +161,23 @@
           size="small"
           container-class="mb-2"
         />
+        
+        <FilterMultiSelect
+          v-model="filters.conIngresos"
+          label="Con Ingresos:"
+          :options="options.conIngresosOptions.value"
+          placeholder="Todos"
+          size="small"
+          container-class="mb-2"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import FilterSelect from '../FilterSelect.vue'
 import FilterMultiSelect from '../FilterMultiSelect.vue'
-import FilterDateRange from '../FilterDateRange.vue'
 import FilterText from '../FilterText.vue'
-import FilterDate from '../FilterDate.vue'
-import FilterNumber from '../FilterNumber.vue'
 
 defineProps({
   filters: {
@@ -307,15 +193,4 @@ defineProps({
 defineEmits(['update:filters'])
 </script>
 
-<style scoped>
-/* Asegurar que los estilos se apliquen correctamente */
-.section-container-blue {
-  background: linear-gradient(135deg, #dbeafe, #eff6ff) !important;
-}
-
-.section-header-blue {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
-  color: white !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-</style>
+<style src="../FilterPanel.styles.css"></style>

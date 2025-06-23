@@ -1,13 +1,13 @@
-/* FilterPanel.styles.css */
+/* FilterPanel.styles.css - VERSIÓN LIMPIA Y CENTRALIZADA */
 
-/* Estilos para el panel de filtros optimizado */
+/* ===== ESTRUCTURA BASE ===== */
 .filter-panel {
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
-/* Scrollbar personalizado para filtros activos */
+/* Scrollbar personalizado */
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
 }
@@ -26,12 +26,88 @@
   background: #94a3b8;
 }
 
-/* Headers con gradiente - sticky mejorado */
-.filter-panel .sticky {
-  z-index: 20;
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
 }
 
-/* Hacer inputs más pequeños globalmente dentro del FilterPanel */
+/* ===== HEADERS DE SECCIONES ===== */
+.section-header-blue,
+.section-header-green,
+.section-header-purple,
+.section-header-orange,
+.section-header-indigo {
+  color: white !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  margin: 0 !important;
+  border-radius: 0 !important;
+}
+
+.section-header-blue {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+}
+
+.section-header-green {
+  background: linear-gradient(135deg, #059669, #047857) !important;
+}
+
+.section-header-purple {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
+}
+
+.section-header-orange {
+  background: linear-gradient(135deg, #ea580c, #c2410c) !important;
+}
+
+.section-header-indigo {
+  background: linear-gradient(135deg, #4f46e5, #4338ca) !important;
+}
+
+/* ===== CONTENEDORES DE SECCIONES ===== */
+.section-container-blue,
+.section-container-green,
+.section-container-purple,
+.section-container-orange,
+.section-container-indigo {
+
+  border-radius: 0.75rem !important;
+  overflow: hidden !important;
+}
+
+.section-container-blue {
+  box-shadow: 0 1px 3px rgba(59, 130, 246, 0.1) !important;
+  background: linear-gradient(135deg, #dbeafe, #eff6ff) !important;
+}
+
+.section-container-green {
+  box-shadow: 0 1px 3px rgba(16, 185, 129, 0.1) !important;
+  background: linear-gradient(135deg, #d1fae5, #ecfdf5) !important;
+}
+
+.section-container-purple {
+  box-shadow: 0 1px 3px rgba(139, 92, 246, 0.1) !important;
+  background: linear-gradient(135deg, #e9d5ff, #f3e8ff) !important;
+}
+
+.section-container-orange {
+  box-shadow: 0 1px 3px rgba(249, 115, 22, 0.1) !important;
+  background: linear-gradient(135deg, #fed7aa, #fef3c7) !important;
+}
+
+.section-container-indigo {
+  box-shadow: 0 1px 3px rgba(99, 102, 241, 0.1) !important;
+  background: linear-gradient(135deg, #e0e7ff, #eef2ff) !important;
+}
+
+/* ===== INPUTS Y CAMPOS ===== */
+/* Tamaños compactos para todos los inputs */
+
+
+/* Contenedores de filtros */
+.filter-panel .filter-field {
+  margin-bottom: 0.5rem;
+}
+
 .filter-panel :deep(.p-inputtext),
 .filter-panel :deep(.p-select),
 .filter-panel :deep(.p-datepicker-input),
@@ -41,171 +117,11 @@
   min-height: 28px !important;
 }
 
-/* Labels más pequeños */
-.filter-panel :deep(.filter-field label) {
-  font-size: 0.75rem !important;
-  font-weight: 500 !important;
-  margin-bottom: 0.25rem !important;
-  color: #475569 !important;
-}
 
-/* Selectores múltiples más compactos */
-.filter-panel :deep(.p-select-multiple .p-select-label) {
-  padding: 0.25rem 0.5rem !important;
-  font-size: 0.75rem !important;
-}
-
-/* Botones más pequeños */
-.filter-panel :deep(.p-button-small) {
-  padding: 0.25rem 0.5rem !important;
-  font-size: 0.75rem !important;
-}
-
-/* Contenedores de filtros */
-.filter-panel .filter-field {
-  margin-bottom: 0.5rem;
-}
-
-/* Grid responsive mejorado */
-@media (min-width: 768px) {
-  .filter-panel .grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 1024px) {
-  .filter-panel .grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (min-width: 1280px) {
-  .filter-panel .grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-/* Cards de filtros con hover sutil */
-.filter-panel .bg-white {
-  transition: all 0.2s ease;
-  transform: translateZ(0);
-}
-
-.filter-panel .bg-white:hover {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-/* Headers de sección con mejor contraste */
-.filter-panel h3 {
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-/* Campos de fecha en rango - más compactos */
-.filter-panel :deep(.grid.grid-cols-2) {
-  gap: 0.5rem;
-}
-
-/* Placeholders más sutiles */
-.filter-panel :deep(.p-inputtext::placeholder),
-.filter-panel :deep(.p-select-placeholder) {
-  color: #94a3b8 !important;
-  font-size: 0.75rem !important;
-}
-
-/* Botones de limpiar en campos */
-.filter-panel :deep(.filter-field button) {
-  right: 0.5rem !important;
-}
-
-/* Optimización para pantallas pequeñas */
-@media (max-width: 640px) {
-  .filter-panel .grid {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
-  }
-  
-  .filter-panel .sticky.top-16 {
-    top: 60px;
-  }
-}
-
-/* Mejoras para el resumen de filtros activos */
-.filter-panel .custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 #f1f5f9;
-}
-
-/* Estados focus mejorados */
-.filter-panel :deep(.p-inputtext:focus),
-.filter-panel :deep(.p-select:focus) {
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
-  border-color: #3b82f6 !important;
-}
-
-/* Estilos específicos para headers de secciones */
-.section-header-blue {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
-  color: white !important;
-}
-
-.section-header-green {
-  background: linear-gradient(135deg, #059669, #047857) !important;
-  color: white !important;
-}
-
-.section-header-purple {
-  background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
-  color: white !important;
-}
-
-.section-header-orange {
-  background: linear-gradient(135deg, #ea580c, #c2410c) !important;
-  color: white !important;
-}
-
-.section-header-indigo {
-  background: linear-gradient(135deg, #4f46e5, #4338ca) !important;
-  color: white !important;
-}
-
-/* Contenedores con colores pastel correspondientes */
-.filter-panel .section-container-blue {
-  background: linear-gradient(135deg, #dbeafe, #eff6ff) !important;
-}
-
-.filter-panel .section-container-green {
-  background: linear-gradient(135deg, #d1fae5, #ecfdf5) !important;
-}
-
-.filter-panel .section-container-purple {
-  background: linear-gradient(135deg, #e9d5ff, #f3e8ff) !important;
-}
-
-.filter-panel .section-container-orange {
-  background: linear-gradient(135deg, #fed7aa, #fef3c7) !important;
-}
-
-.filter-panel .section-container-indigo {
-  background: linear-gradient(135deg, #e0e7ff, #eef2ff) !important;
-}
-
-/* Arreglar problema de botón clear y dropdown */
-.filter-panel :deep(.p-select) {
-  position: relative;
-}
-
-.filter-panel :deep(.p-select .p-select-clear-icon) {
-  right: 2.5rem !important; /* Mover botón clear para no solapar con dropdown */
-}
-
-.filter-panel :deep(.p-select .p-select-dropdown) {
-  right: 0.5rem !important;
-  z-index: 1;
-}
-
-/* Hacer selectores más pequeños */
+/* Select específico */
 .filter-panel :deep(.p-select) {
   min-height: 28px !important;
+  position: relative;
 }
 
 .filter-panel :deep(.p-select .p-select-label) {
@@ -214,7 +130,87 @@
   line-height: 1rem !important;
 }
 
-/* Animaciones para filtros activos */
+/* MultiSelect */
+.filter-panel :deep(.p-select-multiple .p-select-label) {
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.75rem !important;
+}
+
+/* Botones clear en selects */
+.filter-panel :deep(.p-select .p-select-clear-icon) {
+  right: 2.5rem !important;
+}
+
+.filter-panel :deep(.p-select .p-select-dropdown) {
+  right: 0.5rem !important;
+  z-index: 1;
+}
+
+/* Estados focus */
+.filter-panel :deep(.p-inputtext:focus),
+.filter-panel :deep(.p-select:focus) {
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+  border-color: #3b82f6 !important;
+}
+
+/* Placeholders */
+.filter-panel :deep(.p-inputtext::placeholder),
+.filter-panel :deep(.p-select-placeholder) {
+  color: #94a3b8 !important;
+  font-size: 0.75rem !important;
+}
+
+/* ===== LABELS Y CAMPOS ===== */
+.filter-panel :deep(.filter-field label) {
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+  margin-bottom: 0.25rem !important;
+  color: #475569 !important;
+}
+
+.filter-field {
+  margin-bottom: 0.5rem;
+}
+
+/* ===== BOTONES ===== */
+.filter-panel :deep(.p-button-small) {
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.75rem !important;
+}
+
+/* ===== GRID RESPONSIVE ===== */
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1280px) {
+  .grid.grid-cols-1.lg\:grid-cols-2.xl\:grid-cols-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ===== OPTIMIZACIONES MÓVIL ===== */
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .sticky.top-16 {
+    top: 60px;
+  }
+}
+
+/* ===== ANIMACIONES ===== */
+/* Filtros activos */
 .filter-active-enter-from {
   opacity: 0;
   transform: translateX(-10px);
@@ -243,11 +239,26 @@
   transition: all 0.2s ease;
 }
 
-/* Mejoras para el contador de filtros */
+/* Hover effects */
+.bg-white {
+  transition: all 0.2s ease;
+  transform: translateZ(0);
+}
+
+.bg-white:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* ===== CONTADOR DE FILTROS ===== */
 .filter-counter {
   background: linear-gradient(135deg, #3b82f6, #1d4ed8);
   box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
   animation: pulse-soft 2s infinite;
+  min-width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 @keyframes pulse-soft {
@@ -257,4 +268,14 @@
   50% {
     opacity: 0.8;
   }
+}
+
+/* ===== CAMPOS DE FECHA EN RANGO ===== */
+:deep(.grid.grid-cols-2) {
+  gap: 0.5rem;
+}
+
+
+h3 {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }

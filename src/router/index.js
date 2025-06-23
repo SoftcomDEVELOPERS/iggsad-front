@@ -25,6 +25,8 @@ const routes = [
       requiredPermission: 'landing-accessView' // ejemplo: 'expediente-readView'
     }
   },
+
+  
   // {
   //   path: '/admin',
   //   name: 'Admin',

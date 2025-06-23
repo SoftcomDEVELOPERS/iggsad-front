@@ -1,14 +1,14 @@
 <template>
   <div class="space-y-3">
     <!-- Filtros adicionales -->
-    <div class="section-container-indigo rounded-lg shadow-sm border border-indigo-200">
-      <div class="sticky top-16 section-header-indigo text-white px-3 py-2 rounded-t-lg z-20">
-        <h3 class="text-xs font-semibold uppercase tracking-wide">
+    <div class="section-container-indigo">
+      <div class="section-header-indigo px-4 py-3">
+        <h3 class="text-sm font-semibold uppercase tracking-wide">
           FILTROS ADICIONALES
         </h3>
       </div>
       
-      <div class="p-3 space-y-2">
+      <div class="p-4 space-y-3">
         <FilterText
           v-model="filters.hastaExpediente"
           label="Hasta:"
@@ -87,3 +87,16 @@ defineProps({
 
 defineEmits(['update:filters'])
 </script>
+
+<style scoped>
+/* Estilos para sección índigo */
+.section-container-indigo {
+  background: linear-gradient(135deg, #e0e7ff, #eef2ff) !important;
+}
+
+.section-header-indigo {
+  background: linear-gradient(135deg, #4f46e5, #4338ca) !important;
+  color: white !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+</style>

@@ -12,7 +12,7 @@
     :show-clear-button="showClearButton"
     :container-class="containerClass"
   >
-    <template #default="{ fieldId, value, updateValue, isDisabled, placeholder: fieldPlaceholder }">
+    <template #default="{ fieldId, value, updateValue, isDisabled, placeholder: fieldPlaceholder, showClear, onClear }">
       <InputText
         :id="fieldId"
         :model-value="value || ''"
@@ -120,3 +120,5 @@ const handleBlur = (event) => {
   emit('change', event.target.value)
 }
 </script>
+
+<style src="./FilterPanel.styles.css"></style>

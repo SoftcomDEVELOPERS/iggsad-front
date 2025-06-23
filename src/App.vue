@@ -71,14 +71,14 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-// import { useAuthStore } from '@/stores/auth'
+import { useAuthStore } from '@/stores/auth'
 import Menubar from 'primevue/menubar'
 import Button from 'primevue/button'
 import Toast from 'primevue/toast'
 
 const router = useRouter()
 const route = useRoute()
-// const auth = useAuthStore()
+const auth = useAuthStore()
 
 // Verificar si estamos en la página de login
 const isLoginPage = computed(() => route.name === 'Login')
@@ -186,8 +186,8 @@ const menuItems = ref([
 ])
 
 // Función de logout
-const logout = () => {
-  // auth.logout()
+const logout = async () => {
+  await auth.logout()
   router.push('/login')
 }
 </script>

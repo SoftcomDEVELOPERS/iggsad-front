@@ -19,18 +19,9 @@
         :placeholder="placeholder"
         :options="options"
         :size="size"
+        :showClear="showClearButton && hasValue && !disabled"
+        :onClear="clearValue"
       />
-      
-      <!-- Botón de limpiar campo -->
-      <button
-        v-if="showClearButton && modelValue && !disabled"
-        @click="clearValue"
-        class="absolute right-2 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-        type="button"
-        :title="`Limpiar ${label}`"
-      >
-        <i class="pi pi-times" :class="getSizeIconClass()"></i>
-      </button>
     </div>
     
     <!-- Mensaje de error -->
@@ -107,10 +98,21 @@ const fieldId = ref(`field-${Math.random().toString(36).substr(2, 9)}`)
 
 // Computed para determinar si el campo tiene valor
 const hasValue = computed(() => {
-  if (Array.isArray(props.modelValue)) {
-    return props.modelValue.length > 0
+  const value = props.modelValue
+  
+  if (value === null || value === undefined || value === '') {
+    return false
   }
-  return props.modelValue !== null && props.modelValue !== undefined && props.modelValue !== ''
+  
+  if (Array.isArray(value)) {
+    return value.length > 0 && value.some(v => v !== null && v !== undefined && v !== '')
+  }
+  
+  if (typeof value === 'object' && value !== null) {
+    return Object.keys(value).length > 0
+  }
+  
+  return true
 })
 
 // Métodos
@@ -131,14 +133,6 @@ const getSizeLabelClass = () => {
     case 'small': return 'text-xs mb-1'
     case 'large': return 'text-base mb-3'
     default: return 'text-sm mb-2'
-  }
-}
-
-const getSizeIconClass = () => {
-  switch (props.size) {
-    case 'small': return 'text-xs'
-    case 'large': return 'text-base'
-    default: return 'text-sm'
   }
 }
 
@@ -180,19 +174,6 @@ defineExpose({
 
 .filter-field.size-large {
   font-size: 1.125rem;
-}
-
-/* Animación para el botón de limpiar */
-.filter-field button {
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.2s ease, visibility 0.2s ease;
-}
-
-.filter-field:hover button,
-.filter-field:focus-within button {
-  opacity: 1;
-  visibility: visible;
 }
 
 /* Estados de validación */

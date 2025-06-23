@@ -343,27 +343,32 @@
       :auto-hide="false"
     />
 
-    <!-- Drawer de filtros avanzado -->
+    <!-- Drawer de filtros avanzado con tamaño dinámico -->
     <Drawer 
       v-model:visible="showFilters" 
       header="Filtros Avanzados" 
       position="bottom" 
-      class="min-h-[70vh] max-h-[85vh]"
+      :class="drawerFullscreen ? 'fullscreen-drawer' : 'normal-drawer'"
       :pt="{
         mask: { style: 'backdrop-filter: blur(2px);' },
-        root: { style: 'height: 70vh; min-height: 70vh;' },
+        root: { 
+          style: drawerFullscreen 
+            ? 'height: 95vh; min-height: 95vh;' 
+            : 'height: 75vh; min-height: 75vh;' 
+        },
         content: { style: 'height: 100%; overflow-y: auto;' }
       }"
     >
       <FilterPanel 
-        title="Filtros de Búsqueda Procesal"
         @apply-filters="handleApplyFilters"
         @clear-filters="handleClearFilters"
         @filter-change="handleFilterChange"
+        @search-expediente="handleExpedienteSearch"
+        @toggle-fullscreen="handleToggleFullscreen"
       />
     </Drawer>
   </div>
-</template>
+</template>    
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
@@ -375,13 +380,6 @@ import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import Badge from 'primevue/badge'
 import Drawer from 'primevue/drawer'
-import MultiSelect from 'primevue/multiselect'
-import Dropdown from 'primevue/dropdown'
-import Calendar from 'primevue/calendar'
-import SelectButton from 'primevue/selectbutton'
-import Accordion from 'primevue/accordion'
-import AccordionTab from 'primevue/accordiontab'
-import InputNumber from 'primevue/inputnumber'
 import Dock from '@/components/Dock.vue'
 import FilterPanel from '@/components/filters/FilterPanel.vue'
 
@@ -392,22 +390,10 @@ const searchQuery = ref('')
 const showFilters = ref(false)
 const searchResults = ref([])
 const lastAccess = ref('14 Jun 2025, 09:30')
+const drawerFullscreen = ref(false) // ✅ Nuevo estado para pantalla completa
 
 // Mensaje global del sistema
 const globalMessage = ref('Estamos a 23. Has recuperado 0,00 €. Muy lejos del objetivo de 0,00 €. Estás dando pérdidas.')
-
-// Filtros
-const filters = ref({
-  processType: [],
-  status: null,
-  dateRange: null,
-  court: null,
-  priority: [],
-  amountFrom: null,
-  amountTo: null,
-  lawyer: null,
-  clientName: ''
-})
 
 // Datos
 const stats = ref({
@@ -515,39 +501,6 @@ const dockItems = ref([
   }
 ])
 
-// Opciones para filtros
-const processTypes = ref([
-  { name: 'Civil', value: 'civil' },
-  { name: 'Penal', value: 'penal' },
-  { name: 'Mercantil', value: 'mercantil' },
-  { name: 'Familia', value: 'familia' }
-])
-
-const statusOptions = ref([
-  { name: 'Activo', value: 'active' },
-  { name: 'Pendiente', value: 'pending' },
-  { name: 'En revisión', value: 'review' },
-  { name: 'Archivado', value: 'archived' }
-])
-
-const courts = ref([
-  { name: 'Juzgado 1ª Instancia Nº 1', value: 'ji1' },
-  { name: 'Juzgado Mercantil Nº 1', value: 'jm1' },
-  { name: 'Juzgado Familia Nº 1', value: 'jf1' }
-])
-
-const priorityOptions = ref([
-  { name: 'Urgente', value: 'urgent' },
-  { name: 'Alta', value: 'high' },
-  { name: 'Normal', value: 'normal' }
-])
-
-const lawyers = ref([
-  { name: 'Ana Rodríguez', value: 'ana' },
-  { name: 'Carlos López', value: 'carlos' },
-  { name: 'Elena Martín', value: 'elena' }
-])
-
 // Computed
 const unreadNotifications = computed(() => 
   notifications.value.filter(n => !n.read).length
@@ -558,16 +511,8 @@ const unreadMessages = computed(() =>
 )
 
 const activeFiltersCount = computed(() => {
-  let count = 0
-  if (filters.value.processType.length > 0) count++
-  if (filters.value.status) count++
-  if (filters.value.dateRange) count++
-  if (filters.value.court) count++
-  if (filters.value.priority.length > 0) count++
-  if (filters.value.amountFrom || filters.value.amountTo) count++
-  if (filters.value.lawyer) count++
-  if (filters.value.clientName) count++
-  return count
+  // Este será calculado por el FilterPanel
+  return 0
 })
 
 // Métodos
@@ -637,7 +582,7 @@ const clearSearch = () => {
   searchResults.value = []
 }
 
-// Métodos para el nuevo sistema de filtros
+// ✅ Nuevos métodos para el FilterPanel
 const handleApplyFilters = (filterData) => {
   console.log('Aplicando filtros:', filterData)
   // Aquí harías la búsqueda con los filtros
@@ -652,7 +597,7 @@ const handleApplyFilters = (filterData) => {
       statusText: 'Activo'
     }
   ]
-  showFilters.value = false
+  showFilters.value = false // Cerrar drawer al aplicar
 }
 
 const handleClearFilters = () => {
@@ -663,6 +608,23 @@ const handleClearFilters = () => {
 const handleFilterChange = (filterData) => {
   console.log('Filtros cambiados:', filterData)
   // Opcional: búsqueda en tiempo real
+}
+
+// ✅ Método para búsqueda de expediente desde FilterPanel
+const handleExpedienteSearch = (expediente) => {
+  console.log('Búsqueda de expediente:', expediente)
+  if (expediente) {
+    searchQuery.value = expediente
+    performSearch()
+    // Opcional: cerrar drawer después de buscar
+    // showFilters.value = false
+  }
+}
+
+// ✅ Método para alternar pantalla completa del drawer
+const handleToggleFullscreen = (isFullscreen) => {
+  drawerFullscreen.value = isFullscreen
+  console.log('Drawer fullscreen:', isFullscreen)
 }
 
 const markAsRead = (notificationId) => {
@@ -758,4 +720,18 @@ onMounted(() => {
   overflow: hidden;
 }
 
+/* ✅ Estilos para drawer fullscreen */
+.fullscreen-drawer :deep(.p-drawer) {
+  height: 95vh !important;
+}
+
+.normal-drawer :deep(.p-drawer) {
+  height: 75vh !important;
+}
+
+/* Animaciones suaves para el cambio de tamaño */
+.fullscreen-drawer :deep(.p-drawer),
+.normal-drawer :deep(.p-drawer) {
+  transition: height 0.3s ease !important;
+}
 </style>
