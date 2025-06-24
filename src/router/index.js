@@ -19,10 +19,31 @@ const routes = [
   {
     path: '/',
     name: 'Landing Page',
-    component: () => import('@/views/LandingPage.vue'),
+    component: () => import('@/views/Dashboard.vue'),
     meta: {
       requiresAuth: true,
       requiredPermission: 'landing-accessView' // ejemplo: 'expediente-readView'
+    }
+  },
+  
+  // ✨ RUTA DE RECUPERACIÓN DE CONTRASEÑA (para reset con token del email)
+  {
+    path: '/reset-password',
+    name: 'ResetPassword',
+    component: () => import('@/views/ResetPassword.vue'),
+    meta: { requiresAuth: false },
+    beforeEnter: (to, from, next) => {
+      const auth = useAuthStore()
+      if (auth.isAuthenticated) {
+        return next({ name: 'Landing Page' })
+      }
+      
+      // Verificar que hay un token en la query
+      if (!to.query.token) {
+        return next({ name: 'Login' })
+      }
+      
+      next()
     }
   },
 

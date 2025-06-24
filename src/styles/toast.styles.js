@@ -1,30 +1,30 @@
-// styles/toast.styles.js
+// styles/toast.styles.js - Estilo profesional para gestión procesal
+
 export const applyToastStyles = () => {
   const toastStyles = document.createElement('style')
   toastStyles.id = 'gestion-procesal-toast-styles'
   toastStyles.textContent = `
-/* ===== TOAST EMPRESARIAL GESTIÓN PROCESAL ===== */
+/* ===== TOAST PROFESIONAL GESTIÓN PROCESAL ===== */
 
-/* Contenedor principal con z-index alto */
+/* Contenedor principal */
 .p-toast {
   z-index: 9999 !important;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
 }
 
-/* Mensaje principal con glassmorphism */
+/* Mensaje principal - Diseño sobrio y profesional */
 .p-toast .p-toast-message {
-  background: rgba(255, 255, 255, 0.98) !important;
-  backdrop-filter: blur(12px) !important;
-  border: 1px solid rgba(226, 232, 240, 0.8) !important;
-  border-radius: 10px !important;
+  background: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 8px !important;
   box-shadow: 
-    0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04),
-    0 0 0 1px rgba(255, 255, 255, 0.05) !important;
-  margin-bottom: 0.75rem !important;
-  padding: 1.25rem !important;
-  min-width: 320px !important;
-  max-width: 480px !important;
+    0 10px 15px -3px rgba(0, 0, 0, 0.08),
+    0 4px 6px -2px rgba(0, 0, 0, 0.04) !important;
+  margin-bottom: 0.5rem !important;
+  padding: 1rem 1.25rem !important;
+  min-width: 350px !important;
+  max-width: 450px !important;
+  backdrop-filter: none !important;
 }
 
 /* Contenido del mensaje */
@@ -34,10 +34,10 @@ export const applyToastStyles = () => {
   gap: 0.75rem !important;
 }
 
-/* Icono del mensaje */
+/* Icono del mensaje - Más discreto */
 .p-toast .p-toast-message .p-toast-message-icon {
-  width: 1.5rem !important;
-  height: 1.5rem !important;
+  width: 1.25rem !important;
+  height: 1.25rem !important;
   margin-right: 0 !important;
   margin-top: 0.125rem !important;
   flex-shrink: 0 !important;
@@ -49,140 +49,139 @@ export const applyToastStyles = () => {
   min-width: 0 !important;
 }
 
-/* Título del mensaje */
+/* Título del mensaje - Más formal */
 .p-toast .p-toast-message .p-toast-summary {
   font-weight: 600 !important;
-  font-size: 0.9375rem !important;
-  color: #111827 !important;
-  margin-bottom: 0.375rem !important;
-  line-height: 1.4 !important;
-  letter-spacing: -0.01em !important;
+  font-size: 0.875rem !important;
+  color: #1f2937 !important;
+  margin-bottom: 0.25rem !important;
+  line-height: 1.25 !important;
+  letter-spacing: 0 !important;
 }
 
 /* Detalle del mensaje */
 .p-toast .p-toast-message .p-toast-detail {
   font-size: 0.8125rem !important;
-  color: #6b7280 !important;
-  line-height: 1.5 !important;
+  color: #4b5563 !important;
+  line-height: 1.4 !important;
   margin: 0 !important;
 }
 
-/* Botón de cerrar */
+/* Botón de cerrar - Más visible */
 .p-toast .p-toast-message .p-toast-icon-close {
-  width: 1.5rem !important;
-  height: 1.5rem !important;
-  color: #9ca3af !important;
-  transition: all 0.2s ease !important;
-  border-radius: 6px !important;
+  width: 1.25rem !important;
+  height: 1.25rem !important;
+  color: #6b7280 !important;
+  transition: all 0.15s ease !important;
+  border-radius: 4px !important;
   flex-shrink: 0 !important;
-  margin-left: 0.5rem !important;
+  margin-left: 0.75rem !important;
 }
 
 .p-toast .p-toast-message .p-toast-icon-close:hover {
-  color: #6b7280 !important;
-  background-color: rgba(156, 163, 175, 0.1) !important;
-  transform: scale(1.05) !important;
+  color: #374151 !important;
+  background-color: #f3f4f6 !important;
 }
 
-/* ===== COLORES POR SEVERIDAD ===== */
+/* ===== COLORES PROFESIONALES POR SEVERIDAD ===== */
 
-/* Success - Verde empresarial */
+/* Success - Verde legal/judicial */
 .p-toast .p-toast-message-success {
-  border-left: 4px solid #10b981 !important;
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.02), rgba(255, 255, 255, 0.98)) !important;
+  border-left: 4px solid #059669 !important;
+  background: #ffffff !important;
 }
 
 .p-toast .p-toast-message-success .p-toast-message-icon {
-  color: #10b981 !important;
+  color: #059669 !important;
 }
 
 .p-toast .p-toast-message-success .p-toast-summary {
-  color: #065f46 !important;
+  color: #064e3b !important;
 }
 
-/* Info - Azul profesional */
+/* Info - Azul corporativo */
 .p-toast .p-toast-message-info {
-  border-left: 4px solid #3b82f6 !important;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.02), rgba(255, 255, 255, 0.98)) !important;
+  border-left: 4px solid #1d4ed8 !important;
+  background: #ffffff !important;
 }
 
 .p-toast .p-toast-message-info .p-toast-message-icon {
-  color: #3b82f6 !important;
+  color: #1d4ed8 !important;
 }
 
 .p-toast .p-toast-message-info .p-toast-summary {
-  color: #1e40af !important;
+  color: #1e3a8a !important;
 }
 
-/* Warning - Ámbar corporativo */
+/* Warning - Naranja profesional (alertas legales) */
 .p-toast .p-toast-message-warn {
-  border-left: 4px solid #f59e0b !important;
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.02), rgba(255, 255, 255, 0.98)) !important;
+  border-left: 4px solid #d97706 !important;
+  background: #ffffff !important;
 }
 
 .p-toast .p-toast-message-warn .p-toast-message-icon {
-  color: #f59e0b !important;
+  color: #d97706 !important;
 }
 
 .p-toast .p-toast-message-warn .p-toast-summary {
   color: #92400e !important;
 }
 
-/* Error - Rojo empresarial */
+/* Error - Rojo serio (errores críticos) */
 .p-toast .p-toast-message-error {
-  border-left: 4px solid #ef4444 !important;
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.02), rgba(255, 255, 255, 0.98)) !important;
+  border-left: 4px solid #dc2626 !important;
+  background: #ffffff !important;
 }
 
 .p-toast .p-toast-message-error .p-toast-message-icon {
-  color: #ef4444 !important;
+  color: #dc2626 !important;
 }
 
 .p-toast .p-toast-message-error .p-toast-summary {
   color: #991b1b !important;
 }
 
-/* ===== ANIMACIONES EMPRESARIALES ===== */
+/* ===== ANIMACIONES DISCRETAS ===== */
 
-/* Entrada suave */
+/* Entrada sutil */
 .p-toast .p-toast-message {
-  animation: toastSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  animation: toastSlideInProfessional 0.3s ease-out !important;
 }
 
-@keyframes toastSlideIn {
+@keyframes toastSlideInProfessional {
   from {
     opacity: 0;
-    transform: translateX(100%) scale(0.95);
+    transform: translateX(50px);
   }
   to {
     opacity: 1;
-    transform: translateX(0) scale(1);
+    transform: translateX(0);
   }
 }
 
 /* Salida suave */
 .p-toast .p-toast-message.p-toast-message-leave {
-  animation: toastSlideOut 0.3s ease-in forwards !important;
+  animation: toastSlideOutProfessional 0.25s ease-in forwards !important;
 }
 
-@keyframes toastSlideOut {
+@keyframes toastSlideOutProfessional {
   from {
     opacity: 1;
-    transform: translateX(0) scale(1);
+    transform: translateX(0);
   }
   to {
     opacity: 0;
-    transform: translateX(100%) scale(0.95);
+    transform: translateX(50px);
   }
 }
 
-/* ===== RESPONSIVE ===== */
+/* ===== RESPONSIVE PROFESIONAL ===== */
 
 /* Móvil */
 @media (max-width: 640px) {
   .p-toast {
-    left: 0.5rem !important;
-    right: 0.5rem !important;
+    left: 0.75rem !important;
+    right: 0.75rem !important;
     top: 1rem !important;
   }
   
@@ -190,11 +189,11 @@ export const applyToastStyles = () => {
     min-width: auto !important;
     max-width: none !important;
     margin-bottom: 0.5rem !important;
-    padding: 1rem !important;
+    padding: 0.875rem 1rem !important;
   }
   
   .p-toast .p-toast-summary {
-    font-size: 0.875rem !important;
+    font-size: 0.8125rem !important;
   }
   
   .p-toast .p-toast-detail {
@@ -205,60 +204,8 @@ export const applyToastStyles = () => {
 /* Tablet */
 @media (min-width: 641px) and (max-width: 1024px) {
   .p-toast .p-toast-message {
-    min-width: 280px !important;
-    max-width: 400px !important;
-  }
-}
-
-/* ===== MODO OSCURO (OPCIONAL) ===== */
-@media (prefers-color-scheme: dark) {
-  .p-toast .p-toast-message {
-    background: rgba(31, 41, 55, 0.98) !important;
-    border-color: rgba(75, 85, 99, 0.8) !important;
-  }
-  
-  .p-toast .p-toast-summary {
-    color: #f9fafb !important;
-  }
-  
-  .p-toast .p-toast-detail {
-    color: #d1d5db !important;
-  }
-  
-  .p-toast .p-toast-icon-close {
-    color: #9ca3af !important;
-  }
-  
-  .p-toast .p-toast-icon-close:hover {
-    color: #d1d5db !important;
-    background-color: rgba(156, 163, 175, 0.2) !important;
-  }
-}
-
-/* ===== HIGH CONTRAST ===== */
-@media (prefers-contrast: high) {
-  .p-toast .p-toast-message {
-    border-width: 2px !important;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
-  }
-  
-  .p-toast .p-toast-summary {
-    font-weight: 700 !important;
-  }
-}
-
-/* ===== REDUCED MOTION ===== */
-@media (prefers-reduced-motion: reduce) {
-  .p-toast .p-toast-message {
-    animation: none !important;
-  }
-  
-  .p-toast .p-toast-message.p-toast-message-leave {
-    animation: none !important;
-  }
-  
-  .p-toast .p-toast-icon-close {
-    transition: none !important;
+    min-width: 320px !important;
+    max-width: 420px !important;
   }
 }
 `
@@ -266,39 +213,15 @@ export const applyToastStyles = () => {
   // Solo agregar si no existe ya
   if (!document.getElementById('gestion-procesal-toast-styles')) {
     document.head.appendChild(toastStyles)
-    console.log('✅ Estilos de Toast empresarial aplicados')
+    console.log('✅ Estilos de Toast profesional aplicados')
   }
 }
 
-// Función para remover los estilos (útil para testing o hot reload)
+// Función para remover los estilos
 export const removeToastStyles = () => {
   const existingStyles = document.getElementById('gestion-procesal-toast-styles')
   if (existingStyles) {
     existingStyles.remove()
     console.log('🗑️ Estilos de Toast removidos')
   }
-}
-
-// Configuración de toast por defecto para la aplicación
-export const defaultToastConfig = {
-  position: 'top-right',
-  life: 4000,
-  closable: true,
-  breakpoints: {
-    '640px': {
-      position: 'top-center',
-      life: 3000
-    }
-  }
-}
-
-// Función helper para mostrar toasts consistentes
-export const showToast = (toast, { severity = 'info', summary, detail, life = 4000 }) => {
-  toast.add({
-    severity,
-    summary,
-    detail,
-    life,
-    closable: true
-  })
 }

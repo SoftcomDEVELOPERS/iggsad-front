@@ -157,7 +157,7 @@ const applyFilters = async () => {
       'Filtros aplicados',
       'La búsqueda se ha realizado correctamente'
     )
-    // ✅ Emitir evento para que LandingPage se sincronice
+    // ✅ Emitir evento para que Dashboard se sincronice
     emit('apply-filters', filters.value)
     
     console.log('✅ Filtros aplicados desde FilterPanel correctamente')
@@ -187,7 +187,7 @@ const searchExpediente = async () => {
       // ✅ Usar el store para buscar por expediente específico
       await expedientesStore.searchExpedientes(filters.value, expedienteSearch.value.trim())
       
-      // ✅ Emitir evento para sincronizar con LandingPage
+      // ✅ Emitir evento para sincronizar con Dashboard
       emit('search-expediente', expedienteSearch.value.trim())
       
       console.log('✅ Búsqueda desde FilterPanel realizada:', expedienteSearch.value.trim())

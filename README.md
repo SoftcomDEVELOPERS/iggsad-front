@@ -36,7 +36,7 @@ front/
 │  │   └─ filters/sections/FilterSection*.vue   # Secciones de filtro reutilizables  
 │  ├─ views/              #  
 │  │   ├─ Login.vue            # Formulario de login  
-│  │   └─ LandingPage.vue      # Dashboard / página principal  
+│  │   └─ Dashboard.vue      # Dashboard / página principal  
 │  └─ style.css           # Estilos globales adicionales  
 └─ .git/                  # Control de versiones (hooks, configuración…)  
 ```

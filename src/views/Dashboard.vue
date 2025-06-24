@@ -46,7 +46,7 @@
           label="Filtros"
           @click="toggleFilters"
           :badge="totalActiveFilters > 0 ? totalActiveFilters.toString() : null"
-          :severity="totalActiveFilters > 0 ? 'secondary' : undefined"
+          :severity="totalActiveFilters > 0 ? 'primary' : undefined"
           :outlined="totalActiveFilters === 0"
         />
         <Button 
@@ -605,7 +605,7 @@ const performSearch = async () => {
   }
   
   try {
-    console.log('🔍 Iniciando búsqueda desde LandingPage:', expedienteQuery.trim())
+    console.log('🔍 Iniciando búsqueda desde Dashboard:', expedienteQuery.trim())
     
     // ✅ NO actualizar persistentExpedienteSearch aquí si ya está igual
     if (persistentExpedienteSearch.value !== expedienteQuery.trim()) {
@@ -625,10 +625,10 @@ const performSearch = async () => {
     }))
     
     addToRecentSearches(expedienteQuery.trim())
-    console.log('✅ Búsqueda desde LandingPage completada:', searchResults.value.length)
+    console.log('✅ Búsqueda desde Dashboard completada:', searchResults.value.length)
     
   } catch (error) {
-    console.error('❌ Error en búsqueda desde LandingPage:', error)
+    console.error('❌ Error en búsqueda desde Dashboard:', error)
     searchResults.value = []
   }
 }

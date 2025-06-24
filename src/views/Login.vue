@@ -25,7 +25,7 @@
         </template>
         
         <template #content>
-          <div class="px-4 sm:px-6 py-6 sm:py-8">
+          <div class="px-4 sm:px-6 py-6 sm:py-8 flex justify-center">
             <LoginForm />
           </div>
         </template>

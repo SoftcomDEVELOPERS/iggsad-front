@@ -62,11 +62,7 @@
           variant="simple"
           class="mt-1"
         >
-          <ul class="my-0 px-4 space-y-1 text-sm">
-            <li v-for="(error, index) in $form.password.errors" :key="index">
-              {{ error.message }}
-            </li>
-          </ul>
+          {{ $form.password.error.message }}
         </Message>
       </div>
 
@@ -105,7 +101,6 @@
       
       <!-- Información -->
       <div class="text-center mb-6">
-        <i class="pi pi-envelope text-3xl text-primary-600 mb-3"></i>
         <h3 class="text-lg font-semibold text-slate-800 mb-2">
           Recuperar Contraseña
         </h3>
@@ -197,16 +192,11 @@ const resetValues = ref({
   email: ''
 })
 
-// Resolver para login
+// Resolver para login - SIN validaciones complejas
 const loginResolver = zodResolver(
   z.object({
     email: z.string().min(1, { message: 'Usuario es requerido.' }),
-    password: z
-      .string()
-      .min(3, { message: 'Mínimo 3 caracteres.' })
-      .refine(v => /[a-z]/.test(v), { message: 'Al menos una letra minúscula.' })
-      .refine(v => /[A-Z]/.test(v), { message: 'Al menos una letra mayúscula.' })
-      .refine(v => /\d/.test(v), { message: 'Al menos un número.' })
+    password: z.string().min(1, { message: 'Contraseña es requerida.' })
   })
 )
 
@@ -240,7 +230,6 @@ async function onLoginSubmit(event) {
   // Validar evento
   if (!event || !event.valid || !event.values) {
     console.warn('⚠️ Evento inválido:', event)
-
     showWarn('Datos inválidos', 'Por favor complete todos los campos correctamente')
     return
   }
@@ -250,7 +239,6 @@ async function onLoginSubmit(event) {
   if (!email || !password) {
     console.warn('⚠️ Valores vacíos detectados:', event.values)
     showWarn('Campos requeridos', 'Usuario y contraseña son obligatorios')
-
     return
   }
 
@@ -312,7 +300,6 @@ async function onResetSubmit(event) {
   // Validar evento
   if (!event || !event.valid || !event.values?.email) {
     console.warn('⚠️ Evento inválido o email vacío:', event)
-
     showWarn('Email requerido', 'Por favor ingrese un email válido')
     return
   }
@@ -322,26 +309,35 @@ async function onResetSubmit(event) {
   try {
     isResetLoading.value = true
     
-    // TODO: Reemplazar con tu servicio real de reset password
-    // await authService.resetPassword(event.values.email)
-    
-    // Simular llamada a API por ahora
-    await new Promise(resolve => setTimeout(resolve, 1500))
+    // ✅ Usar el store para mantener consistencia
+    const response = await auth.requestPasswordReset(event.values.email)
     
     console.log('✅ Enlace de recuperación enviado')
     
-    // Mostrar mensaje de éxito
-    showSuccess('Enlace enviado', `Revisa tu correo ${event.values.email} para continuar`)
+    // ✨ Usar el mensaje del backend
+    showSuccess(
+      'Enlace enviado', 
+      response.message || `Hemos enviado las instrucciones de recuperación a ${event.values.email}`
+    )
+    
     // Volver al modo login después de un tiempo
     setTimeout(() => {
       isResetMode.value = false
       resetValues.value.email = '' // Limpiar campo
-    }, 2000)
+    }, 3000)
     
   } catch (error) {
     console.error('❌ Error en reset:', error)
     
-    showError('Error al enviar', error.message || 'No se pudo enviar el enlace de recuperación')
+    // ✨ Usar el mensaje del backend si está disponible
+    let errorMessage = error.message || 'No se pudo enviar el enlace de recuperación'
+    
+    // Fallback para errores de conexión
+    if (error.message && error.message.includes('Network') || error.message.includes('fetch')) {
+      errorMessage = 'Error de conexión con el servidor'
+    }
+    
+    showError('Error al enviar', errorMessage)
   } finally {
     isResetLoading.value = false
   }
@@ -387,5 +383,19 @@ async function onResetSubmit(event) {
 :deep(.p-password-input:disabled) {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* Animación suave para el icono del modo reset */
+.pi-envelope {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
 </style>
