@@ -172,7 +172,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import { z } from 'zod'
-import { useToast } from 'primevue/usetoast'
+import { useToast } from '@/composables/useToast'
 
 // PrimeVue components
 import InputText from 'primevue/inputtext'
@@ -223,7 +223,7 @@ const resetResolver = zodResolver(
 // Composables
 const router = useRouter()
 const auth = useAuthStore()
-const toast = useToast()
+const { showWarn, showError, showSuccess } = useToast()
 
 // Funciones de manejo
 function toggleResetMode() {
@@ -240,12 +240,8 @@ async function onLoginSubmit(event) {
   // Validar evento
   if (!event || !event.valid || !event.values) {
     console.warn('⚠️ Evento inválido:', event)
-    toast.add({ 
-      severity: 'warn', 
-      summary: 'Datos inválidos', 
-      detail: 'Por favor complete todos los campos correctamente',
-      life: 3000 
-    })
+
+    showWarn('Datos inválidos', 'Por favor complete todos los campos correctamente')
     return
   }
 
@@ -253,12 +249,8 @@ async function onLoginSubmit(event) {
   const { email, password } = event.values
   if (!email || !password) {
     console.warn('⚠️ Valores vacíos detectados:', event.values)
-    toast.add({ 
-      severity: 'warn', 
-      summary: 'Campos requeridos', 
-      detail: 'Usuario y contraseña son obligatorios',
-      life: 3000 
-    })
+    showWarn('Campos requeridos', 'Usuario y contraseña son obligatorios')
+
     return
   }
 
@@ -273,12 +265,7 @@ async function onLoginSubmit(event) {
     console.log('✅ Login exitoso, cookies establecidas por el backend')
     
     // Mostrar mensaje de éxito
-    toast.add({ 
-      severity: 'success', 
-      summary: 'Acceso exitoso', 
-      detail: `Bienvenido, ${auth.user?.firstName || auth.user?.username || 'Usuario'}`,
-      life: 3000 
-    })
+    showSuccess('Acceso exitoso', `Bienvenido, ${auth.user?.firstName || auth.user?.username || 'Usuario'}`)
     
     // Pequeña pausa para que el usuario vea el mensaje
     await new Promise(resolve => setTimeout(resolve, 500))
@@ -303,12 +290,7 @@ async function onLoginSubmit(event) {
     }
     
     // Mostrar mensaje de error
-    toast.add({ 
-      severity: 'error', 
-      summary: 'Error de acceso', 
-      detail: errorMessage, 
-      life: 5000 
-    })
+    showError('Error de acceso', errorMessage)
     
     // Limpiar formulario en caso de error de credenciales
     if (errorMessage.includes('incorrectos')) {
@@ -330,12 +312,8 @@ async function onResetSubmit(event) {
   // Validar evento
   if (!event || !event.valid || !event.values?.email) {
     console.warn('⚠️ Evento inválido o email vacío:', event)
-    toast.add({ 
-      severity: 'warn', 
-      summary: 'Email requerido', 
-      detail: 'Por favor ingrese un email válido',
-      life: 3000 
-    })
+
+    showWarn('Email requerido', 'Por favor ingrese un email válido')
     return
   }
 
@@ -353,13 +331,7 @@ async function onResetSubmit(event) {
     console.log('✅ Enlace de recuperación enviado')
     
     // Mostrar mensaje de éxito
-    toast.add({ 
-      severity: 'success', 
-      summary: 'Enlace enviado', 
-      detail: `Se ha enviado un enlace de recuperación a ${event.values.email}`,
-      life: 5000 
-    })
-    
+    showSuccess('Enlace enviado', `Revisa tu correo ${event.values.email} para continuar`)
     // Volver al modo login después de un tiempo
     setTimeout(() => {
       isResetMode.value = false
@@ -369,12 +341,7 @@ async function onResetSubmit(event) {
   } catch (error) {
     console.error('❌ Error en reset:', error)
     
-    toast.add({ 
-      severity: 'error', 
-      summary: 'Error al enviar', 
-      detail: error.message || 'No se pudo enviar el enlace de recuperación',
-      life: 5000 
-    })
+    showError('Error al enviar', error.message || 'No se pudo enviar el enlace de recuperación')
   } finally {
     isResetLoading.value = false
   }

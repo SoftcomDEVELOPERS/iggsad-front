@@ -18,6 +18,8 @@ import { Form } from '@primevue/forms';
 // Toast
 import ToastService from 'primevue/toastservice'
 import Toast from 'primevue/toast'
+import { applyToastStyles, defaultToastConfig } from '@/styles/toast.styles.js'
+
 // Otros componentes
 import Message from 'primevue/message';
 import IconField from 'primevue/iconfield';
@@ -54,7 +56,12 @@ app.component('Message', Message)
 app.component('Toast', Toast)
 app.component('IconField', IconField)
 app.component('InputIcon', InputIcon)
-app.use(ToastService)
+
+// Configurar ToastService con configuración empresarial
+app.use(ToastService, defaultToastConfig)
+
+// Aplicar estilos empresariales
+applyToastStyles()
 
 // Conectar router y montar tras estar listo
 app.use(router)

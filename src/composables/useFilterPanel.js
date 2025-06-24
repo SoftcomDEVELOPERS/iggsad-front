@@ -168,6 +168,22 @@ export function useFilterPanel() {
     return String(value)
   }
 
+  // ✅ Función para contar filtros activos
+  const countActiveFilters = (filtersObj) => {
+    let count = 0
+    Object.entries(filtersObj).forEach(([key, value]) => {
+      if (value !== null && value !== '' && value !== undefined) {
+        if (Array.isArray(value)) {
+          const validItems = value.filter(v => v !== null && v !== '' && v !== undefined)
+          if (validItems.length > 0) count++
+        } else {
+          count++
+        }
+      }
+    })
+    return count
+  }
+
   const clearFilter = (key, emit) => {
     if (Array.isArray(filters.value[key])) {
       // Si es un array de fechas, resetear a [null, null]
@@ -247,6 +263,7 @@ export function useFilterPanel() {
     activeFilters,
     getFilterLabel,
     getFilterValue,
+    countActiveFilters,  
     clearFilter,
     clearAllFilters,
     applyFilters,

@@ -1,14 +1,14 @@
-/* FilterPanel.styles.css - VERSIÓN ULTRA COMPACTA PARA GESTIÓN JUDICIAL */
+/* FilterPanel.styles.css - VERSIÓN LIMPIA Y ORGANIZADA */
 
 /* ===== ESTRUCTURA BASE ===== */
 .filter-panel {
   height: 100%;
   display: flex;
   flex-direction: column;
-  font-size: 0.75rem; /* Tamaño base más pequeño */
+  font-size: 0.75rem;
 }
 
-/* Scrollbar personalizado más delgado */
+/* ===== SCROLLBAR PERSONALIZADO ===== */
 .custom-scrollbar::-webkit-scrollbar {
   width: 3px;
 }
@@ -32,7 +32,7 @@
   scrollbar-color: #cbd5e1 #f1f5f9;
 }
 
-/* ===== HEADERS DE SECCIONES MÁS COMPACTOS ===== */
+/* ===== HEADERS DE SECCIONES ===== */
 .section-header-blue,
 .section-header-green,
 .section-header-purple,
@@ -42,7 +42,7 @@
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   margin: 0 !important;
   border-radius: 0 !important;
-  padding: 0.5rem 1rem !important; /* Reducido de 0.75rem */
+  padding: 0.5rem 1rem !important;
 }
 
 .section-header-blue {
@@ -65,28 +65,28 @@
   background: linear-gradient(135deg, #4f46e5, #4338ca) !important;
 }
 
-/* Títulos de sección más pequeños */
+/* Títulos de sección */
 .section-header-blue h3,
 .section-header-green h3,
 .section-header-purple h3,
 .section-header-orange h3,
 .section-header-indigo h3 {
-  font-size: 0.65rem !important; /* Muy pequeño */
+  font-size: 0.65rem !important;
   font-weight: 600 !important;
   letter-spacing: 0.05em !important;
   margin: 0 !important;
   text-transform: uppercase;
 }
 
-/* ===== CONTENEDORES DE SECCIONES MÁS COMPACTOS ===== */
+/* ===== CONTENEDORES DE SECCIONES ===== */
 .section-container-blue,
 .section-container-green,
 .section-container-purple,
 .section-container-orange,
 .section-container-indigo {
-  border-radius: 0.5rem !important; /* Reducido */
+  border-radius: 0.5rem !important;
   overflow: hidden !important;
-  margin-bottom: 0.75rem !important; /* Reducido */
+  margin-bottom: 0.75rem !important;
 }
 
 .section-container-blue {
@@ -114,55 +114,50 @@
   background: linear-gradient(135deg, #e0e7ff, #eef2ff) !important;
 }
 
-/* Padding interno de secciones más compacto */
+/* Padding interno de secciones */
 .section-container-blue > div:last-child,
 .section-container-green > div:last-child,
 .section-container-purple > div:last-child,
 .section-container-orange > div:last-child,
 .section-container-indigo > div:last-child {
-  padding: 0.75rem !important; /* Reducido de 1rem */
+  padding: 0.75rem !important;
 }
 
-/* ===== INPUTS Y CAMPOS ULTRA COMPACTOS ===== */
-/* Forzar tamaño en PrimeVue */
-.filter-panel :deep(.p-component) {
-  font-size: 0.7rem !important;
-}
-
-
-.filter-panel :deep(.p-inputtext),
-.filter-panel :deep(.p-select .p-select-label),
-.filter-panel :deep(.p-datepicker-input),
-.filter-panel :deep(.p-inputnumber-input) {
+/* ===== INPUTS Y CAMPOS COMPACTOS ===== */
+.filter-panel .p-inputtext,
+.filter-panel .p-select,
+.filter-panel .p-datepicker-input,
+.filter-panel .p-inputnumber-input,
+.filter-panel .p-component input {
   height: 24px !important;
   min-height: 24px !important;
   padding: 0.25rem 0.4rem !important;
   font-size: 0.7rem !important;
   line-height: 1.2 !important;
+  border-radius: 4px !important;
 }
 
-/* Select específico más compacto */
-.filter-panel :deep(.p-select) {
-  height: 24px !important;
+/* Select específico */
+.filter-panel .p-select {
   min-height: 24px !important;
 }
 
-.filter-panel :deep(.p-select .p-select-label) {
+.filter-panel .p-select .p-select-label {
   padding: 0.25rem 2rem 0.25rem 0.4rem !important;
   font-size: 0.7rem !important;
   line-height: 1.2 !important;
   min-height: 20px !important;
 }
 
-/* MultiSelect más compacto */
-.filter-panel :deep(.p-select-multiple .p-select-label) {
+/* MultiSelect */
+.filter-panel .p-select-multiple .p-select-label {
   padding: 0.2rem 0.4rem !important;
   font-size: 0.7rem !important;
   min-height: 20px !important;
 }
 
-/* Chips en MultiSelect más pequeños */
-.filter-panel :deep(.p-select-multiple .p-select-label .p-chip) {
+/* Chips en MultiSelect */
+.filter-panel .p-select-multiple .p-select-label .p-chip {
   font-size: 0.65rem !important;
   padding: 0.1rem 0.3rem !important;
   margin: 0.05rem !important;
@@ -170,114 +165,113 @@
   min-height: 16px !important;
 }
 
-/* Iconos de clear y dropdown más pequeños */
-.filter-panel :deep(.p-select .p-select-clear-icon) {
+/* Iconos y controles */
+.filter-panel .p-select .p-select-clear-icon {
   right: 1.8rem !important;
   font-size: 0.65rem !important;
 }
 
-.filter-panel :deep(.p-select .p-select-dropdown) {
+.filter-panel .p-select .p-select-dropdown {
   right: 0.3rem !important;
   font-size: 0.65rem !important;
   width: 1.5rem !important;
-  height: 22px !important
+  height: 22px !important;
 }
 
-/* DatePicker más compacto */
-.filter-panel :deep(.p-datepicker-input) {
+/* DatePicker */
+.filter-panel .p-datepicker-input {
   padding-right: 1.8rem !important;
 }
 
-.filter-panel :deep(.p-datepicker .p-datepicker-trigger) {
+.filter-panel .p-datepicker .p-datepicker-trigger {
   right: 0.3rem !important;
   width: 1.2rem !important;
   height: 1.2rem !important;
   font-size: 0.65rem !important;
 }
 
-/* InputNumber más compacto */
-.filter-panel :deep(.p-inputnumber .p-inputnumber-buttons) {
+/* InputNumber */
+.filter-panel .p-inputnumber .p-inputnumber-buttons {
   width: 1.2rem !important;
 }
 
-.filter-panel :deep(.p-inputnumber .p-inputnumber-button) {
+.filter-panel .p-inputnumber .p-inputnumber-button {
   width: 1.2rem !important;
   height: 0.6rem !important;
   font-size: 0.6rem !important;
 }
 
-/* Estados focus más sutiles */
-.filter-panel :deep(.p-inputtext:focus),
-.filter-panel :deep(.p-select:focus) {
-  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.3) !important; /* Más sutil */
+/* Estados focus */
+.filter-panel .p-inputtext:focus,
+.filter-panel .p-select:focus {
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.3) !important;
   border-color: #3b82f6 !important;
   outline: none !important;
 }
 
-/* Placeholders más pequeños */
-.filter-panel :deep(.p-inputtext::placeholder),
-.filter-panel :deep(.p-select-placeholder) {
+/* Placeholders */
+.filter-panel .p-inputtext::placeholder,
+.filter-panel .p-select-placeholder {
   color: #9ca3af !important;
   font-size: 0.7rem !important;
   font-style: italic;
 }
 
-/* ===== LABELS Y CAMPOS MÁS COMPACTOS ===== */
-.filter-panel :deep(.filter-field label) {
-  font-size: 0.65rem !important; /* Muy pequeño */
+/* ===== LABELS Y CAMPOS ===== */
+.filter-panel .filter-field label {
+  font-size: 0.65rem !important;
   font-weight: 500 !important;
-  margin-bottom: 0.15rem !important; /* Muy reducido */
+  margin-bottom: 0.15rem !important;
   color: #374151 !important;
   line-height: 1.2 !important;
 }
 
 .filter-field {
-  margin-bottom: 0.4rem !important; /* Muy reducido */
+  margin-bottom: 0.4rem !important;
 }
 
-/* Espaciado entre campos en secciones */
+/* Espaciado entre campos */
 .space-y-3 > * + * {
-  margin-top: 0.4rem !important; /* Reducido de 0.75rem */
+  margin-top: 0.4rem !important;
 }
 
-/* ===== BOTONES MÁS COMPACTOS ===== */
-.filter-panel :deep(.p-button-small) {
+/* ===== BOTONES ===== */
+.filter-panel .p-button-small {
   padding: 0.2rem 0.4rem !important;
   font-size: 0.65rem !important;
   min-height: 24px !important;
   line-height: 1.2 !important;
 }
 
-.filter-panel :deep(.p-button-small .p-button-icon) {
+.filter-panel .p-button-small .p-button-icon {
   font-size: 0.65rem !important;
   margin-right: 0.2rem !important;
 }
 
-/* Botones de clear en campos */
-.filter-panel :deep(.p-button-text) {
+.filter-panel .p-button-text {
   padding: 0.1rem !important;
   min-height: 16px !important;
   width: 16px !important;
 }
 
-/* ===== GRID MÁS COMPACTO ===== */
+/* ===== GRID ===== */
 .filter-panel .grid {
-  gap: 0.75rem !important; /* Reducido */
+  gap: 0.75rem !important;
 }
 
-/* ===== CONTENEDOR STICKY HEADER MÁS COMPACTO ===== */
+/* ===== HEADER STICKY ===== */
 .filter-panel .sticky {
-  padding: 0.75rem !important; /* Reducido */
+  padding: 0.75rem !important;
   border-bottom: 1px solid #e5e7eb !important;
 }
 
 .filter-panel .sticky h2 {
-  font-size: 0.9rem !important; /* Más pequeño */
+  font-size: 0.9rem !important;
   font-weight: 600 !important;
   margin-bottom: 0.5rem !important;
 }
 
-/* Input de búsqueda rápida más compacto */
+/* Input de búsqueda rápida */
 .filter-panel .sticky .p-inputtext {
   padding: 0.3rem 0.5rem !important;
   padding-left: 2rem !important;
@@ -287,71 +281,16 @@
 }
 
 .filter-panel .sticky label {
-  font-size: 0.65rem !important;
-  margin-bottom: 0.2rem !important;
+  font-size: 0.80rem !important;
+  margin-bottom: 0.4rem !important;
 }
 
-/* ===== OPTIMIZACIONES MÓVIL MÁS COMPACTAS ===== */
-@media (max-width: 640px) {
-  .grid {
-    grid-template-columns: 1fr;
-    gap: 0.5rem !important;
-  }
-  
-  .filter-panel :deep(.p-inputtext),
-  .filter-panel :deep(.p-select) {
-    min-height: 22px !important;
-    font-size: 0.65rem !important;
-  }
-  
-  .filter-panel :deep(.filter-field label) {
-    font-size: 0.6rem !important;
-  }
-  
-  .section-header-blue h3,
-  .section-header-green h3,
-  .section-header-purple h3,
-  .section-header-orange h3,
-  .section-header-indigo h3 {
-    font-size: 0.6rem !important;
-  }
-}
-
-/* ===== ANIMACIONES SUTILES ===== */
-.filter-active-enter-from {
-  opacity: 0;
-  transform: translateX(-5px);
-}
-
-.filter-active-enter-to {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-.filter-active-enter-active {
-  transition: all 0.15s ease;
-}
-
-.filter-active-leave-from {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-.filter-active-leave-to {
-  opacity: 0;
-  transform: translateX(5px);
-}
-
-.filter-active-leave-active {
-  transition: all 0.15s ease;
-}
-
-/* ===== CAMPOS DE FECHA EN RANGO MÁS COMPACTOS ===== */
-:deep(.grid.grid-cols-2) {
+/* ===== CAMPOS DE FECHA EN RANGO ===== */
+.grid.grid-cols-2 {
   gap: 0.3rem !important;
 }
 
-:deep(.grid.grid-cols-1.md\:grid-cols-2) {
+.grid.grid-cols-1.md\:grid-cols-2 {
   gap: 0.2rem !important;
 }
 
@@ -362,7 +301,7 @@
   color: #6b7280 !important;
 }
 
-/* ===== PANEL FLOTANTE DE FILTROS ACTIVOS MÁS COMPACTO ===== */
+/* ===== PANEL FLOTANTE DE FILTROS ACTIVOS ===== */
 .floating-filters-panel {
   font-size: 0.7rem !important;
 }
@@ -394,39 +333,23 @@
   font-weight: 700 !important;
 }
 
-/* ===== MEJORAS ESPECÍFICAS PARA GESTIÓN JUDICIAL ===== */
-/* Campos críticos con énfasis visual sutil */
+/* ===== CAMPOS CRÍTICOS Y TIPOS DE DATOS ===== */
 .filter-field[data-critical="true"] label {
   color: #dc2626 !important;
   font-weight: 600 !important;
 }
 
-.filter-field[data-critical="true"] :deep(.p-inputtext),
-.filter-field[data-critical="true"] :deep(.p-select) {
+.filter-field[data-critical="true"] .p-inputtext,
+.filter-field[data-critical="true"] .p-select {
   border-left: 2px solid #dc2626 !important;
 }
 
-/* Campos de fecha con indicador visual */
-.filter-field[data-type="date"] :deep(.p-inputtext) {
+.filter-field[data-type="date"] .p-inputtext {
   background: linear-gradient(90deg, #fefce8 0%, #ffffff 8%) !important;
 }
 
-/* Campos numéricos con indicador visual */
-.filter-field[data-type="number"] :deep(.p-inputtext) {
+.filter-field[data-type="number"] .p-inputtext {
   background: linear-gradient(90deg, #f0f9ff 0%, #ffffff 8%) !important;
-}
-
-/* Mejoras de accesibilidad */
-.filter-panel :deep(.p-inputtext:focus),
-.filter-panel :deep(.p-select:focus) {
-  position: relative;
-  z-index: 2;
-}
-
-/* Transiciones más rápidas para mejor UX */
-.filter-panel :deep(.p-inputtext),
-.filter-panel :deep(.p-select) {
-  transition: all 0.1s ease !important;
 }
 
 /* ===== BOTONES DE ACCIÓN PRINCIPALES ===== */
@@ -441,32 +364,361 @@
   margin-right: 0.25rem !important;
 }
 
-/* ===== ESTILOS ESPECÍFICOS PARA DRAWERS EN PANTALLA COMPLETA ===== */
-.fullscreen-drawer .filter-panel .grid {
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
-  gap: 0.75rem !important;
+/* ===== RESPONSIVE MÓVIL ===== */
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem !important;
+  }
+  
+  .filter-panel .p-inputtext,
+  .filter-panel .p-select {
+    min-height: 22px !important;
+    font-size: 0.65rem !important;
+  }
+  
+  .filter-panel .filter-field label {
+    font-size: 0.6rem !important;
+  }
+  
+  .section-header-blue h3,
+  .section-header-green h3,
+  .section-header-purple h3,
+  .section-header-orange h3,
+  .section-header-indigo h3 {
+    font-size: 0.6rem !important;
+  }
 }
 
-.normal-drawer .filter-panel .grid {
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
-  gap: 0.5rem !important;
+/* ===== ANIMACIONES ===== */
+.filter-active-enter-from {
+  opacity: 0;
+  transform: translateX(-5px);
 }
 
-/* ===== MEJORAS DE RENDIMIENTO ===== */
-/* Evitar reflows innecesarios */
-.filter-panel :deep(.p-inputtext),
-.filter-panel :deep(.p-select) {
+.filter-active-enter-to {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.filter-active-enter-active {
+  transition: all 0.15s ease;
+}
+
+.filter-active-leave-from {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.filter-active-leave-to {
+  opacity: 0;
+  transform: translateX(5px);
+}
+
+.filter-active-leave-active {
+  transition: all 0.15s ease;
+}
+
+/* ===== CORRECCIONES ESPECÍFICAS ===== */
+
+/* Centrar placeholder verticalmente */
+.filter-panel .p-inputtext::placeholder,
+.filter-panel .p-select-placeholder {
+  color: #9ca3af !important;
+  font-size: 0.7rem !important;
+  font-style: italic;
+  line-height: 24px !important; /* Centrar verticalmente */
+  padding-top: 0 !important;
+}
+
+/* ===== SELECTORES EXACTOS DEL DOM ===== */
+
+/* Panel overlay principal */
+.p-select-overlay.p-component[data-pc-section="overlay"] {
+  min-width: 200px !important;
+}
+
+/* Header del select */
+.p-select-header[data-pc-section="header"] {
+  padding: 0.15rem 0.3rem !important;
+  font-size: 0.6rem !important;
+  min-height: 18px !important;
+}
+
+/* Contenedor de la lista */
+.p-select-list-container[data-pc-section="listcontainer"] {
+  max-height: 120px !important;
+}
+
+/* Lista de opciones */
+.p-select-list[data-pc-section="list"] {
+  padding: 0.1rem !important;
+}
+
+/* Items individuales */
+.p-select-option[data-pc-section="option"] {
+  padding: 0.15rem 0.3rem !important;
+  font-size: 0.65rem !important;
+  line-height: 1.1 !important;
+  min-height: 18px !important;
+  height: 18px !important;
+}
+
+/* Contenedor del filtro */
+.p-select-filter-container[data-pc-section="filtercontainer"] {
+  padding: 0.1rem !important;
+}
+
+/* Input del filtro */
+.p-select-filter[data-pc-section="filterinput"] {
+  height: 18px !important;
+  min-height: 18px !important;
+  padding: 0.1rem 0.25rem !important;
+  font-size: 0.6rem !important;
+}
+
+/* Icono del filtro */
+.p-select-filter-icon[data-pc-section="filtericon"] {
+  font-size: 0.6rem !important;
+}
+
+/* ===== FORZAR CON MÁXIMA ESPECIFICIDAD ===== */
+
+/* Overlay container */
+div.p-select-overlay.p-component {
+  font-size: 0.65rem !important;
+}
+
+/* Lista completa */
+ul.p-select-list[role="listbox"] {
+  max-height: 120px !important;
+  overflow-y: auto !important;
+  padding: 0.1rem !important;
+}
+
+/* Items de la lista */
+li.p-select-option[role="option"] {
+  padding: 0.15rem 0.3rem !important;
+  font-size: 0.65rem !important;
+  height: 18px !important;
+  line-height: 1.1 !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* Header con checkbox "Seleccionar todos" */
+div.p-select-header {
+  padding: 0.15rem 0.3rem !important;
+  min-height: 18px !important;
+  font-size: 0.6rem !important;
+}
+
+/* Checkbox más pequeño */
+.p-select-panel .p-checkbox,
+.p-overlay .p-select-panel .p-checkbox {
+  width: 10px !important;
+  height: 10px !important;
+}
+
+.p-select-panel .p-checkbox .p-checkbox-box,
+.p-overlay .p-select-panel .p-checkbox .p-checkbox-box {
+  width: 10px !important;
+  height: 10px !important;
+}
+
+/* ===== OPTIMIZACIONES DE RENDIMIENTO ===== */
+.filter-panel .p-inputtext,
+.filter-panel .p-select {
   will-change: border-color, box-shadow;
 }
 
-/* Optimización para listas largas */
-.filter-panel :deep(.p-select-panel) {
-  max-height: 200px !important;
-  overflow-y: auto !important;
+/* ===== BARRA DE BÚSQUEDA BALANCEADA ===== */
+
+/* Contenedor del IconField */
+.p-iconfield[data-pc-name="pcfiltercontainer"] {
+  padding: 0.25rem !important;
+  margin: 0.1rem !important;
 }
 
-.filter-panel :deep(.p-select-panel .p-select-item) {
-  padding: 0.25rem 0.5rem !important;
+/* Input de búsqueda con tamaño balanceado */
+input.p-inputtext.p-component.p-select-filter[data-p-placeholder="Buscar..."] {
+  height: 22px !important;
+  min-height: 22px !important;
+  padding: 0.2rem 0.3rem !important;
+  padding-left: 1.8rem !important; /* Espacio para el icono */
   font-size: 0.7rem !important;
   line-height: 1.2 !important;
+}
+
+/* Icono de búsqueda en tamaño normal */
+.p-inputicon[data-pc-name="pcfiltericon"] svg {
+  width: 12px !important;
+  height: 12px !important;
+}
+
+/* Selectores específicos del overlay */
+.p-select-overlay .p-iconfield[data-pc-name="pcfiltercontainer"] .p-inputtext {
+  height: 22px !important;
+  min-height: 22px !important;
+  padding: 3px 6px 3px 24px !important;
+  font-size: 0.7rem !important;
+  line-height: 16px !important;
+}
+
+/* Icono en tamaño apropiado */
+.p-select-overlay .p-inputicon svg,
+.p-select-overlay .p-inputicon i {
+  font-size: 0.7rem !important;
+  width: 12px !important;
+  height: 12px !important;
+}
+
+/* Drawer Header */
+.p-drawer-header {
+  padding-bottom: 0 !important;
+}
+
+
+/* ===== MULTISELECT MÁS COMPACTO ===== */
+
+/* Contenedor principal del MultiSelect */
+.filter-panel .p-multiselect {
+  height: 24px !important;
+  min-height: 24px !important;
+  border-radius: 4px !important;
+}
+
+/* Label del MultiSelect */
+.filter-panel .p-multiselect .p-multiselect-label {
+  padding: 0.2rem 2rem 0.2rem 0.4rem !important;
+  font-size: 0.7rem !important;
+  min-height: 20px !important;
+  line-height: 1.2 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.2rem !important;
+}
+
+/* Placeholder del MultiSelect */
+.filter-panel .p-multiselect .p-multiselect-label.p-placeholder {
+  color: #9ca3af !important;
+  font-style: italic !important;
+}
+
+/* Chips más pequeños */
+.filter-panel .p-multiselect .p-multiselect-label .p-chip {
+  font-size: 0.6rem !important;
+  padding: 0.1rem 0.25rem !important;
+  margin: 0.05rem !important;
+  height: 14px !important;
+  line-height: 1 !important;
+  border-radius: 3px !important;
+}
+
+/* Texto del chip */
+.filter-panel .p-multiselect .p-multiselect-label .p-chip .p-chip-text {
+  font-size: 0.6rem !important;
+  line-height: 1 !important;
+}
+
+/* Icono de cerrar del chip */
+.filter-panel .p-multiselect .p-multiselect-label .p-chip .p-chip-remove-icon {
+  font-size: 0.5rem !important;
+  width: 8px !important;
+  height: 8px !important;
+  margin-left: 0.15rem !important;
+}
+
+/* Trigger del MultiSelect */
+.filter-panel .p-multiselect .p-multiselect-trigger {
+  width: 1.5rem !important;
+  height: 22px !important;
+  border-left: 1px solid #e5e7eb !important;
+}
+
+.filter-panel .p-multiselect .p-multiselect-trigger-icon {
+  font-size: 0.65rem !important;
+}
+
+/* Clear icon */
+.filter-panel .p-multiselect .p-multiselect-clear-icon {
+  right: 1.8rem !important;
+  font-size: 0.65rem !important;
+  width: 12px !important;
+  height: 12px !important;
+}
+
+/* ===== PANEL DEL MULTISELECT ===== */
+
+/* Panel principal */
+.p-multiselect-panel {
+  max-height: 120px !important;
+  font-size: 0.65rem !important;
+  border-radius: 6px !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Header del panel */
+.p-multiselect-panel .p-multiselect-header {
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.65rem !important;
+  min-height: 24px !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+/* Checkbox "Seleccionar todos" */
+.p-multiselect-panel .p-multiselect-header .p-checkbox {
+  width: 12px !important;
+  height: 12px !important;
+  margin-right: 0.25rem !important;
+}
+
+/* Items del panel */
+.p-multiselect-panel .p-multiselect-items {
+  padding: 0.1rem !important;
+}
+
+.p-multiselect-panel .p-multiselect-item {
+  padding: 0.2rem 0.4rem !important;
+  font-size: 0.65rem !important;
+  min-height: 20px !important;
+  line-height: 1.2 !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* Checkbox de los items */
+.p-multiselect-panel .p-multiselect-item .p-checkbox {
+  width: 10px !important;
+  height: 10px !important;
+  margin-right: 0.3rem !important;
+}
+
+.p-multiselect-panel .p-multiselect-item .p-checkbox .p-checkbox-box {
+  width: 10px !important;
+  height: 10px !important;
+}
+
+/* Filtro del MultiSelect */
+.p-multiselect-panel .p-multiselect-filter-container {
+  padding: 0.25rem !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+.p-multiselect-panel .p-multiselect-filter {
+  height: 22px !important;
+  min-height: 22px !important;
+  padding: 0.2rem 0.3rem !important;
+  font-size: 0.65rem !important;
+  border-radius: 4px !important;
+}
+
+/* Estados hover y focus */
+.p-multiselect-panel .p-multiselect-item:hover {
+  background-color: #f8fafc !important;
+}
+
+.p-multiselect-panel .p-multiselect-item.p-multiselect-item-selected {
+  background-color: #dbeafe !important;
+  color: #1e40af !important;
 }

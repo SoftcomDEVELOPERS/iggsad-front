@@ -32,26 +32,29 @@
     <div class="mb-8">
       <div class="flex gap-3">
         <div class="flex-1">
-          <IconField>
-            <InputIcon class="pi pi-search" />
-            <InputText 
-              v-model="searchQuery"
-              placeholder="Buscar expedientes por número, cliente, tipo..."
-              class="w-full pl-10"
-              @keyup.enter="performSearch"
-            />
-          </IconField>
+          <SearchBar
+            v-model="searchQuery"
+            placeholder="Buscar expedientes por número, cliente, tipo..."
+            :show-validation="true"
+            validation-message="Ingrese un número de expediente"
+            @search="performSearch"
+            @clear="clearSearchFromBothSources"
+          />
         </div>
         <Button 
           icon="pi pi-filter" 
           label="Filtros"
           @click="toggleFilters"
-          :badge="activeFiltersCount > 0 ? activeFiltersCount.toString() : null"
+          :badge="totalActiveFilters > 0 ? totalActiveFilters.toString() : null"
+          :severity="totalActiveFilters > 0 ? 'secondary' : undefined"
+          :outlined="totalActiveFilters === 0"
         />
         <Button 
           icon="pi pi-search" 
           label="Buscar"
           @click="performSearch"
+          :disabled="!canPerformSearch"
+          :severity="canPerformSearch ? undefined : 'secondary'"
         />
       </div>
     </div>
@@ -346,20 +349,31 @@
     <!-- Drawer de filtros avanzado con tamaño dinámico -->
     <Drawer 
       v-model:visible="showFilters" 
-      header="Filtros Avanzados" 
       position="bottom" 
-      :class="drawerFullscreen ? 'fullscreen-drawer' : 'normal-drawer'"
-      :pt="{
-        mask: { style: 'backdrop-filter: blur(2px);' },
-        root: { 
-          style: drawerFullscreen 
-            ? 'height: 95vh; min-height: 95vh;' 
-            : 'height: 75vh; min-height: 75vh;' 
-        },
-        content: { style: 'height: 100%; overflow-y: auto;' }
-      }"
+      :modal="!drawerFullscreen"
+      :dismissable-mask="!drawerFullscreen"
+      class="filter-drawer"
+      :style="drawerFullscreen ? 'height: 100vh; width: 100vw;' : 'height: 75vh;'"
     >
+      <template #header>
+        <div class="flex items-center justify-between w-full">
+          <h2 class="text-lg font-semibold text-slate-800">Filtros de Búsqueda de Expedientes</h2>
+          <div class="flex gap-2">
+            <Button 
+              :icon="drawerFullscreen ? 'pi pi-compress' : 'pi pi-expand'"
+              :label="drawerFullscreen ? 'Ventana' : 'Pantalla Completa'"
+              outlined 
+              size="small"
+              class="text-xs"
+              @click="toggleDrawerFullscreen"
+            />
+          </div>
+        </div>
+      </template>
+
       <FilterPanel 
+        :persistent-filters="persistentFilters"
+        :persistent-expediente-search="persistentExpedienteSearch"
         @apply-filters="handleApplyFilters"
         @clear-filters="handleClearFilters"
         @filter-change="handleFilterChange"
@@ -371,26 +385,32 @@
 </template>    
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
-import InputText from 'primevue/inputtext'
-import IconField from 'primevue/iconfield'
-import InputIcon from 'primevue/inputicon'
 import Badge from 'primevue/badge'
 import Drawer from 'primevue/drawer'
 import Dock from '@/components/Dock.vue'
 import FilterPanel from '@/components/filters/FilterPanel.vue'
+import SearchBar from '@/components/SearchBar.vue'
+import { useExpedientesStore } from '@/stores/expedientes'
+import { useToast } from '@/composables/useToast'
 
 const router = useRouter()
-
+const { showWarn, showError, showSuccess } = useToast()
 // Estado reactivo
 const searchQuery = ref('')
 const showFilters = ref(false)
 const searchResults = ref([])
 const lastAccess = ref('14 Jun 2025, 09:30')
-const drawerFullscreen = ref(false) // ✅ Nuevo estado para pantalla completa
+
+// ✅ Estado persistente de filtros
+const persistentFilters = ref({})
+const persistentExpedienteSearch = ref('')
+const drawerFullscreen = ref(false)
+
+const expedientesStore = useExpedientesStore()
 
 // Mensaje global del sistema
 const globalMessage = ref('Estamos a 23. Has recuperado 0,00 €. Muy lejos del objetivo de 0,00 €. Estás dando pérdidas.')
@@ -510,41 +530,43 @@ const unreadMessages = computed(() =>
   recentMessages.value.filter(m => m.unread).length
 )
 
-const activeFiltersCount = computed(() => {
-  // Este será calculado por el FilterPanel
-  return 0
+// ✅ Calcular filtros activos desde el estado persistente
+const totalActiveFilters = computed(() => {
+  let count = 0
+  
+  // ✅ NO contar la búsqueda por expediente como filtro
+  // Solo contar filtros del objeto persistente (NO la búsqueda)
+  Object.entries(persistentFilters.value).forEach(([key, value]) => {
+    if (value !== null && value !== '' && value !== undefined) {
+      if (Array.isArray(value)) {
+        const validItems = value.filter(v => v !== null && v !== '' && v !== undefined)
+        if (validItems.length > 0) {
+          count++
+        }
+      } else {
+        count++
+      }
+    }
+  })
+  
+  return count
+})
+
+// ✅ Computed para validar si se puede buscar
+const canPerformSearch = computed(() => {
+  const hasExpediente = (searchQuery.value && searchQuery.value.trim()) || 
+                       (persistentExpedienteSearch.value && persistentExpedienteSearch.value.trim())
+  return hasExpediente
 })
 
 // Métodos
 const toggleFilters = () => {
   showFilters.value = !showFilters.value
-}
-
-const performSearch = () => {
-  if (!searchQuery.value.trim()) return
   
-  searchResults.value = [
-    {
-      id: 1,
-      number: 'EXP-2024-001',
-      client: 'García López, María',
-      lastUpdate: 'Hace 2h',
-      priority: 'high',
-      status: 'active',
-      statusText: 'Activo'
-    },
-    {
-      id: 2,
-      number: 'EXP-2024-045',
-      client: 'Empresas del Norte S.L.',
-      lastUpdate: 'Ayer',
-      priority: 'urgent',
-      status: 'pending',
-      statusText: 'Pendiente'
-    }
-  ]
-  
-  addToRecentSearches(searchQuery.value)
+  // ✅ Siempre abrir en modo minimizado
+  if (showFilters.value) {
+    drawerFullscreen.value = false
+  }
 }
 
 const addToRecentSearches = (query) => {
@@ -564,6 +586,53 @@ const addToRecentSearches = (query) => {
   }
 }
 
+// ✅ Método para mostrar mensaje de validación
+const showSearchValidation = () => {
+  console.warn('⚠️ Debe ingresar un número de expediente para realizar la búsqueda')
+   showWarn(
+    'Búsqueda requerida',
+    'Debe ingresar un número de expediente para realizar la búsqueda'
+  )
+}
+
+const performSearch = async () => {
+  const expedienteQuery = searchQuery.value || persistentExpedienteSearch.value
+  
+  if (!expedienteQuery || !expedienteQuery.trim()) {
+    console.warn('⚠️ No se puede buscar sin número de expediente')
+    showSearchValidation()
+    return
+  }
+  
+  try {
+    console.log('🔍 Iniciando búsqueda desde LandingPage:', expedienteQuery.trim())
+    
+    // ✅ NO actualizar persistentExpedienteSearch aquí si ya está igual
+    if (persistentExpedienteSearch.value !== expedienteQuery.trim()) {
+      persistentExpedienteSearch.value = expedienteQuery.trim()
+    }
+    
+    await expedientesStore.searchExpedientes(persistentFilters.value, expedienteQuery.trim())
+    
+    searchResults.value = expedientesStore.expedientes.map(exp => ({
+      id: exp.id,
+      number: exp.numero,
+      client: exp.cliente,
+      lastUpdate: 'Hace 2h',
+      priority: exp.estado === 'Activo' ? 'high' : 'normal',
+      status: exp.estado.toLowerCase(),
+      statusText: exp.estado
+    }))
+    
+    addToRecentSearches(expedienteQuery.trim())
+    console.log('✅ Búsqueda desde LandingPage completada:', searchResults.value.length)
+    
+  } catch (error) {
+    console.error('❌ Error en búsqueda desde LandingPage:', error)
+    searchResults.value = []
+  }
+}
+
 const selectRecentSearch = (search) => {
   searchQuery.value = search.expediente
   performSearch()
@@ -575,56 +644,109 @@ const removeRecentSearch = (searchId) => {
 
 const clearSearchHistory = () => {
   recentSearches.value = []
+  // ✅ También limpiar búsquedas activas
+  clearSearchFromBothSources()
 }
 
 const clearSearch = () => {
+  clearSearchFromBothSources()
+}
+
+const clearSearchFromBothSources = () => {
   searchQuery.value = ''
+  persistentExpedienteSearch.value = ''
   searchResults.value = []
+  expedientesStore.clearResults()
+  console.log('🧹 Búsqueda limpiada desde ambas fuentes')
 }
 
-// ✅ Nuevos métodos para el FilterPanel
-const handleApplyFilters = (filterData) => {
-  console.log('Aplicando filtros:', filterData)
-  // Aquí harías la búsqueda con los filtros
-  searchResults.value = [
-    {
-      id: 1,
-      number: 'EXP-2024-001',
-      client: 'García López, María',
+// ✅ Manejar filtros de forma persistente
+const handleApplyFilters = async (filterData) => {
+  console.log('📋 Aplicando filtros desde FilterPanel:', filterData)
+  
+  // ✅ Guardar filtros persistentemente
+  persistentFilters.value = { ...filterData }
+  
+  // ✅ No hacer búsqueda automática aquí, ya la hace el FilterPanel
+  // Solo actualizar el estado local
+  console.log('✅ Filtros guardados correctamente')
+  
+  // ✅ Si tenemos resultados en el store, sincronizarlos
+  if (expedientesStore.hasExpedientes) {
+    searchResults.value = expedientesStore.expedientes.map(exp => ({
+      id: exp.id,
+      number: exp.numero,
+      client: exp.cliente,
       lastUpdate: 'Hace 2h',
-      priority: 'high',
-      status: 'active',
-      statusText: 'Activo'
-    }
-  ]
-  showFilters.value = false // Cerrar drawer al aplicar
+      priority: exp.estado === 'Activo' ? 'high' : 'normal',
+      status: exp.estado.toLowerCase(),
+      statusText: exp.estado
+    }))
+    console.log('🔄 Resultados sincronizados desde store:', searchResults.value.length)
+  }
 }
 
+// Metodos para gestión de filtros
 const handleClearFilters = () => {
   console.log('Limpiando todos los filtros')
-  searchResults.value = []
+  
+  // ✅ Limpiar estado persistente
+  persistentFilters.value = {}
+  persistentExpedienteSearch.value = ''
+  
+  // ✅ Limpiar resultados y búsquedas
+  clearSearchFromBothSources()
+  
+  console.log('✅ Filtros y búsquedas limpiados completamente')
 }
 
 const handleFilterChange = (filterData) => {
   console.log('Filtros cambiados:', filterData)
-  // Opcional: búsqueda en tiempo real
+  
+  // ✅ Actualizar filtros persistentes en tiempo real
+  persistentFilters.value = { ...filterData }
 }
 
-// ✅ Método para búsqueda de expediente desde FilterPanel
-const handleExpedienteSearch = (expediente) => {
-  console.log('Búsqueda de expediente:', expediente)
-  if (expediente) {
-    searchQuery.value = expediente
-    performSearch()
-    // Opcional: cerrar drawer después de buscar
-    // showFilters.value = false
+const handleExpedienteSearch = async (expediente) => {
+  console.log('🔍 Búsqueda desde FilterPanel:', expediente)
+  
+  // ✅ Solo actualizar sin disparar watchers
+  persistentExpedienteSearch.value = expediente || ''
+  
+  // ✅ Sincronizar searchQuery directamente
+  if (expediente !== searchQuery.value) {
+    searchQuery.value = expediente || ''
+  }
+  
+  // ✅ Los resultados ya están en el store desde FilterPanel
+  if (expedientesStore.hasExpedientes) {
+    searchResults.value = expedientesStore.expedientes.map(exp => ({
+      id: exp.id,
+      number: exp.numero,
+      client: exp.cliente,
+      lastUpdate: 'Hace 2h',
+      priority: exp.estado === 'Activo' ? 'high' : 'normal',
+      status: exp.estado.toLowerCase(), 
+      statusText: exp.estado
+    }))
+    
+    if (expediente) {
+      addToRecentSearches(expediente)
+    }
   }
 }
 
+
 // ✅ Método para alternar pantalla completa del drawer
+const toggleDrawerFullscreen = () => {
+  drawerFullscreen.value = !drawerFullscreen.value
+  console.log('Drawer fullscreen:', drawerFullscreen.value)
+}
+
+// Mantener este método para recibir eventos del FilterPanel
 const handleToggleFullscreen = (isFullscreen) => {
   drawerFullscreen.value = isFullscreen
-  console.log('Drawer fullscreen:', isFullscreen)
+  console.log('Drawer fullscreen desde FilterPanel:', isFullscreen)
 }
 
 const markAsRead = (notificationId) => {
@@ -698,9 +820,13 @@ onMounted(() => {
   // Marcar el item actual como activo (ejemplo: dashboard)
   dockItems.value[0].active = true
 })
+
+
 </script>
 
 <style scoped>
+
+ /* Clases para estilos básicos */
 .transition-shadow {
   transition: box-shadow 0.2s ease-in-out;
 }
@@ -720,18 +846,9 @@ onMounted(() => {
   overflow: hidden;
 }
 
-/* ✅ Estilos para drawer fullscreen */
-.fullscreen-drawer :deep(.p-drawer) {
-  height: 95vh !important;
-}
-
-.normal-drawer :deep(.p-drawer) {
-  height: 75vh !important;
-}
-
-/* Animaciones suaves para el cambio de tamaño */
-.fullscreen-drawer :deep(.p-drawer),
-.normal-drawer :deep(.p-drawer) {
-  transition: height 0.3s ease !important;
+/* Drawer fullscreen usando las clases nativas de PrimeVue */
+.filter-drawer :deep(.p-drawer-full .p-drawer) {
+  height: 100vh !important;
+  width: 100vw !important;
 }
 </style>

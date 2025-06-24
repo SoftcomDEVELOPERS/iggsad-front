@@ -97,7 +97,7 @@
 
     <!-- Números y rangos -->
     <div class="section-container-orange">
-      <div class="section-header-green px-4 py-3">
+      <div class="section-header-orange px-4 py-3">
         <h3 class="text-sm font-semibold uppercase tracking-wide">
           NÚMEROS Y RANGOS
         </h3>

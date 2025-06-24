@@ -2,52 +2,22 @@
   <div class="filter-panel bg-slate-50 h-full overflow-y-auto">
     <!-- Header con búsqueda de expediente -->
     <div class="sticky top-0 bg-white border-b border-slate-200 px-4 py-3 shadow-sm z-10">
-      <div class="flex items-center justify-between mb-3">
-        <h2 class="text-base font-semibold text-slate-800">{{ title }}</h2>
-        <div class="flex gap-2">
-          <Button 
-            :icon="isFullscreen ? 'pi pi-window-minimize' : 'pi pi-window-maximize'"
-            :label="isFullscreen ? 'Ventana' : 'Pantalla Completa'"
-            outlined 
-            size="small"
-            class="text-xs"
-            @click="toggleFullscreen"
-          />
-        </div>
-      </div>
+
       
       <!-- Búsqueda rápida de expediente -->
       <div class="w-full">
-        <label class="block text-xs font-medium text-slate-700 mb-1">
-          Búsqueda Rápida por Expediente
-        </label>
-        <div class="relative">
-
-            <InputText 
-              v-model="expedienteSearch"
-              placeholder="Ej: EXP-2024-001, 12345, referencia..."
-              class="w-full pl-10 pr-20 text-sm"
-              @keyup.enter="searchExpediente"
-            />
-
-          <div class="absolute right-1 top-1/2 transform -translate-y-1/2 flex gap-1">
-            <Button 
-              v-if="expedienteSearch"
-              icon="pi pi-times"
-              text
-              size="small"
-              class="text-xs p-1"
-              @click="clearExpedienteSearch"
-            />
-            <Button 
-              icon="pi pi-search"
-              size="small"
-              class="text-xs"
-              @click="searchExpediente"
-            />
-          </div>
-        </div>
+        <SearchBar
+          v-model="expedienteSearch"
+          label="Búsqueda Rápida por Expediente"
+          placeholder="Ej: EXP-2024-001, 12345, referencia..."
+          variant="compact"
+          :show-validation="true"
+          validation-message="Ingrese un número de expediente"
+          @search="searchExpediente"
+          @clear="clearExpedienteSearch"
+        />
       </div>
+            
     </div>
 
     <!-- Contenido scrolleable con grid reorganizado -->
@@ -103,30 +73,38 @@
 
 <script setup>
 import { ref, watch, onMounted } from 'vue'
-import Button from 'primevue/button'
-import InputText from 'primevue/inputtext'
-import IconField from 'primevue/iconfield'
-import InputIcon from 'primevue/inputicon'
 import FilterSectionProcedimientoBasico from './sections/FilterSectionProcedimientoBasico.vue'
 import FilterSectionFechas from './sections/FilterSectionFechas.vue'
 import FilterSectionIntervinientes from './sections/FilterSectionIntervinientes.vue'
 import FilterSectionAdicionales from './sections/FilterSectionAdicionales.vue'
 import FloatingActiveFilters from './FloatingActiveFilters.vue'
+import SearchBar from '@/components/SearchBar.vue'
 import { useFilterPanel } from '@/composables/useFilterPanel'
 import { useFilterOptions } from '@/constants/filterOptions'
+import { useExpedientesStore } from '@/stores/expedientes'
+import { useToast } from '@/composables/useToast'
 
 const props = defineProps({
   title: {
     type: String,
     default: 'Filtros de Búsqueda Procesal'
+  },
+  persistentFilters: {
+    type: Object,
+    default: () => ({})
+  },
+  persistentExpedienteSearch: {
+    type: String,
+    default: ''
   }
 })
 
+const { showWarn, showError, showSuccess } = useToast()
 const emit = defineEmits(['filter-change', 'apply-filters', 'clear-filters', 'search-expediente', 'toggle-fullscreen'])
 
 // Estados locales
 const isFullscreen = ref(false)
-const expedienteSearch = ref('')
+const expedienteSearch = ref(props.persistentExpedienteSearch)
 
 // Usar el composable para la lógica de filtros
 const {
@@ -143,6 +121,9 @@ const {
 // Usar las opciones de filtros
 const filterOptions = useFilterOptions()
 
+// Usar el store de expedientes
+const expedientesStore = useExpedientesStore()
+
 // Métodos que conectan con el composable
 const clearFilter = (key) => {
   clearSingleFilter(key, emit)
@@ -152,21 +133,67 @@ const clearAllFilters = () => {
   clearAll(emit)
 }
 
-const applyFilters = () => {
+const applyFilters = async () => {
   normalizeFilters()
-  apply(emit)
+  
+  // ✅ Verificar si hay expediente para buscar
+  if (!expedienteSearch.value || !expedienteSearch.value.trim()) {
+    console.warn('⚠️ No se puede aplicar filtros sin número de expediente')
+    showWarn(
+      'Expediente requerido',
+      'Debe ingresar un número de expediente para aplicar los filtros'
+    )
+    emit('apply-filters', filters.value)
+    return
+  }
+  
+  try {
+    console.log('📋 Aplicando filtros desde FilterPanel con expediente:', expedienteSearch.value.trim())
+    
+    // ✅ Usar el store para buscar con filtros
+    await expedientesStore.searchExpedientes(filters.value, expedienteSearch.value.trim())
+    
+    showSuccess(
+      'Filtros aplicados',
+      'La búsqueda se ha realizado correctamente'
+    )
+    // ✅ Emitir evento para que LandingPage se sincronice
+    emit('apply-filters', filters.value)
+    
+    console.log('✅ Filtros aplicados desde FilterPanel correctamente')
+  } catch (error) {
+    console.error('❌ Error al aplicar filtros desde FilterPanel:', error)
+    showError(
+      'Error en la búsqueda',
+      'No se pudieron aplicar los filtros. Inténtelo de nuevo.'
+    )
+  }
 }
 
 // Método para detectar cambios en filtros y emitir evento
 const onFiltersUpdate = () => {
-  normalizeFilters()
-  emit('filter-change', filters.value)
+  if (!isInitialLoad) { // Solo emitir después de la carga inicial
+    normalizeFilters()
+    emit('filter-change', filters.value)
+  }
 }
 
 // Métodos para búsqueda de expediente
-const searchExpediente = () => {
+const searchExpediente = async () => {
   if (expedienteSearch.value.trim()) {
-    emit('search-expediente', expedienteSearch.value.trim())
+    try {
+      console.log('🔍 Búsqueda desde FilterPanel:', expedienteSearch.value.trim())
+      
+      // ✅ Usar el store para buscar por expediente específico
+      await expedientesStore.searchExpedientes(filters.value, expedienteSearch.value.trim())
+      
+      // ✅ Emitir evento para sincronizar con LandingPage
+      emit('search-expediente', expedienteSearch.value.trim())
+      
+      console.log('✅ Búsqueda desde FilterPanel realizada:', expedienteSearch.value.trim())
+    } catch (error) {
+      console.error('❌ Error en búsqueda desde FilterPanel:', error)
+    }
   }
 }
 
@@ -189,7 +216,43 @@ watch(filters, () => {
 
 // Normalizar filtros al montar el componente
 onMounted(() => {
+  // ✅ Cargar filtros persistentes al montar
+  if (props.persistentFilters && Object.keys(props.persistentFilters).length > 0) {
+    Object.assign(filters.value, props.persistentFilters)
+    console.log('✅ Filtros persistentes cargados:', props.persistentFilters)
+  }
+  
+  // ✅ Cargar búsqueda persistente
+  if (props.persistentExpedienteSearch) {
+    expedienteSearch.value = props.persistentExpedienteSearch
+    console.log('✅ Búsqueda persistente cargada:', props.persistentExpedienteSearch)
+  }
+  
   normalizeFilters()
+})
+
+// ✅ Watch seguro para filtros persistentes - solo carga inicial
+let isInitialLoad = true
+
+watch(() => props.persistentFilters, (newFilters) => {
+  if (newFilters && isInitialLoad) {
+    Object.assign(filters.value, newFilters)
+    normalizeFilters()
+    console.log('🔄 Filtros iniciales cargados:', newFilters)
+    isInitialLoad = false
+  }
+}, { deep: true, immediate: true })
+
+// ✅ Watch para sincronizar búsqueda persistente
+watch(() => props.persistentExpedienteSearch, (newSearch) => {
+  expedienteSearch.value = newSearch || ''
+}, { immediate: true })
+
+// ✅ Watch bidireccional para expedienteSearch
+watch(expedienteSearch, (newValue) => {
+  if (newValue !== props.persistentExpedienteSearch) {
+    emit('search-expediente', newValue)
+  }
 })
 
 // Exponer el estado de filtros
@@ -204,4 +267,11 @@ defineExpose({
 })
 </script>
 
-<style src="./FilterPanel.styles.css"></style>
+<style>
+@import './FilterPanel.styles.css';
+
+/* Forzar especificidad para el panel */
+.filter-panel {
+  font-size: 0.75rem;
+}
+</style>

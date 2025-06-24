@@ -5,7 +5,7 @@
     class="floating-filters-panel fixed right-4 top-1/2 transform -translate-y-1/2 z-50"
     :class="{ 'mobile-floating': isMobile }"
   >
-    <div class="bg-white/95 backdrop-blur-md rounded-lg shadow-xl border border-slate-200 p-4 min-w-72 max-w-80">
+    <div class="bg-white/95 backdrop-blur-md rounded-lg shadow-xl border border-slate-200 p-3 min-w-80 max-w-96 max-h-96">
       <!-- Header -->
       <div class="flex items-center justify-between mb-3">
         <div class="flex items-center gap-2">
@@ -27,7 +27,7 @@
       </div>
       
       <!-- Lista de filtros -->
-      <div class="space-y-2 max-h-64 overflow-y-auto custom-scrollbar">
+      <div class="space-y-2 max-h-80 overflow-y-auto custom-scrollbar">
         <TransitionGroup
           name="filter-active"
           tag="div"
@@ -67,7 +67,7 @@
           class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs py-2 px-3 rounded font-medium transition-colors"
         >
           <i class="pi pi-search mr-1"></i>
-          Aplicar
+          Aplicar y Buscar
         </button>
         <button 
           @click="$emit('clear-all')"
