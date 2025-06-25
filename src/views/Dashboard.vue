@@ -1,6 +1,5 @@
-<!-- src/views/Dashboard.vue - COMPLETO CON GRID SYSTEM -->
 <template>
-  <div class="max-w-7xl mx-auto p-6">
+  <div class="min-h-screen p-6">
     <!-- Header de bienvenida -->
     <div class="mb-8">
       <div class="flex items-center justify-between">
@@ -17,27 +16,9 @@
             }) }}
           </p>
         </div>
-        <div class="flex items-center gap-3">
-          <div class="text-right">
-            <p class="text-sm text-slate-500">Último acceso</p>
-            <p class="text-slate-700 font-medium">{{ lastAccess }}</p>
-          </div>
-          <div class="flex gap-2">
-            <Button 
-              icon="pi pi-sliders-h"
-              label="Configuración Avanzada"
-              outlined
-              size="small"
-              @click="showConfigPanel = true"
-            />
-            <Button 
-              :icon="isConfigMode ? 'pi pi-check' : 'pi pi-cog'"
-              :label="isConfigMode ? 'Guardar' : 'Personalizar'"
-              :severity="isConfigMode ? 'success' : 'secondary'"
-              @click="toggleConfigMode"
-              size="small"
-            />
-          </div>
+        <div class="text-right">
+          <p class="text-sm text-slate-500">Último acceso</p>
+          <p class="text-slate-700 font-medium">{{ lastAccess }}</p>
         </div>
       </div>
       
@@ -48,8 +29,8 @@
     </div>
 
     <!-- Barra de búsqueda principal -->
-    <div class="mb-8" :class="{ 'opacity-50': isConfigMode }">
-      <div class="flex gap-3">
+    <div class="">
+      <div class="flex gap-6">  <!-- Cambiar gap-3 por gap-6 -->
         <div class="flex-1">
           <SearchBar
             v-model="searchQuery"
@@ -58,57 +39,65 @@
             validation-message="Ingrese un número de expediente"
             @search="performSearch"
             @clear="clearSearchFromBothSources"
-            :disabled="isConfigMode"
           />
         </div>
-        <Button 
-          icon="pi pi-filter" 
-          label="Filtros"
-          @click="toggleFilters"
-          :badge="totalActiveFilters > 0 ? totalActiveFilters.toString() : null"
-          :severity="totalActiveFilters > 0 ? 'primary' : undefined"
-          :outlined="totalActiveFilters === 0"
-          :disabled="isConfigMode"
-        />
-        <Button 
-          icon="pi pi-search" 
-          label="Buscar"
-          @click="performSearch"
-          :disabled="!canPerformSearch || isConfigMode"
-          :severity="canPerformSearch ? undefined : 'secondary'"
+        <div class="flex gap-3">  <!-- Agrupar botones en su propio contenedor -->
+          <Button 
+            icon="pi pi-filter" 
+            label="Filtros"
+            @click="toggleFilters"
+            :badge="totalActiveFilters > 0 ? totalActiveFilters.toString() : null"
+            :severity="totalActiveFilters > 0 ? 'primary' : undefined"
+            :outlined="totalActiveFilters === 0"
+          />
+          <Button 
+            icon="pi pi-search" 
+            label="Buscar"
+            @click="performSearch"
+            :disabled="!canPerformSearch"
+            :severity="canPerformSearch ? undefined : 'secondary'"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Grid Dashboard Intuitivo -->
+    <div class="mb-8 mt-6">
+
+      <!-- Grid Principal -->
+      <div class="dashboard-grid-section" :class="{ 'config-mode-active': isConfigMode }">
+        <!-- Banner de modo configuración -->
+        <div v-if="isConfigMode" class="config-mode-banner">
+          <div class="banner-content">
+            <i class="pi pi-cog text-blue-600"></i>
+            <div class="banner-text">
+              <strong>Modo Configuración Activo</strong>
+              <span>Arrastra las cards para moverlas, usa la esquina inferior derecha para redimensionar</span>
+            </div>
+            <Button
+              icon="pi pi-times"
+              text
+              rounded
+              @click="handleToggleConfigMode"
+              title="Salir del modo configuración"
+            />
+          </div>
+        </div>
+        
+        <DashboardGrid
+          :layout="currentDashboardLayout"
+          :cards-config="currentCardsConfig"
+          :cards-data="currentCardsData"
+          @layout-updated="handleLayoutUpdate"
+          @card-removed="handleCardRemoved"
+          @card-configured="handleCardConfigured"
+          @config-mode-changed="handleConfigModeChanged"
+          @card-config-updated="handleCardConfigUpdate"
         />
       </div>
     </div>
 
-    <!-- NUEVO: Dashboard Grid Layout -->
-    <DashboardGrid 
-      :layout="dashboardLayout"
-      :cards-config="cardsConfig"
-      :cards-data="cardsData"
-      :config-mode="isConfigMode"
-      @layout-updated="handleLayoutUpdate"
-      @card-removed="handleCardRemoved"
-      @card-configured="handleCardConfigured"
-      @card-config-updated="handleCardConfigUpdated"
-      @show-card-library="showConfigPanel = true"
-      @breakpoint-changed="handleBreakpointChanged"
-    />
-
-    <!-- Panel de configuración avanzada -->
-    <DashboardConfigPanel
-      v-model:visible="showConfigPanel"
-      :dashboard-layout="dashboardLayout"
-      :cards-config="cardsConfig"
-      :available-cards="availableCards"
-      @save="handleConfigSave"
-      @cancel="handleConfigCancel"
-      @layout-updated="handleLayoutUpdate"
-      @card-added="handleCardAdded"
-      @card-removed="handleCardRemoved"
-      @reset-config="handleResetConfig"
-    />
-
-    <!-- Componente Dock personalizado -->
+    <!-- Componente Dock personalizado ORIGINAL -->
     <Dock 
       :items="dockItems"
       @item-click="handleDockClick"
@@ -119,7 +108,7 @@
       :auto-hide="false"
     />
 
-    <!-- Drawer de filtros avanzado con tamaño dinámico -->
+    <!-- Drawer de filtros avanzado ORIGINAL -->
     <Drawer 
       v-model:visible="showFilters" 
       position="bottom" 
@@ -158,140 +147,87 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import Button from 'primevue/button'
 import Drawer from 'primevue/drawer'
 import Dock from '@/components/Dock.vue'
 import FilterPanel from '@/components/filters/FilterPanel.vue'
 import SearchBar from '@/components/SearchBar.vue'
-import DashboardGrid from '@/components/dashboard/DashboardGrid.vue'
-import DashboardConfigPanel from '@/components/dashboard/config/DashboardConfigPanel.vue'
 import { useExpedientesStore } from '@/stores/expedientes'
 import { useToast } from '@/composables/useToast'
+
+//Componente del grid intuitivo
+import DashboardGrid from '@/components/dashboard/DashboardGrid.vue'
+import { useUserDashboard } from '@/composables/useUserDashboard'
+import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
 const { showWarn, showError, showSuccess } = useToast()
 
-// ===== ESTADO ORIGINAL (SIN CAMBIOS) =====
+// Composables para el grid
+const authStore = useAuthStore()
+const { 
+  dashboardConfig, 
+  dashboardLayout,
+  cardsConfig,
+  updateDashboardLayout,
+  removeCard,
+  updateCardConfig,
+  isConfigMode,
+  toggleConfigMode,
+  getCardData
+} = useUserDashboard()
+
+// Estado reactivo ORIGINAL
 const searchQuery = ref('')
 const showFilters = ref(false)
 const searchResults = ref([])
 const lastAccess = ref('14 Jun 2025, 09:30')
+
+// Estado persistente de filtros ORIGINAL
 const persistentFilters = ref({})
 const persistentExpedienteSearch = ref('')
 const drawerFullscreen = ref(false)
 
 const expedientesStore = useExpedientesStore()
 
-// Mensaje global del sistema
+// Mensaje global del sistema ORIGINAL
 const globalMessage = ref('Estamos a 23. Has recuperado 0,00 €. Muy lejos del objetivo de 0,00 €. Estás dando pérdidas.')
 
-// ===== NUEVO: ESTADO DEL GRID SYSTEM =====
-const isConfigMode = ref(false)
-const showConfigPanel = ref(false)
-
-// Layout del dashboard (se guardará en userProfile)
-const dashboardLayout = ref([
-  { i: 'stats-dashboard', x: 0, y: 0, w: 8, h: 4 },
-  { i: 'recent-searches', x: 0, y: 4, w: 8, h: 5 },
-  { i: 'notifications', x: 8, y: 0, w: 4, h: 6 },
-  { i: 'chat', x: 8, y: 6, w: 4, h: 4 },
-  { i: 'quick-actions', x: 8, y: 10, w: 4, h: 3 }
-])
-
-// Configuración de las cards
-const cardsConfig = ref({
-  'stats-dashboard': {
-    title: 'Estadísticas',
-    selectedStats: ['casos-activos', 'audiencias-proximas', 'casos-urgentes', 'total-clientes'],
-    gridLayout: 'auto'
-  },
-  'recent-searches': {
-    title: 'Búsquedas Recientes',
-    maxItems: 5,
-    showActions: true
-  },
-  'notifications': {
-    title: 'Notificaciones',
-    maxItems: 10,
-    showMarkAllRead: true
-  },
-  'chat': {
-    title: 'Chat',
-    maxMessages: 5,
-    showOpenChat: true
-  },
-  'quick-actions': {
-    title: 'Acciones Rápidas',
-    layout: 'vertical'
-  }
+// Datos ORIGINALES
+const stats = ref({
+  totalCases: 147,
+  upcomingHearings: 12,
+  urgentCases: 5,
+  totalClients: 89
 })
 
-// Cards disponibles para añadir
-const availableCards = ref([
-  { id: 'stats-dashboard', title: 'Estadísticas', icon: 'pi pi-chart-bar', type: 'stats' },
-  { id: 'recent-searches', title: 'Búsquedas Recientes', icon: 'pi pi-search', type: 'content' },
-  { id: 'notifications', title: 'Notificaciones', icon: 'pi pi-bell', type: 'sidebar' },
-  { id: 'chat', title: 'Chat', icon: 'pi pi-comments', type: 'sidebar' },
-  { id: 'quick-actions', title: 'Acciones Rápidas', icon: 'pi pi-bolt', type: 'sidebar' }
+const recentSearches = ref([
+  { 
+    id: 1, 
+    expediente: 'EXP-2024-001', 
+    cliente: 'García López, María',
+    deuda: '€25,450'
+  },
+  { 
+    id: 2, 
+    expediente: 'EXP-2024-045', 
+    cliente: 'Empresas del Norte S.L.',
+    deuda: '€87,230'
+  },
+  { 
+    id: 3, 
+    expediente: 'EXP-2024-023', 
+    cliente: 'Martín Rodríguez, Juan',
+    deuda: '€12,800'
+  }
 ])
 
-// Datos para las cards (conectar con tus stores reales)
-const cardsData = computed(() => ({
-  'stats-dashboard': {
-    // Los datos vienen del StatsDashboard internamente
-  },
-  'recent-searches': {
-    searches: [
-      { 
-        id: 1, 
-        expediente: 'EXP-2024-001', 
-        cliente: 'García López, María',
-        deuda: '€25,450',
-        fecha: 'Hace 2h'
-      },
-      { 
-        id: 2, 
-        expediente: 'EXP-2024-045', 
-        cliente: 'Empresas del Norte S.L.',
-        deuda: '€87,230',
-        fecha: 'Hace 4h'
-      },
-      { 
-        id: 3, 
-        expediente: 'EXP-2024-023', 
-        cliente: 'Martín Rodríguez, Juan',
-        deuda: '€12,800',
-        fecha: 'Ayer'
-      }
-    ]
-  },
-  'notifications': {
-    notifications: [
-      { id: 1, title: 'Audiencia mañana', message: 'EXP-2024-001 a las 10:00', time: 'Hace 1h', read: false },
-      { id: 2, title: 'Documento subido', message: 'Nuevo archivo en EXP-2024-045', time: 'Hace 2h', read: false },
-      { id: 3, title: 'Plazo próximo', message: 'Alegaciones EXP-2024-023', time: 'Ayer', read: true }
-    ],
-    unreadCount: 2
-  },
-  'chat': {
-    messages: [
-      { id: 1, sender: 'María García', preview: '¿Podemos revisar el contrato mañana?', time: 'Hace 30 min', unread: true },
-      { id: 2, sender: 'Juan Martín', preview: 'Adjunto documentación solicitada', time: 'Hace 1h', unread: true }
-    ],
-    unreadCount: 2
-  },
-  'quick-actions': {
-    actions: [
-      { id: 'nuevo-caso', label: 'Nuevo Caso', icon: 'pi pi-plus' },
-      { id: 'subir-doc', label: 'Subir Documento', icon: 'pi pi-upload' },
-      { id: 'nuevo-cliente', label: 'Nuevo Cliente', icon: 'pi pi-user-plus' }
-    ]
-  }
-}))
 
-// Items del Dock (SIN CAMBIOS)
+
+
+// Items del Dock ORIGINALES
 const dockItems = ref([
   {
     id: 'casos',
@@ -304,7 +240,7 @@ const dockItems = ref([
     id: 'audiencias',
     label: 'Audiencias',
     icon: 'pi pi-calendar',
-    badge: '12',
+    badge: stats.value.upcomingHearings.toString(),
     command: () => router.push('/audiencias')
   },
   {
@@ -327,115 +263,104 @@ const dockItems = ref([
   }
 ])
 
-// ===== COMPUTED ORIGINALES (SIN CAMBIOS) =====
+// Computed para el grid
+const currentDashboardLayout = computed(() => dashboardLayout.value)
+const currentCardsConfig = computed(() => cardsConfig.value)
+
+// Datos dinámicos de las cards (obtenidos del composable)
+const currentCardsData = computed(() => {
+  const data = {}
+  currentDashboardLayout.value.forEach(item => {
+    data[item.i] = getCardData(item.i)
+  })
+  return data
+})
+
+
+// Calcular filtros activos desde el estado persistente ORIGINAL
 const totalActiveFilters = computed(() => {
   let count = 0
+  
+  // NO contar la búsqueda por expediente como filtro
+  // Solo contar filtros del objeto persistente (NO la búsqueda)
   Object.entries(persistentFilters.value).forEach(([key, value]) => {
     if (value !== null && value !== '' && value !== undefined) {
       if (Array.isArray(value)) {
         const validItems = value.filter(v => v !== null && v !== '' && v !== undefined)
-        if (validItems.length > 0) count++
+        if (validItems.length > 0) {
+          count++
+        }
       } else {
         count++
       }
     }
   })
+  
   return count
 })
 
+// Computed para validar si se puede buscar ORIGINAL
 const canPerformSearch = computed(() => {
   const hasExpediente = (searchQuery.value && searchQuery.value.trim()) || 
                        (persistentExpedienteSearch.value && persistentExpedienteSearch.value.trim())
   return hasExpediente
 })
 
-// ===== MÉTODOS NUEVOS DEL GRID SYSTEM =====
-const toggleConfigMode = () => {
-  isConfigMode.value = !isConfigMode.value
-  if (isConfigMode.value) {
-    showSuccess('Modo Personalización', 'Ahora puedes arrastrar y redimensionar las tarjetas')
-  } else {
-    showSuccess('Cambios Guardados', 'La configuración se ha guardado correctamente')
+// NUEVO: Métodos del grid
+const handleLayoutUpdate = async (newLayout) => {
+  try {
+    await updateDashboardLayout(newLayout)
+    showSuccess('Layout Guardado', 'La configuración del dashboard se ha guardado')
+  } catch (error) {
+    showError('Error de Guardado', 'No se pudo guardar la configuración del layout')
   }
 }
 
-const handleLayoutUpdate = (newLayout) => {
-  // Evitar bucles comparando contenido real
-  const currentStr = JSON.stringify(dashboardLayout.value)
-  const newStr = JSON.stringify(newLayout)
-  
-  if (currentStr !== newStr) {
-    console.log('Layout actualizado con cambios reales:', newLayout.length, 'cards')
-    dashboardLayout.value = [...newLayout]
-    
-    // 🎯 GUARDAR DIRECTAMENTE EN EL BACKEND
-    saveDashboardConfig({
-      layout: newLayout,
-      cardsConfig: cardsConfig.value
-    })
+const handleCardRemoved = async (cardId) => {
+  try {
+    await removeCard(cardId)
+    showSuccess('Card Eliminada', 'La card ha sido eliminada del dashboard')
+  } catch (error) {
+    showError('Error', 'No se pudo eliminar la card')
   }
-}
-
-const handleCardRemoved = (cardId) => {
-  dashboardLayout.value = dashboardLayout.value.filter(item => item.i !== cardId)
-  delete cardsConfig.value[cardId]
-  showSuccess('Card eliminada', `La tarjeta ${cardId} ha sido eliminada`)
 }
 
 const handleCardConfigured = (cardId) => {
-  console.log('Configurar card:', cardId)
-  // Abrir panel específico de configuración de la card
+  console.log('Configurando card:', cardId)
+  showSuccess('Configuración', `Configurando ${cardId}`)
 }
 
-const handleCardConfigUpdated = (cardId, newConfig) => {
-  cardsConfig.value[cardId] = { ...cardsConfig.value[cardId], ...newConfig }
-  console.log('Configuración de card actualizada:', cardId, newConfig)
-}
-
-const handleBreakpointChanged = ({ breakpoint, layout }) => {
-  console.log('Breakpoint changed:', breakpoint)
-  // Aquí podrías guardar layouts específicos por breakpoint
-}
-
-const handleCardAdded = (cardType) => {
-  const newCardId = `${cardType}-${Date.now()}`
-  const newItem = {
-    i: newCardId,
-    x: 0,
-    y: 0,
-    w: 4,
-    h: 4
+const handleCardConfigUpdate = async (cardId, newConfig) => {
+  try {
+    await updateCardConfig(cardId, newConfig)
+    showSuccess('Card Actualizada', `Configuración de ${cardId} guardada`)
+  } catch (error) {
+    showError('Error', 'No se pudo actualizar la configuración de la card')
   }
-  
-  dashboardLayout.value.push(newItem)
-  cardsConfig.value[newCardId] = { title: cardType }
-  showSuccess('Card añadida', `Nueva tarjeta ${cardType} añadida al dashboard`)
 }
 
-const handleConfigSave = () => {
-  showSuccess('Configuración guardada', 'Todos los cambios se han aplicado correctamente')
-  showConfigPanel.value = false
+const handleConfigModeChanged = (configMode) => {
+  if (configMode) {
+    showSuccess('Modo Configuración', 'Arrastra las cards para reorganizarlas')
+  } else {
+    showSuccess('Configuración Guardada', 'Los cambios han sido guardados')
+  }
 }
 
-const handleConfigCancel = () => {
-  showConfigPanel.value = false
+const handleToggleConfigMode = () => {
+  const newConfigMode = toggleConfigMode()
+  if (newConfigMode) {
+    showSuccess('Modo Configuración', 'Ahora puedes reorganizar las cards arrastrándolas')
+  } else {
+    showSuccess('Modo Normal', 'Dashboard guardado y bloqueado')
+  }
 }
 
-const handleResetConfig = () => {
-  // Restablecer al layout por defecto
-  dashboardLayout.value = [
-    { i: 'stats-dashboard', x: 0, y: 0, w: 8, h: 4 },
-    { i: 'recent-searches', x: 0, y: 4, w: 8, h: 5 },
-    { i: 'notifications', x: 8, y: 0, w: 4, h: 6 },
-    { i: 'chat', x: 8, y: 6, w: 4, h: 4 },
-    { i: 'quick-actions', x: 8, y: 10, w: 4, h: 3 }
-  ]
-  showSuccess('Configuración restablecida', 'Se ha restaurado el layout por defecto')
-}
-
-// ===== MÉTODOS ORIGINALES (SIN CAMBIOS) =====
+// Métodos ORIGINALES (SIN CAMBIOS)
 const toggleFilters = () => {
   showFilters.value = !showFilters.value
+  
+  // Siempre abrir en modo minimizado
   if (showFilters.value) {
     drawerFullscreen.value = false
   }
@@ -446,21 +371,22 @@ const addToRecentSearches = (query) => {
     id: Date.now(),
     expediente: query.includes('EXP-') ? query : `EXP-2024-${Math.floor(Math.random() * 999).toString().padStart(3, '0')}`,
     cliente: query.includes('EXP-') ? 'Cliente Ejemplo' : query,
-    deuda: `€${(Math.random() * 100000).toFixed(0)}`,
-    fecha: 'Ahora'
+    deuda: `€${(Math.random() * 100000).toFixed(0)}`
   }
   
-  // Actualizar datos de recent-searches
-  const currentSearches = cardsData.value['recent-searches'].searches
-  currentSearches.unshift(newSearch)
-  if (currentSearches.length > 5) {
-    currentSearches.splice(5)
+  const exists = recentSearches.value.find(s => s.expediente === newSearch.expediente)
+  if (!exists) {
+    recentSearches.value.unshift(newSearch)
+    if (recentSearches.value.length > 5) {
+      recentSearches.value = recentSearches.value.slice(0, 5)
+    }
   }
 }
 
+// Método para mostrar mensaje de validación ORIGINAL
 const showSearchValidation = () => {
   console.warn('⚠️ Debe ingresar un número de expediente para realizar la búsqueda')
-  showWarn(
+   showWarn(
     'Búsqueda requerida',
     'Debe ingresar un número de expediente para realizar la búsqueda'
   )
@@ -478,6 +404,7 @@ const performSearch = async () => {
   try {
     console.log('🔍 Iniciando búsqueda desde Dashboard:', expedienteQuery.trim())
     
+    // NO actualizar persistentExpedienteSearch aquí si ya está igual
     if (persistentExpedienteSearch.value !== expedienteQuery.trim()) {
       persistentExpedienteSearch.value = expedienteQuery.trim()
     }
@@ -511,10 +438,18 @@ const clearSearchFromBothSources = () => {
   console.log('🧹 Búsqueda limpiada desde ambas fuentes')
 }
 
+// Manejar filtros de forma persistente ORIGINAL
 const handleApplyFilters = async (filterData) => {
   console.log('📋 Aplicando filtros desde FilterPanel:', filterData)
+  
+  // Guardar filtros persistentemente
   persistentFilters.value = { ...filterData }
   
+  // No hacer búsqueda automática aquí, ya la hace el FilterPanel
+  // Solo actualizar el estado local
+  console.log('✅ Filtros guardados correctamente')
+  
+  // Si tenemos resultados en el store, sincronizarlos
   if (expedientesStore.hasExpedientes) {
     searchResults.value = expedientesStore.expedientes.map(exp => ({
       id: exp.id,
@@ -529,27 +464,39 @@ const handleApplyFilters = async (filterData) => {
   }
 }
 
+// Metodos para gestión de filtros ORIGINALES
 const handleClearFilters = () => {
   console.log('Limpiando todos los filtros')
+  
+  // Limpiar estado persistente
   persistentFilters.value = {}
   persistentExpedienteSearch.value = ''
+  
+  // Limpiar resultados y búsquedas
   clearSearchFromBothSources()
+  
   console.log('✅ Filtros y búsquedas limpiados completamente')
 }
 
 const handleFilterChange = (filterData) => {
   console.log('Filtros cambiados:', filterData)
+  
+  // Actualizar filtros persistentes en tiempo real
   persistentFilters.value = { ...filterData }
 }
 
 const handleExpedienteSearch = async (expediente) => {
   console.log('🔍 Búsqueda desde FilterPanel:', expediente)
+  
+  // Solo actualizar sin disparar watchers
   persistentExpedienteSearch.value = expediente || ''
   
+  // Sincronizar searchQuery directamente
   if (expediente !== searchQuery.value) {
     searchQuery.value = expediente || ''
   }
   
+  // Los resultados ya están en el store desde FilterPanel
   if (expedientesStore.hasExpedientes) {
     searchResults.value = expedientesStore.expedientes.map(exp => ({
       id: exp.id,
@@ -567,21 +514,28 @@ const handleExpedienteSearch = async (expediente) => {
   }
 }
 
+// Método para alternar pantalla completa del drawer ORIGINAL
 const toggleDrawerFullscreen = () => {
   drawerFullscreen.value = !drawerFullscreen.value
   console.log('Drawer fullscreen:', drawerFullscreen.value)
 }
 
+// Mantener este método para recibir eventos del FilterPanel ORIGINAL
 const handleToggleFullscreen = (isFullscreen) => {
   drawerFullscreen.value = isFullscreen
   console.log('Drawer fullscreen desde FilterPanel:', isFullscreen)
 }
 
+// Métodos del Dock ORIGINALES
 const handleDockClick = (item) => {
   console.log('Dock item clicked:', item)
+  
+  // Actualizar estado activo
   dockItems.value.forEach(dockItem => {
     dockItem.active = dockItem.id === item.id
   })
+  
+  // Ejecutar comando si existe
   if (item.command) {
     item.command()
   }
@@ -596,22 +550,94 @@ const onDockShown = () => {
 }
 
 onMounted(() => {
-  console.log('Dashboard cargado con grid system')
+  console.log('Dashboard cargado')
+  // Marcar el item actual como activo (ejemplo: dashboard)
   dockItems.value[0].active = true
 })
 </script>
 
 <style scoped>
-.filter-drawer :deep(.p-drawer-full .p-drawer) {
-  height: 100vh !important;
-  width: 100vw !important;
+.dashboard-grid-section {
+  background: white;
+  border-radius: 5px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 }
 
+.dashboard-grid-section.config-mode-active {
+  border: 2px solid #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+/* Banner de modo configuración */
+.config-mode-banner {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border: 1px solid #93c5fd;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  animation: slideDown 0.3s ease-out;
+}
+
+.banner-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.banner-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.banner-text strong {
+  color: #1e40af;
+  font-weight: 600;
+}
+
+.banner-text span {
+  color: #1e40af;
+  font-size: 0.875rem;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ESTILOS ORIGINALES */
+/* Clases para estilos básicos */
 .transition-shadow {
   transition: box-shadow 0.2s ease-in-out;
 }
 
 .transition-colors {
   transition: background-color 0.2s ease-in-out;
+}
+
+.hover\:shadow-lg:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Drawer fullscreen usando las clases nativas de PrimeVue */
+.filter-drawer :deep(.p-drawer-full .p-drawer) {
+  height: 100vh !important;
+  width: 100vw !important;
 }
 </style>

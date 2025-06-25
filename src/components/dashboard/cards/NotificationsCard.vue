@@ -5,7 +5,7 @@
     <div class="card-header p-4 border-b border-slate-200">
       <div class="flex items-center justify-between">
         <h3 class="text-lg font-semibold text-slate-800 flex items-center">
-          <i class="pi pi-bell mr-2"></i>
+          <i class="pi pi-bell mr-2 "></i>
           {{ config?.title || 'Notificaciones' }}
           <Badge v-if="unreadCount > 0" :value="unreadCount" class="ml-2" />
         </h3>

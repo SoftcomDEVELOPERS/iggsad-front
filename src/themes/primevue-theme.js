@@ -212,6 +212,31 @@ export const GestionProcesalTheme = definePreset(Nora, {
                 }
             }
         },
+        badge: {
+            root: {
+                background: '{primary.color}',
+                color: '#ffffff', // Blanco siempre
+                fontSize: '0.75rem',
+                fontWeight: '700',
+                minWidth: '1.5rem',
+                height: '1.5rem'
+            },
+            sm: {
+                fontSize: '0.625rem',
+                minWidth: '1.25rem',
+                height: '1.25rem'
+            },
+            lg: {
+                fontSize: '0.875rem',
+                minWidth: '1.75rem',
+                height: '1.75rem'
+            },
+            xl: {
+                fontSize: '1rem',
+                minWidth: '2rem',
+                height: '2rem'
+            }
+            },
         toast: {
             root: {
                 width: '25rem',
@@ -227,7 +252,7 @@ export const GestionProcesalTheme = definePreset(Nora, {
                 gap: '0.5rem'
             },
             text: {
-                gap: '0.5rem'
+                gap: '0.5rem',
             },
             summary: {
                 fontWeight: '600',

@@ -1,97 +1,177 @@
-<!-- src/components/dashboard/DashboardGrid.vue - VERSIÓN CORREGIDA -->
+<!-- src/components/dashboard/DashboardGrid.vue - VERSIÓN INTUITIVA -->
 <template>
   <div class="dashboard-grid-container">
-    <!-- Toolbar de configuración -->
-    <div v-if="configMode" class="config-toolbar bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <i class="pi pi-cog text-blue-600"></i>
-          <span class="text-sm font-medium text-blue-800">Modo Configuración Activo</span>
-        </div>
-        <div class="flex gap-2">
-          <Button
-            icon="pi pi-plus"
-            label="Añadir Card"
-            size="small"
-            @click="$emit('show-card-library')"
-          />
-          <Button
-            icon="pi pi-refresh"
-            label="Reset"
-            outlined
-            size="small"
-            @click="resetLayout"
-          />
-        </div>
-      </div>
+    <!-- Botón de configuración flotante -->
+    <div class="config-toggle">
+      <Button
+        :icon="configMode ? 'pi pi-check' : 'pi pi-cog'"
+        :label="configMode ? 'Finalizar' : 'Configurar'"
+        :class="{ 
+          'config-active': configMode,
+          'config-inactive': !configMode 
+        }"
+        @click="toggleConfigMode"
+        :severity="configMode ? 'success' : 'secondary'"
+        size="small"
+      />
     </div>
 
-    <!-- Grid principal -->
-    <grid-layout
-      v-model:layout="currentLayout"
-      :col-num="colNum"
-      :row-height="rowHeight"
-      :is-draggable="!configMode ? false : true"
-      :is-resizable="!configMode ? false : true"
-      :vertical-compact="true"
-      :use-css-transforms="true"
-      :auto-size="true"
-      :responsive="true"
-      :breakpoints="breakpoints"
-      :cols="responsiveCols"
-      @update:layout="handleLayoutUpdate"
-      @breakpoint-changed="handleBreakpointChange"
-    >
-      <grid-item
-        v-for="item in currentLayout"
-        :key="item.i"
-        :x="item.x"
-        :y="item.y"
-        :w="item.w"
-        :h="item.h"
-        :i="item.i"
-        :min-w="getCardConfig(item.i)?.minW || 2"
-        :min-h="getCardConfig(item.i)?.minH || 2"
-        :max-w="getCardConfig(item.i)?.maxW || 12"
-        :max-h="getCardConfig(item.i)?.maxH || 10"
-        class="grid-item-container"
-        :class="{ 'config-mode': configMode }"
-      >
-        <!-- Wrapper universal para todas las cards -->
-        <GridCard
-          :card-id="item.i"
-          :card-config="getCardConfig(item.i)"
-          :config-mode="configMode"
-          :data="getCardData(item.i)"
-          @remove-card="removeCard"
-          @configure-card="configureCard"
-        >
-          <!-- Renderizar componente dinámico según tipo de card -->
-          <component
-            :is="getCardComponent(item.i)"
-            :card-id="item.i"
-            :config="getCardConfig(item.i)"
-            :data="getCardData(item.i)"
-            :config-mode="configMode"
-            @update-config="updateCardConfig"
-          />
-        </GridCard>
-      </grid-item>
-    </grid-layout>
+    <!-- Toolbar flotante en modo configuración -->
+    <Transition name="slide-down">
+      <div v-if="configMode" class="config-toolbar">
+        <div class="toolbar-content">
+          <div class="toolbar-section">
+            <i class="pi pi-info-circle text-blue-600"></i>
+            <span class="toolbar-text">Arrastra para mover • Esquina inferior derecha para redimensionar</span>
+          </div>
+          
+          <div class="toolbar-actions">
+            <Button
+              icon="pi pi-plus"
+              label="Añadir Card"
+              size="small"
+              outlined
+              @click="showCardSelector = true"
+            />
+            <Button
+              icon="pi pi-refresh"
+              label="Reset"
+              size="small"
+              outlined
+              severity="warn"
+              @click="resetLayout"
+            />
+          </div>
+        </div>
+      </div>
+    </Transition>
 
-    <!-- Placeholder cuando no hay cards -->
+    <!-- Grid principal -->
+    <div class="" :class="{ 'config-mode-active': configMode }">
+      <grid-layout
+        v-model:layout="currentLayout"
+        :col-num="colNum"
+        :row-height="rowHeight"
+        :is-draggable="configMode"
+        :is-resizable="configMode"
+        :vertical-compact="true"
+        :use-css-transforms="true"
+        :auto-size="true"
+        :responsive="true"
+        :breakpoints="breakpoints"
+        :cols="responsiveCols"
+        :margin="[12, 12]"
+        class="full-width-grid"
+        @update:layout="handleLayoutUpdate"
+        @breakpoint-changed="handleBreakpointChange"
+      >
+        <grid-item
+          v-for="item in currentLayout"
+          :key="item.i"
+          :x="item.x"
+          :y="item.y"
+          :w="item.w"
+          :h="item.h"
+          :i="item.i"
+          :min-w="getCardConfig(item.i)?.minW || 2"
+          :min-h="getCardConfig(item.i)?.minH || 2"
+          :max-w="getCardConfig(item.i)?.maxW || 12"
+          :max-h="getCardConfig(item.i)?.maxH || 10"
+          class="grid-item"
+          :class="{ 
+            'in-config-mode': configMode,
+            'dragging': isDragging && draggedItem === item.i,
+            'resizing': isResizing && resizedItem === item.i
+          }"
+        >
+          <!-- Card con overlay de configuración -->
+          <div class="card-container">
+            <!-- Overlay de configuración -->
+            <div v-if="configMode" class="config-overlay">
+              <div class="config-handles">
+                <!-- Handle de arrastre -->
+                <div class="drag-handle" title="Arrastra para mover">
+                  <i class="pi pi-arrows-alt"></i>
+                </div>
+                
+                <!-- Botón de eliminar -->
+                <Button
+                  icon="pi pi-times"
+                  severity="danger"
+                  size="small"
+                  text
+                  rounded
+                  class="remove-btn"
+                  @click="removeCard(item.i)"
+                  title="Eliminar card"
+                />
+              </div>
+              
+              <!-- Información de la card -->
+              <div class="card-info">
+                <span class="card-size">{{ item.w }}×{{ item.h }}</span>
+              </div>
+            </div>
+
+            <!-- Contenido de la card -->
+            <GridCard
+              :card-id="item.i"
+              :card-config="getCardConfig(item.i)"
+              :config-mode="configMode"
+              :data="getCardData(item.i)"
+              :class="{ 'with-overlay': configMode }"
+              @remove-card="removeCard"
+              @configure-card="configureCard"
+            >
+              <component
+                :is="getCardComponent(item.i)"
+                :card-id="item.i"
+                :config="getCardConfig(item.i)"
+                :data="getCardData(item.i)"
+                :config-mode="configMode"
+                @update-config="updateCardConfig"
+              />
+            </GridCard>
+          </div>
+        </grid-item>
+      </grid-layout>
+    </div>
+
+    <!-- Estado vacío -->
     <div v-if="currentLayout.length === 0" class="empty-dashboard">
-      <div class="text-center py-12">
-        <i class="pi pi-th-large text-4xl text-slate-300 mb-4"></i>
-        <h3 class="text-lg font-medium text-slate-600 mb-2">Dashboard Vacío</h3>
-        <p class="text-sm text-slate-500 mb-4">Añade cards para personalizar tu experiencia</p>
+      <div class="empty-content">
+        <i class="pi pi-th-large"></i>
+        <h3>Dashboard Personalizable</h3>
+        <p>Activa el modo configuración para añadir y organizar tus cards</p>
         <Button 
-          icon="pi pi-plus" 
-          label="Añadir Primera Card" 
-          @click="$emit('show-card-library')"
+          icon="pi pi-cog" 
+          label="Configurar Dashboard" 
+          @click="configMode = true"
         />
       </div>
     </div>
+
+    <!-- Selector de cards (modal simple) -->
+    <Dialog 
+      v-model:visible="showCardSelector" 
+      header="Seleccionar Card"
+      modal
+      :style="{ width: '600px' }"
+    >
+      <div class="card-selector-grid">
+        <div 
+          v-for="card in availableCards" 
+          :key="card.id"
+          class="card-option"
+          :class="{ 'already-added': isCardInLayout(card.id) }"
+          @click="addCard(card.id)"
+        >
+          <i :class="card.icon"></i>
+          <span>{{ card.title }}</span>
+          <Badge v-if="isCardInLayout(card.id)" value="Añadida" severity="success" />
+        </div>
+      </div>
+    </Dialog>
   </div>
 </template>
 
@@ -99,6 +179,8 @@
 import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import { GridLayout, GridItem } from 'grid-layout-plus'
 import Button from 'primevue/button'
+import Dialog from 'primevue/dialog'
+import Badge from 'primevue/badge'
 import GridCard from './GridCard.vue'
 import StatsDashboard from './cards/StatsDashboard.vue'
 import RecentSearchesCard from './cards/RecentSearchesCard.vue'
@@ -118,10 +200,6 @@ const props = defineProps({
   cardsData: {
     type: Object,
     default: () => ({})
-  },
-  configMode: {
-    type: Boolean,
-    default: false
   }
 })
 
@@ -130,175 +208,168 @@ const emit = defineEmits([
   'card-removed',
   'card-configured',
   'card-config-updated',
-  'show-card-library',
-  'breakpoint-changed'
+  'config-mode-changed'
 ])
 
 // Estado del grid
 const currentLayout = ref([...props.layout])
-const currentBreakpoint = ref('lg')
-
-// ✅ VARIABLE PARA EVITAR BUCLES
-const isInternalUpdate = ref(false)
-
-// Configuración responsive
-const breakpoints = {
-  lg: 1200,
-  md: 768,
-  sm: 576,
-  xs: 0
-}
-
-const responsiveCols = {
-  lg: 12,
-  md: 8,
-  sm: 4,
-  xs: 2
-}
+const configMode = ref(false)
+const showCardSelector = ref(false)
+const isDragging = ref(false)
+const isResizing = ref(false)
+const draggedItem = ref(null)
+const resizedItem = ref(null)
 
 // Configuración del grid
-const colNum = computed(() => responsiveCols[currentBreakpoint.value])
-const rowHeight = computed(() => {
-  switch (currentBreakpoint.value) {
-    case 'xs': return 80
-    case 'sm': return 70
-    case 'md': return 60
-    default: return 60
-  }
-})
+const colNum = 12
+const rowHeight = 60
+const breakpoints = { lg: 1200, md: 768, sm: 576, xs: 0 }
+const responsiveCols = { lg: 12, md: 8, sm: 4, xs: 2 }
 
-// Mapeo de componentes
-const cardComponents = {
-  'stats-dashboard': StatsDashboard,
-  'recent-searches': RecentSearchesCard,
-  'notifications': NotificationsCard,
-  'chat': ChatCard,
-  'quick-actions': QuickActionsCard
-}
+// Cards disponibles
+const availableCards = [
+  { id: 'stats-dashboard', title: 'Estadísticas', icon: 'pi pi-chart-bar' },
+  { id: 'recent-searches', title: 'Búsquedas Recientes', icon: 'pi pi-search' },
+  { id: 'notifications', title: 'Notificaciones', icon: 'pi pi-bell' },
+  { id: 'chat', title: 'Chat', icon: 'pi pi-comments' },
+  { id: 'quick-actions', title: 'Acciones Rápidas', icon: 'pi pi-bolt' }
+]
 
-// Configuración por defecto de las cards
-const defaultCardConfigs = {
-  'stats-dashboard': {
-    minW: 4, minH: 3, maxW: 12, maxH: 6,
-    title: 'Estadísticas',
-    selectedStats: ['casos-activos', 'audiencias-proximas', 'casos-urgentes', 'total-clientes'],
-    gridLayout: 'auto'
-  },
-  'recent-searches': {
-    minW: 6, minH: 4, maxW: 12, maxH: 8,
-    title: 'Búsquedas Recientes',
-    maxItems: 5,
-    showActions: true
-  },
-  'notifications': {
-    minW: 3, minH: 4, maxW: 6, maxH: 12,
-    title: 'Notificaciones',
-    maxItems: 10,
-    showMarkAllRead: true
-  },
-  'chat': {
-    minW: 3, minH: 4, maxW: 6, maxH: 10,
-    title: 'Chat',
-    maxMessages: 5,
-    showOpenChat: true
-  },
-  'quick-actions': {
-    minW: 3, minH: 3, maxW: 6, maxH: 6,
-    title: 'Acciones Rápidas',
-    layout: 'vertical'
-  }
+// Computed
+const isCardInLayout = (cardId) => {
+  return currentLayout.value.some(item => item.i === cardId)
 }
 
 // Métodos
-const getCardComponent = (cardId) => {
-  const cardType = cardId.includes('-') ? cardId.split('-')[0] + '-' + cardId.split('-')[1] : cardId
-  return cardComponents[cardType] || cardComponents['stats-dashboard']
+const toggleConfigMode = () => {
+  configMode.value = !configMode.value
+  emit('config-mode-changed', configMode.value)
+  
+  if (configMode.value) {
+    // Mostrar ayuda visual
+    nextTick(() => {
+      document.querySelectorAll('.grid-item').forEach(el => {
+        el.style.outline = '2px dashed #3b82f6'
+        el.style.outlineOffset = '4px'
+      })
+    })
+  } else {
+    // Guardar cambios y ocultar ayuda visual
+    document.querySelectorAll('.grid-item').forEach(el => {
+      el.style.outline = 'none'
+    })
+    handleLayoutUpdate(currentLayout.value)
+  }
 }
 
-const getCardConfig = (cardId) => {
-  return {
-    ...defaultCardConfigs[cardId],
-    ...props.cardsConfig[cardId]
+const handleLayoutUpdate = (newLayout) => {
+  if (JSON.stringify(newLayout) !== JSON.stringify(currentLayout.value)) {
+    currentLayout.value = [...newLayout]
+    emit('layout-updated', newLayout)
   }
+}
+
+const handleBreakpointChange = (newBreakpoint, newCols) => {
+  emit('breakpoint-changed', { breakpoint: newBreakpoint, cols: newCols })
+}
+
+const addCard = (cardId) => {
+  if (isCardInLayout(cardId)) return
+  
+  // Encontrar posición libre
+  const newItem = {
+    i: cardId,
+    x: 0,
+    y: 0,
+    w: 4,
+    h: 4
+  }
+  
+  // Buscar posición óptima
+  const existingItems = currentLayout.value
+  let placed = false
+  
+  for (let y = 0; y < 20 && !placed; y++) {
+    for (let x = 0; x <= colNum - newItem.w && !placed; x++) {
+      const isOccupied = existingItems.some(item => 
+        x < item.x + item.w && 
+        x + newItem.w > item.x && 
+        y < item.y + item.h && 
+        y + newItem.h > item.y
+      )
+      
+      if (!isOccupied) {
+        newItem.x = x
+        newItem.y = y
+        placed = true
+      }
+    }
+  }
+  
+  currentLayout.value.push(newItem)
+  showCardSelector.value = false
+  
+  // Auto-save después de añadir
+  nextTick(() => {
+    handleLayoutUpdate(currentLayout.value)
+  })
+}
+
+const removeCard = (cardId) => {
+  const index = currentLayout.value.findIndex(item => item.i === cardId)
+  if (index !== -1) {
+    currentLayout.value.splice(index, 1)
+    emit('card-removed', cardId)
+    handleLayoutUpdate(currentLayout.value)
+  }
+}
+
+const resetLayout = () => {
+  if (confirm('¿Restablecer el dashboard a la configuración por defecto?')) {
+    const defaultLayout = [
+      { i: 'stats-dashboard', x: 0, y: 0, w: 8, h: 4 },
+      { i: 'recent-searches', x: 8, y: 0, w: 4, h: 4 },
+      { i: 'notifications', x: 0, y: 4, w: 6, h: 3 },
+      { i: 'chat', x: 6, y: 4, w: 6, h: 3 }
+    ]
+    
+    currentLayout.value = [...defaultLayout]
+    handleLayoutUpdate(defaultLayout)
+  }
+}
+
+// Métodos de configuración de cards
+const getCardConfig = (cardId) => {
+  return props.cardsConfig[cardId] || {}
 }
 
 const getCardData = (cardId) => {
   return props.cardsData[cardId] || {}
 }
 
-// ✅ MÉTODO CORREGIDO - SIN BUCLE
-const handleLayoutUpdate = (newLayout) => {
-  console.log('Grid layout changed by user interaction')
-  
-  // Marcar como actualización interna para evitar bucle en watcher
-  isInternalUpdate.value = true
-  
-  // Emitir hacia Dashboard.vue
-  emit('layout-updated', newLayout)
-  
-  // Resetear flag después del próximo tick
-  nextTick(() => {
-    isInternalUpdate.value = false
-  })
-}
-
-const handleBreakpointChange = (breakpoint, layout) => {
-  currentBreakpoint.value = breakpoint
-  emit('breakpoint-changed', { breakpoint, layout })
-  console.log(`Grid breakpoint changed to: ${breakpoint}`)
-}
-
-const removeCard = (cardId) => {
-  currentLayout.value = currentLayout.value.filter(item => item.i !== cardId)
-  emit('card-removed', cardId)
+const getCardComponent = (cardId) => {
+  const components = {
+    'stats-dashboard': StatsDashboard,
+    'recent-searches': RecentSearchesCard,
+    'notifications': NotificationsCard,
+    'chat': ChatCard,
+    'quick-actions': QuickActionsCard
+  }
+  return components[cardId] || 'div'
 }
 
 const configureCard = (cardId) => {
   emit('card-configured', cardId)
 }
 
-const updateCardConfig = (cardId, newConfig) => {
-  emit('card-config-updated', cardId, newConfig)
+const updateCardConfig = (cardId, config) => {
+  emit('card-config-updated', cardId, config)
 }
 
-const resetLayout = () => {
-  // Layout por defecto
-  const defaultLayout = [
-    { i: 'stats-dashboard', x: 0, y: 0, w: 8, h: 4 },
-    { i: 'recent-searches', x: 0, y: 4, w: 8, h: 5 },
-    { i: 'notifications', x: 8, y: 0, w: 4, h: 6 },
-    { i: 'chat', x: 8, y: 6, w: 4, h: 4 },
-    { i: 'quick-actions', x: 8, y: 10, w: 4, h: 3 }
-  ]
-  
-  currentLayout.value = [...defaultLayout]
-  emit('layout-updated', defaultLayout)
-}
-
-const addCard = (cardType, position = null) => {
-  const newCardId = `${cardType}-${Date.now()}`
-  const defaultPos = position || { x: 0, y: 0, w: 4, h: 4 }
-  
-  const newItem = {
-    i: newCardId,
-    ...defaultPos
-  }
-  
-  currentLayout.value.push(newItem)
-  emit('layout-updated', currentLayout.value)
-}
-
-// ✅ WATCHER CORREGIDO - SIN BUCLE
+// Watchers
 watch(() => props.layout, (newLayout) => {
-  // Solo actualizar si NO es una actualización interna Y hay cambios reales
-  if (!isInternalUpdate.value) {
-    const currentStr = JSON.stringify(currentLayout.value)
-    const newStr = JSON.stringify(newLayout)
-    
-    if (currentStr !== newStr) {
-      console.log('Layout updated from parent, syncing...')
-      currentLayout.value = [...newLayout]
-    }
+  if (JSON.stringify(newLayout) !== JSON.stringify(currentLayout.value)) {
+    currentLayout.value = [...newLayout]
   }
 }, { deep: true })
 
@@ -306,125 +377,364 @@ watch(() => props.layout, (newLayout) => {
 onMounted(() => {
   console.log('DashboardGrid montado con layout:', currentLayout.value)
 })
-
-// Exponer métodos públicos
-defineExpose({
-  addCard,
-  removeCard,
-  resetLayout,
-  currentLayout: currentLayout.value
-})
 </script>
 
 <style scoped>
 .dashboard-grid-container {
+  position: relative;
   width: 100%;
-  min-height: 400px;
+  max-width: none !important;
 }
 
-.grid-item-container {
-  transition: all 0.2s ease;
+/* Botón de configuración flotante */
+.config-toggle {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 13px;
 }
 
-.grid-item-container.config-mode {
-  /* Estilos para modo configuración */
+.config-toggle :deep(.p-button) {
+  transition: all 0.3s ease;
+  border-radius: 8px 8px 0 0;
 }
 
+.config-active :deep(.p-button) {
+  background: #10b981;
+  border-color: #10b981;
+  transform: translateY(4px);
+}
+
+.config-inactive :deep(.p-button) {
+  background: #6b7280;
+  border-color: #6b7280;
+}
+
+/* Toolbar flotante */
 .config-toolbar {
-  user-select: none;
+  position: sticky;
+  top: 0;
+  z-index: 9;
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border: 1px solid #93c5fd;
+  margin-bottom: 1rem;
+  margin-left: 13px;
+  margin-right: 13px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
+.toolbar-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.toolbar-section {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.toolbar-text {
+  font-size: 0.875rem;
+  color: #1e40af;
+  font-weight: 500;
+}
+
+.toolbar-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Transiciones */
+.slide-down-enter-active, .slide-down-leave-active {
+  transition: all 0.3s ease;
+}
+
+.slide-down-enter-from {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
+.slide-down-leave-to {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
+/* Grid wrapper */
+.grid-wrapper {
+  transition: all 0.3s ease;
+}
+
+.grid-wrapper.config-mode-active {
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(59, 130, 246, 0.05) 10px,
+    rgba(59, 130, 246, 0.05) 20px
+  );
+  border-radius: 12px;
+  padding: 8px;
+}
+
+/* Grid items */
+.grid-item {
+  transition: all 0.2s ease !important;
+}
+
+.grid-item.in-config-mode {
+  cursor: move;
+}
+
+.grid-item.dragging {
+  opacity: 0.8;
+  transform: rotate(2deg) scale(1.02);
+  z-index: 1000 !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+}
+
+.grid-item.resizing {
+  opacity: 0.9;
+  z-index: 999 !important;
+}
+
+/* Card container */
+.card-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Config overlay */
+.config-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(59, 130, 246, 0.1);
+  border: 2px solid #3b82f6;
+  border-radius: 12px;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.grid-item.in-config-mode .config-overlay {
+  opacity: 1;
+}
+
+.grid-item.in-config-mode:hover .config-overlay {
+  background: rgba(59, 130, 246, 0.15);
+}
+
+.config-handles {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: auto;
+}
+
+.drag-handle {
+  background: #3b82f6;
+  color: white;
+  padding: 6px;
+  border-radius: 6px;
+  cursor: grab;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.remove-btn {
+  pointer-events: auto;
+}
+
+.card-info {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-family: monospace;
+}
+
+.card-size {
+  font-weight: 600;
+}
+
+/* GridCard with overlay */
+:deep(.grid-card.with-overlay) {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Empty dashboard */
 .empty-dashboard {
   min-height: 400px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px dashed #e2e8f0;
+  border: 2px dashed #d1d5db;
   border-radius: 12px;
-  background: #f8fafc;
+  background: #f9fafb;
 }
 
-/* Estilos para grid-layout-plus */
-:deep(.vue-grid-layout) {
-  background: transparent;
+.empty-content {
+  text-align: center;
+  color: #6b7280;
 }
 
-:deep(.vue-grid-item) {
-  transition: all 0.2s ease;
+.empty-content i {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  color: #d1d5db;
+}
+
+.empty-content h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #374151;
+}
+
+.empty-content p {
+  margin-bottom: 1.5rem;
+}
+
+/* Card selector */
+.card-selector-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.card-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 2px solid #e5e7eb;
   border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
 }
 
-:deep(.vue-grid-item.cssTransforms) {
-  transition-property: transform, opacity;
+.card-option:hover {
+  border-color: #3b82f6;
+  background: #f0f9ff;
 }
 
-:deep(.vue-grid-item.resizing) {
-  opacity: 0.9;
-  z-index: 3;
+.card-option.already-added {
+  border-color: #10b981;
+  background: #f0fdf4;
+  cursor: default;
 }
 
-:deep(.vue-grid-item.vue-draggable-dragging) {
-  transition: none;
-  z-index: 3;
-  opacity: 0.9;
+.card-option i {
+  font-size: 2rem;
+  color: #6b7280;
 }
 
-:deep(.vue-grid-item.no-touch) {
-  -ms-touch-action: none;
-  touch-action: none;
+.card-option.already-added i {
+  color: #10b981;
 }
 
-/* Resize handles */
+/* Resize handles styling */
 :deep(.vue-resizable-handle) {
-  position: absolute;
   opacity: 0;
   transition: opacity 0.2s ease;
 }
 
-:deep(.vue-grid-item:hover .vue-resizable-handle) {
-  opacity: 0.8;
-}
-
-:deep(.vue-grid-item.config-mode .vue-resizable-handle) {
+:deep(.grid-item:hover .vue-resizable-handle) {
   opacity: 0.6;
 }
 
-:deep(.vue-resizable-handle-se) {
-  bottom: 1px;
-  right: 1px;
-  background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIHZpZXdCb3g9IjAgMCAxMiAxMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDEySDlWOUgxMlYxMlpNMTIgNkg5VjNIMTJWNloiIGZpbGw9IiM2MzY2ZjEiLz4KPC9zdmc+');
-  background-repeat: no-repeat;
-  background-position: bottom right;
-  cursor: nw-resize;
-  width: 12px;
-  height: 12px;
+:deep(.grid-item.in-config-mode .vue-resizable-handle) {
+  opacity: 0.8;
 }
 
-/* Responsive adjustments */
+:deep(.vue-resizable-handle-se) {
+  bottom: 4px;
+  right: 4px;
+  width: 16px;
+  height: 16px;
+  background: #3b82f6;
+  border-radius: 3px;
+  cursor: nw-resize;
+}
+
+:deep(.vue-resizable-handle-se::after) {
+  content: '';
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  width: 8px;
+  height: 8px;
+  background: linear-gradient(-45deg, 
+    transparent 0%, 
+    transparent 40%, 
+    white 40%, 
+    white 50%, 
+    transparent 50%, 
+    transparent 60%, 
+    white 60%, 
+    white 70%, 
+    transparent 70%
+  );
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-  .config-toolbar {
-    padding: 0.75rem;
+  .config-toggle {
+    top: -50px;
   }
   
-  .config-toolbar .flex {
+  .toolbar-content {
     flex-direction: column;
-    gap: 0.75rem;
     align-items: stretch;
   }
   
-  :deep(.vue-grid-layout) {
-    margin: 0 -8px;
+  .toolbar-actions {
+    justify-content: center;
+  }
+  
+  .card-selector-grid {
+    grid-template-columns: 1fr;
   }
 }
 
-@media (max-width: 576px) {
-  :deep(.vue-grid-layout) {
-    margin: 0 -4px;
-  }
-  
-  .empty-dashboard {
-    min-height: 300px;
-    margin: 1rem 0;
-  }
+:deep(.vgl-layout) {
+  width: 100% !important;
+  min-width: 100% !important;
 }
+
+.dashboard-grid-container {
+  width: 100%;
+  min-width: 100%;
+}
+
+.full-width-grid {
+  width: 100% !important;
+}
+
 </style>
