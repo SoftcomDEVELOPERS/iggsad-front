@@ -1,4 +1,6 @@
 // services/auth.services.js
+import { getDefaultUserProfile } from '@/utils/defaultUserProfile'
+
 const SSO = import.meta.env.VITE_SSO_URL
 
 /**
@@ -42,46 +44,7 @@ export async function fetchMe() {
   const data = await res.json();
   
   // ✨ NUEVO: Falsear el userProfile hasta que esté en el backend
-  const fakeUserProfile = {
-    dashboard: {
-      layout: 'grid-auto',
-      cards: [
-        { id: 'casos-activos', type: 'stat', visible: true, order: 1, size: 'normal' },
-        { id: 'audiencias-proximas', type: 'stat', visible: true, order: 2, size: 'normal' },
-        { id: 'casos-urgentes', type: 'stat', visible: true, order: 3, size: 'normal' },
-        { id: 'total-clientes', type: 'stat', visible: false, order: 4, size: 'normal' }, // Usuario lo ocultó
-        { id: 'busquedas-recientes', type: 'content', visible: true, order: 5, size: 'large' },
-        { id: 'notificaciones', type: 'sidebar', visible: true, order: 6, size: 'normal' },
-        { id: 'chat', type: 'sidebar', visible: true, order: 7, size: 'normal' },
-        { id: 'acciones-rapidas', type: 'sidebar', visible: true, order: 8, size: 'small' }
-      ]
-    },
-    dock: {
-      enabled: true,
-      position: 'bottom',
-      autoHide: false,
-      items: [
-        { id: 'casos', visible: true, order: 1 },
-        { id: 'audiencias', visible: true, order: 2 },
-        { id: 'clientes', visible: true, order: 3 },
-        { id: 'documentos', visible: true, order: 4 },
-        { id: 'perfil', visible: false, order: 5 } // Usuario lo ocultó
-      ]
-    },
-    filters: {
-      defaults: {
-        cliente: ['activos'],
-        estadoExpediente: ['todos']
-      },
-      favorites: ['cliente', 'estadoExpediente'],
-      expandedSections: ['procedimiento-basico', 'fechas']
-    },
-    preferences: {
-      theme: 'light',
-      language: 'es',
-      dateFormat: 'dd/mm/yyyy'
-    }
-  };
+  const fakeUserProfile = getDefaultUserProfile();
   
   // Adaptar según la estructura de respuesta de tu backend
   if (data.success && data.data) {

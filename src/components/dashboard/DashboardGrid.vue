@@ -1,51 +1,45 @@
-<!-- src/components/dashboard/DashboardGrid.vue -->
+<!-- src/components/dashboard/DashboardGrid.vue - VERSIÓN CORREGIDA -->
 <template>
   <div class="dashboard-grid-container">
-    <!-- Modo configuración: barra de herramientas -->
-    <div v-if="configMode" class="config-toolbar mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+    <!-- Toolbar de configuración -->
+    <div v-if="configMode" class="config-toolbar bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
       <div class="flex items-center justify-between">
-        <div class="flex items-center gap-4">
-          <h4 class="text-sm font-semibold text-blue-800">Modo Personalización</h4>
-          <div class="flex items-center gap-2 text-xs text-blue-700">
-            <i class="pi pi-info-circle"></i>
-            <span>Arrastra para mover • Esquinas para redimensionar</span>
-          </div>
-        </div>
         <div class="flex items-center gap-2">
-          <Button 
-            icon="pi pi-plus" 
-            label="Añadir Card" 
+          <i class="pi pi-cog text-blue-600"></i>
+          <span class="text-sm font-medium text-blue-800">Modo Configuración Activo</span>
+        </div>
+        <div class="flex gap-2">
+          <Button
+            icon="pi pi-plus"
+            label="Añadir Card"
             size="small"
-            outlined
             @click="$emit('show-card-library')"
           />
-          <Button 
-            icon="pi pi-refresh" 
-            label="Reset Layout" 
-            size="small"
-            severity="secondary"
+          <Button
+            icon="pi pi-refresh"
+            label="Reset"
             outlined
+            size="small"
             @click="resetLayout"
           />
         </div>
       </div>
     </div>
 
-    <!-- Grid Layout Principal -->
+    <!-- Grid principal -->
     <grid-layout
       v-model:layout="currentLayout"
       :col-num="colNum"
       :row-height="rowHeight"
-      :is-draggable="configMode"
-      :is-resizable="configMode"
-      :is-mirrored="false"
+      :is-draggable="!configMode ? false : true"
+      :is-resizable="!configMode ? false : true"
       :vertical-compact="true"
-      :margin="[16, 16]"
       :use-css-transforms="true"
+      :auto-size="true"
       :responsive="true"
       :breakpoints="breakpoints"
       :cols="responsiveCols"
-      @layout-updated="handleLayoutUpdate"
+      @update:layout="handleLayoutUpdate"
       @breakpoint-changed="handleBreakpointChange"
     >
       <grid-item
@@ -102,8 +96,8 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
-import { GridLayout, GridItem } from 'vue-grid-layout'
+import { ref, computed, watch, onMounted, nextTick } from 'vue'
+import { GridLayout, GridItem } from 'grid-layout-plus'
 import Button from 'primevue/button'
 import GridCard from './GridCard.vue'
 import StatsDashboard from './cards/StatsDashboard.vue'
@@ -143,6 +137,9 @@ const emit = defineEmits([
 // Estado del grid
 const currentLayout = ref([...props.layout])
 const currentBreakpoint = ref('lg')
+
+// ✅ VARIABLE PARA EVITAR BUCLES
+const isInternalUpdate = ref(false)
 
 // Configuración responsive
 const breakpoints = {
@@ -229,9 +226,20 @@ const getCardData = (cardId) => {
   return props.cardsData[cardId] || {}
 }
 
+// ✅ MÉTODO CORREGIDO - SIN BUCLE
 const handleLayoutUpdate = (newLayout) => {
-  currentLayout.value = newLayout
+  console.log('Grid layout changed by user interaction')
+  
+  // Marcar como actualización interna para evitar bucle en watcher
+  isInternalUpdate.value = true
+  
+  // Emitir hacia Dashboard.vue
   emit('layout-updated', newLayout)
+  
+  // Resetear flag después del próximo tick
+  nextTick(() => {
+    isInternalUpdate.value = false
+  })
 }
 
 const handleBreakpointChange = (breakpoint, layout) => {
@@ -280,9 +288,18 @@ const addCard = (cardType, position = null) => {
   emit('layout-updated', currentLayout.value)
 }
 
-// Watchers
+// ✅ WATCHER CORREGIDO - SIN BUCLE
 watch(() => props.layout, (newLayout) => {
-  currentLayout.value = [...newLayout]
+  // Solo actualizar si NO es una actualización interna Y hay cambios reales
+  if (!isInternalUpdate.value) {
+    const currentStr = JSON.stringify(currentLayout.value)
+    const newStr = JSON.stringify(newLayout)
+    
+    if (currentStr !== newStr) {
+      console.log('Layout updated from parent, syncing...')
+      currentLayout.value = [...newLayout]
+    }
+  }
 }, { deep: true })
 
 // Lifecycle
@@ -327,7 +344,7 @@ defineExpose({
   background: #f8fafc;
 }
 
-/* Estilos para vue-grid-layout */
+/* Estilos para grid-layout-plus */
 :deep(.vue-grid-layout) {
   background: transparent;
 }

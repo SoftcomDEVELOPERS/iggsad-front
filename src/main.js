@@ -22,6 +22,8 @@ import { applyToastStyles } from '@/styles/toast.styles.js'
 import { applyToastVariants } from '@/styles/toast.variants.js'
 import { defaultToastConfig } from '@/styles/toast.config.js'
 
+import ConfirmationService from 'primevue/confirmationservice'
+import ConfirmDialog from 'primevue/confirmdialog'
 // Otros componentes
 import Message from 'primevue/message';
 import IconField from 'primevue/iconfield';
@@ -65,6 +67,9 @@ app.use(ToastService, defaultToastConfig)
 // ✅ Aplicar estilos por separado (estas son funciones que manipulan el DOM)
 applyToastStyles()
 applyToastVariants()
+
+app.use(ConfirmationService)
+app.component('ConfirmDialog', ConfirmDialog)
 
 // Conectar router y montar tras estar listo
 app.use(router)

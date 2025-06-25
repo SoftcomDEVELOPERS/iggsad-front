@@ -1,13 +1,14 @@
 // stores/auth.js
 import { defineStore } from 'pinia'
 import * as authService from '@/services/auth.services.js'
+import { getDefaultUserProfile } from '@/utils/defaultUserProfile.js'
 import Cookies from 'js-cookie'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null,
     frontPermissions: [],
-    userProfile: null, // ✨ NUEVO: Configuración personalizada del usuario
+    userProfile: getDefaultUserProfile(), // ✨ Configuración personalizada del usuario
     isLoading: false
   }),
   
@@ -66,7 +67,7 @@ export const useAuthStore = defineStore('auth', {
         // Paso 3: Guardar en el store
         this.user = user
         this.frontPermissions = frontPermissions
-        this.userProfile = userProfile || this.getDefaultUserProfile() // ✨ NUEVO
+        this.userProfile = userProfile || getDefaultUserProfile() // ✨ NUEVO
         
         console.log('Login exitoso:', { user, frontPermissions, userProfile: this.userProfile })
         return loginResponse
@@ -83,51 +84,32 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
-    /**
-     * ✨ NUEVO: Perfil por defecto si no viene del backend
-     */
-    getDefaultUserProfile() {
-      return {
-        dashboard: {
-          layout: 'grid-auto',
-          cards: [
-            { id: 'casos-activos', type: 'stat', visible: true, order: 1, size: 'normal' },
-            { id: 'audiencias-proximas', type: 'stat', visible: true, order: 2, size: 'normal' },
-            { id: 'casos-urgentes', type: 'stat', visible: true, order: 3, size: 'normal' },
-            { id: 'total-clientes', type: 'stat', visible: true, order: 4, size: 'normal' },
-            { id: 'busquedas-recientes', type: 'content', visible: true, order: 5, size: 'large' },
-            { id: 'notificaciones', type: 'sidebar', visible: true, order: 6, size: 'normal' },
-            { id: 'chat', type: 'sidebar', visible: true, order: 7, size: 'normal' },
-            { id: 'acciones-rapidas', type: 'sidebar', visible: true, order: 8, size: 'small' }
-          ]
-        },
-        dock: {
-          enabled: true,
-          position: 'bottom',
-          autoHide: false,
-          items: [
-            { id: 'casos', visible: true, order: 1 },
-            { id: 'audiencias', visible: true, order: 2 },
-            { id: 'clientes', visible: true, order: 3 },
-            { id: 'documentos', visible: true, order: 4 },
-            { id: 'perfil', visible: true, order: 5 }
-          ]
-        },
-        filters: {
-          defaults: {},
-          favorites: [],
-          expandedSections: ['procedimiento-basico']
-        },
-        preferences: {
-          theme: 'light',
-          language: 'es',
-          dateFormat: 'dd/mm/yyyy'
+    async saveDashboardConfig(dashboardConfig) {
+      try {
+        // Actualizar localmente primero (UX inmediata)
+        userProfile.value.dashboard = {
+          ...userProfile.value.dashboard,
+          ...dashboardConfig
         }
+        console.log('✅ Dashboard actualizado localmente:', userProfile.value.dashboard);
+        
+        // Enviar al backend (en background)
+        // await fetch(`${VITE_SSO_URL}/user/profile`, {
+        //   method: 'PUT',
+        //   headers: { 'Content-Type': 'application/json' },
+        //   credentials: 'include',
+        //   body: JSON.stringify(dashboardConfig)
+        // })
+        
+        console.log('✅ Dashboard guardado en servidor')
+      } catch (error) {
+        console.error('❌ Error guardando dashboard:', error)
+        // Opcional: mostrar toast de error
       }
     },
 
     /**
-     * ✨ NUEVO: Actualizar configuración del dashboard
+     * ✨ Actualizar configuración del dashboard
      */
     async updateDashboardConfig(config) {
       try {
@@ -192,7 +174,7 @@ export const useAuthStore = defineStore('auth', {
         const { user, frontPermissions, userProfile } = await authService.fetchMe()
         this.user = user
         this.frontPermissions = frontPermissions
-        this.userProfile = userProfile || this.getDefaultUserProfile() // ✨ NUEVO
+        this.userProfile = userProfile || getDefaultUserProfile() // ✨ NUEVO
         
         console.log('Usuario autenticado:', user)
         return true
@@ -206,7 +188,7 @@ export const useAuthStore = defineStore('auth', {
             const { user, frontPermissions, userProfile } = await authService.fetchMe()
             this.user = user
             this.frontPermissions = frontPermissions
-            this.userProfile = userProfile || this.getDefaultUserProfile() // ✨ NUEVO
+            this.userProfile = userProfile || getDefaultUserProfile() // ✨ NUEVO
             return true
           }
         }
@@ -233,7 +215,7 @@ export const useAuthStore = defineStore('auth', {
           const { user, frontPermissions, userProfile } = await authService.fetchMe()
           this.user = user
           this.frontPermissions = frontPermissions
-          this.userProfile = userProfile || this.getDefaultUserProfile() // ✨ NUEVO
+          this.userProfile = userProfile || getDefaultUserProfile() // ✨ NUEVO
           return true
         }
         

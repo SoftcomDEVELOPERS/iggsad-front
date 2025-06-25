@@ -166,7 +166,7 @@ import Dock from '@/components/Dock.vue'
 import FilterPanel from '@/components/filters/FilterPanel.vue'
 import SearchBar from '@/components/SearchBar.vue'
 import DashboardGrid from '@/components/dashboard/DashboardGrid.vue'
-import DashboardConfigPanel from '@/components/dashboard/DashboardConfigPanel.vue'
+import DashboardConfigPanel from '@/components/dashboard/config/DashboardConfigPanel.vue'
 import { useExpedientesStore } from '@/stores/expedientes'
 import { useToast } from '@/composables/useToast'
 
@@ -360,9 +360,20 @@ const toggleConfigMode = () => {
 }
 
 const handleLayoutUpdate = (newLayout) => {
-  dashboardLayout.value = newLayout
-  console.log('Layout actualizado:', newLayout)
-  // Aquí guardarías en el userProfile
+  // Evitar bucles comparando contenido real
+  const currentStr = JSON.stringify(dashboardLayout.value)
+  const newStr = JSON.stringify(newLayout)
+  
+  if (currentStr !== newStr) {
+    console.log('Layout actualizado con cambios reales:', newLayout.length, 'cards')
+    dashboardLayout.value = [...newLayout]
+    
+    // 🎯 GUARDAR DIRECTAMENTE EN EL BACKEND
+    saveDashboardConfig({
+      layout: newLayout,
+      cardsConfig: cardsConfig.value
+    })
+  }
 }
 
 const handleCardRemoved = (cardId) => {

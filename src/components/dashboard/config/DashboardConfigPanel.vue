@@ -1,7 +1,7 @@
 <!-- src/components/dashboard/DashboardConfigPanel.vue -->
 <template>
   <Dialog 
-    v-model:visible="visible" 
+    :visible="visible" 
     modal 
     :draggable="false"
     :closable="true"
@@ -79,6 +79,18 @@
       <!-- Acciones rápidas -->
       <div class="flex gap-3">
         <Button 
+        icon="pi pi-th-large" 
+        label="Librería de Cards"
+        outlined
+        @click="showCardLibrary = true"
+      />
+      <Button 
+        icon="pi pi-chart-bar" 
+        label="Configurar Estadísticas"
+        outlined
+        @click="showStatsSelector = true"
+      />
+        <Button 
           icon="pi pi-refresh" 
           label="Restablecer Layout"
           severity="secondary"
@@ -93,6 +105,7 @@
         />
       </div>
     </div>
+    
 
     <template #footer>
       <div class="flex justify-between items-center">
@@ -114,6 +127,21 @@
         </div>
       </div>
     </template>
+
+    <CardLibrary
+      v-model:visible="showCardLibrary"
+      :dashboard-layout="dashboardLayout"
+      :available-cards="availableCards"
+      @card-added="$emit('card-added', $event)"
+      @card-removed="$emit('card-removed', $event)"
+    />
+
+    <StatsSelector
+      v-model:visible="showStatsSelector"
+      :current-selected-stats="currentStatsConfig?.selectedStats || []"
+      :current-layout="currentStatsConfig?.gridLayout || 'auto'"
+      @apply="handleStatsConfig"
+    />
   </Dialog>
 </template>
 
@@ -122,7 +150,10 @@ import { ref, computed } from 'vue'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import Badge from 'primevue/badge'
+import CardLibrary from './CardLibrary.vue'
+import StatsSelector from './StatsSelector.vue'
 import { useToast } from '@/composables/useToast'
+
 
 const props = defineProps({
   visible: {
@@ -154,6 +185,8 @@ const emit = defineEmits([
 ])
 
 const { showSuccess, showError, showWarn } = useToast()
+const showCardLibrary = ref(false)
+const showStatsSelector = ref(false)
 
 // Estado local
 const saving = ref(false)
@@ -243,7 +276,7 @@ const exportConfig = () => {
 const handleSave = async () => {
   try {
     saving.value = true
-    await emit('save')
+    emit('save')
     showSuccess('Configuración guardada', 'Los cambios se han aplicado correctamente')
     emit('update:visible', false)
   } catch (error) {
@@ -251,6 +284,12 @@ const handleSave = async () => {
   } finally {
     saving.value = false
   }
+}
+
+const handleStatsConfig = (config) => {
+  // Actualizar configuración de stats-dashboard
+  emit('card-config-updated', 'stats-dashboard', config)
+  showStatsSelector.value = false
 }
 
 const handleCancel = () => {

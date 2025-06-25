@@ -65,6 +65,7 @@
 
     <!-- Toast global -->
     <Toast position="top-right" />
+    <ConfirmDialog />
   </div>
 </template>
 

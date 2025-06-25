@@ -1,5 +1,5 @@
 // src/types/vue-grid-layout.d.ts
-declare module 'vue-grid-layout' {
+declare module 'grid-layout-plus' {
   import { DefineComponent } from 'vue'
   
   export interface LayoutItem {
