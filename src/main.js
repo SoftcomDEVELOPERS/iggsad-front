@@ -3,14 +3,12 @@ import App from './App.vue'
 import router from './router'
 import { createPinia } from 'pinia'
 
-// ===== TEMA MEJORADO =====
-import { 
-  GestionProcesalTheme, 
-  applyIggsadTokens 
-} from './themes/primevue-theme.js'
-
 // ===== ESTILOS BASE =====
 import './assets/tailwind.css'
+import './styles/index.css'  
+
+// ===== TEMA MEJORADO =====
+import { GestionProcesalTheme } from './themes/primevue-theme.js'
 
 // ===== PRIMEVUE CORE =====
 import PrimeVue from 'primevue/config'
@@ -172,20 +170,70 @@ app.config.errorHandler = (err, vm, info) => {
   }
 }
 
+// ===== VALIDACIONES POST-MOUNT =====
+// 🔧 CORREGIDO: Ejecutar validaciones DESPUÉS de que Vue renderice
+function runPostMountValidations() {
+  // Esperar un tick para que Vue termine de renderizar
+  setTimeout(() => {
+    const checks = {
+      'PrimeVue': !!document.querySelector('.p-component'),
+      'Tailwind': !!document.querySelector('[class*="bg-"], [class*="text-"], [class*="flex"], [class*="grid"]'),
+      'Inter Font': getComputedStyle(document.body).fontFamily.includes('Inter'),
+      'Toast Styles': !!document.getElementById('gestion-procesal-toast-styles'),
+      'Iggsad Tokens': !!document.getElementById('iggsad-css-tokens'),
+      'Router View': !!document.querySelector('#app router-view, #app > main'),
+      'Menubar': !!document.querySelector('.p-menubar')
+    }
+    
+    console.log('\n🔍 === VALIDACIÓN DEL SISTEMA ===')
+    Object.entries(checks).forEach(([name, loaded]) => {
+      console.log(`${loaded ? '✅' : '❌'} ${name}: ${loaded ? 'Cargado' : 'No encontrado'}`)
+    })
+    
+    // Validaciones específicas adicionales
+    if (checks['PrimeVue']) {
+      const primeComponents = document.querySelectorAll('.p-component').length
+      console.log(`📊 Componentes PrimeVue encontrados: ${primeComponents}`)
+    }
+    
+    if (checks['Tailwind']) {
+      const tailwindClasses = document.querySelectorAll('[class*="bg-"], [class*="text-"], [class*="p-"], [class*="m-"], [class*="flex"], [class*="grid"]').length
+      console.log(`📊 Elementos con clases Tailwind: ${tailwindClasses}`)
+    }
+    
+    // Verificar tokens CSS específicos
+    const rootStyles = getComputedStyle(document.documentElement)
+    const iggsadPrimary = rootStyles.getPropertyValue('--iggsad-primary-600')
+    const iggsadSurface = rootStyles.getPropertyValue('--iggsad-surface-white')
+    
+    if (iggsadPrimary) {
+      console.log(`🎨 Token --iggsad-primary-600: ${iggsadPrimary}`)
+    }
+    if (iggsadSurface) {
+      console.log(`🎨 Token --iggsad-surface-white: ${iggsadSurface}`)
+    }
+    
+    console.log('=== FIN VALIDACIÓN ===\n')
+  }, 100) // 100ms es suficiente para que Vue renderice
+}
+
 // ===== DETECTAR MODO DESARROLLO =====
 if (import.meta.env.DEV) {
   console.log('🔧 Modo desarrollo - Logs adicionales habilitados')
   
-  // Verificar que todas las dependencias críticas estén cargadas
-  window.addEventListener('load', () => {
-    const checks = {
-      'PrimeVue': !!document.querySelector('.p-component'),
-      'Tailwind': !!document.querySelector('[class*="bg-"]'),
-      'Inter Font': getComputedStyle(document.body).fontFamily.includes('Inter')
-    }
-    
-    Object.entries(checks).forEach(([name, loaded]) => {
-      console.log(`${loaded ? '✅' : '❌'} ${name}: ${loaded ? 'Cargado' : 'No encontrado'}`)
-    })
+  // Ejecutar validaciones después del mount
+  router.isReady().then(() => {
+    // Esperar a que el router haya terminado de cargar la primera ruta
+    setTimeout(runPostMountValidations, 200)
   })
+  
+  // También ejecutar cuando la página esté completamente cargada
+  if (document.readyState === 'loading') {
+    window.addEventListener('load', () => {
+      setTimeout(runPostMountValidations, 300)
+    })
+  } else {
+    // Si ya está cargada, ejecutar inmediatamente
+    setTimeout(runPostMountValidations, 100)
+  }
 }

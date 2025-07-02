@@ -1,96 +1,102 @@
 <template>
-  <div id="app" class="min-h-screen bg-slate-50">
-    <!-- Header con navegación -->
-    <div v-if="!isLoginPage" class="bg-white shadow-sm border-b border-slate-200">
-      <div class="max-w-7xl mx-auto px-4">
-        <div class="flex items-center justify-between h-16">
-          <!-- Logo y título -->
-          <div class="flex items-center space-x-4">
-            <div class="flex items-center space-x-3">
-              <!-- Logo -->
-              <img 
-                src="/logoBalanza.png" 
-                alt="Logo Balanza" 
-                class="w-10 h-10 object-contain"
-                @error="showFallbackIcon = true"
-                v-if="!showFallbackIcon"
-              />
-              <!-- Fallback icon si no se encuentra la imagen -->
-              <div 
-                v-else
-                class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center"
-              >
-                <i class="pi pi-balance-scale text-white text-lg"></i>
-              </div>
-              
-              <div>
-                <h1 class="text-xl font-bold text-slate-800">Gestión Procesal</h1>
-                <p class="text-sm text-slate-500">Sistema Jurídico Integral</p>
-              </div>
-            </div>
+  <div id="app">
+    <!-- Toast container -->
+    <Toast />
+    <ConfirmDialog />
+    
+    <!-- Header principal - SOLO mostrar si NO estamos en login -->
+    <header v-if="!isLoginPage" class="iggsad-header">
+      <div class="iggsad-header-content">
+        <!-- Logo y branding -->
+        <div class="iggsad-brand">
+          <img 
+            src="/images/logoBalanza.png" 
+            alt="Logo" 
+            class="iggsad-logo"
+            @error="logoError = true"
+            v-if="!logoError"
+          />
+          <i v-else class="pi pi-balance-scale iggsad-logo-fallback"></i>
+          
+          <div class="iggsad-brand-text">
+            <h1 class="iggsad-brand-title">Gestión Procesal</h1>
+            <p class="iggsad-brand-subtitle">Sistema Jurídico Integral</p>
           </div>
-
-          <!-- Navegación principal -->
-          <Menubar :model="menuItems">
-            <template #start>
-              <div class="flex items-center space-x-1">
-                <!-- Los items del menú se renderizan aquí -->
-              </div>
-            </template>
-            <template #end>
-              <div class="flex items-center space-x-3">
-                <Button 
-                  icon="pi pi-user" 
-                  :label="currentUser"
-                  text 
-                  class="text-slate-700 hover:text-blue-600"
-                />
-                <Button 
-                  icon="pi pi-sign-out" 
-                  text 
-                  class="text-slate-700 hover:text-red-600"
-                  @click="logout"
-                />
-              </div>
-            </template>
-          </Menubar>
         </div>
+
+        <!-- Navegación principal -->
+        <Menubar 
+          :model="menuItems" 
+          class="iggsad-main-navigation"
+        >
+          <template #end>
+            <div class="iggsad-user-controls">
+              <!-- Mostrar nombre del usuario si está disponible -->
+              <span v-if="authStore.user" class="iggsad-user-name">
+                {{ authStore.user.firstName || authStore.user.username || 'Usuario' }}
+              </span>
+              
+              <Button 
+                icon="pi pi-user" 
+                text 
+                aria-label="Perfil usuario"
+                class="iggsad-user-button"
+                @click="goToProfile"
+              />
+              <Button 
+                icon="pi pi-cog" 
+                text 
+                aria-label="Configuración"
+                class="iggsad-user-button"
+                @click="goToSettings"
+              />
+              <Button 
+                icon="pi pi-sign-out" 
+                text 
+                aria-label="Cerrar sesión"
+                class="iggsad-user-button"
+                @click="handleLogout"
+              />
+            </div>
+          </template>
+        </Menubar>
       </div>
-    </div>
+    </header>
 
     <!-- Contenido principal -->
-    <main class="flex-1">
-      <RouterView />
+    <main class="iggsad-main-content">
+      <router-view />
     </main>
-
-    <!-- Toast global -->
-    <Toast position="top-right" />
-    <ConfirmDialog />
   </div>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useToast } from '@/composables/useToast'
+
 import Menubar from 'primevue/menubar'
 import Button from 'primevue/button'
 import Toast from 'primevue/toast'
+import ConfirmDialog from 'primevue/confirmdialog'
 
+// ===== COMPOSABLES =====
 const router = useRouter()
 const route = useRoute()
-const auth = useAuthStore()
+const authStore = useAuthStore()
+const { showSuccess, showError } = useToast()
 
-// Verificar si estamos en la página de login
-const isLoginPage = computed(() => route.name === 'Login')
+// ===== ESTADO =====
+const logoError = ref(false)
 
-// Usuario actual (simulado)
-const currentUser = ref('Juan Pérez')
+// ===== COMPUTED =====
+// 🔧 CORREGIDO: Verificar si estamos en la página de login
+const isLoginPage = computed(() => {
+  return route.name === 'Login' || route.path === '/login'
+})
 
-// Estado para manejar el logo
-const showFallbackIcon = ref(false)
-
-// Elementos del menú principal
+// ===== MENÚ DE NAVEGACIÓN =====
 const menuItems = ref([
   {
     label: 'Casos',
@@ -107,12 +113,12 @@ const menuItems = ref([
         command: () => router.push('/casos/nuevo')
       },
       {
+        separator: true
+      },
+      {
         label: 'Casos Urgentes',
         icon: 'pi pi-exclamation-triangle',
         command: () => router.push('/casos/urgentes')
-      },
-      {
-        separator: true
       },
       {
         label: 'Archivo',
@@ -157,9 +163,12 @@ const menuItems = ref([
         command: () => router.push('/documentos/plantillas')
       },
       {
+        separator: true
+      },
+      {
         label: 'Subir Documento',
         icon: 'pi pi-upload',
-        command: () => router.push('/documentos/upload')
+        command: () => router.push('/documentos/subir')
       }
     ]
   },
@@ -169,13 +178,16 @@ const menuItems = ref([
     items: [
       {
         label: 'Lista de Clientes',
-        icon: 'pi pi-users',
+        icon: 'pi pi-list',
         command: () => router.push('/clientes')
       },
       {
         label: 'Nuevo Cliente',
         icon: 'pi pi-user-plus',
         command: () => router.push('/clientes/nuevo')
+      },
+      {
+        separator: true
       },
       {
         label: 'Deudores',
@@ -186,202 +198,101 @@ const menuItems = ref([
   }
 ])
 
-// Función de logout
-const logout = async () => {
-  await auth.logout()
-  router.push('/login')
+// ===== MÉTODOS =====
+const handleLogout = async () => {
+  try {
+    await authStore.logout()
+    showSuccess('Sesión cerrada', 'Has cerrado sesión correctamente')
+    router.push('/login')
+  } catch (error) {
+    console.error('Error al cerrar sesión:', error)
+    showError('Error', 'Error al cerrar sesión')
+  }
 }
+
+const goToProfile = () => {
+  router.push('/perfil')
+}
+
+const goToSettings = () => {
+  router.push('/configuracion')
+}
+
 </script>
 
 <style>
-/* Estilos globales personalizados */
-#app {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+/* 
+ * ===== IMPORTAR ESTILOS SEPARADOS =====
+ * Los estilos del layout están en un archivo separado para mejor organización
+ */
+@import '@/styles/app-layout.css';
+
+/* ===== SOLO ESTILOS ESPECÍFICOS QUE NO ESTÁN EN EL ARCHIVO SEPARADO ===== */
+
+/* Estilo específico para el nombre de usuario */
+.iggsad-user-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--iggsad-surface-600);
+  margin-right: var(--iggsad-spacing-sm);
+  padding: var(--iggsad-spacing-xs) var(--iggsad-spacing-sm);
+  background: var(--iggsad-surface-100);
+  border-radius: var(--iggsad-radius-sm);
+  transition: var(--iggsad-transition-fast);
 }
 
-/* Sobrescribir el tema personalizado para el menubar en el header */
-.custom-menubar.p-menubar {
-  background: transparent !important;
-  border: none !important;
-  padding: 0 !important;
-  border-radius: 0 !important;
+.iggsad-user-name:hover {
+  background: var(--iggsad-surface-200);
+  color: var(--iggsad-surface-700);
 }
 
-.custom-menubar.p-menubar .p-menubar-root-list {
-  background: transparent !important;
-  gap: 0.5rem;
-}
-
-/* Forzar colores oscuros en el menubar del header */
-.custom-menubar.p-menubar .p-menuitem .p-menuitem-content .p-menuitem-link {
-  padding: 0.5rem 1rem !important;
-  border-radius: 6px !important;
-  font-weight: 500 !important;
-  transition: all 0.2s ease !important;
-  color: #334155 !important; /* slate-700 - forzar color oscuro */
-  background: transparent !important;
-}
-
-.custom-menubar.p-menubar .p-menuitem .p-menuitem-content .p-menuitem-link:hover,
-.custom-menubar.p-menubar .p-menuitem .p-menuitem-content .p-menuitem-link:focus {
-  background: rgba(59, 130, 246, 0.1) !important; /* blue-600 con opacidad */
-  color: #2563eb !important; /* blue-600 */
-}
-
-.custom-menubar.p-menubar .p-menuitem .p-menuitem-content .p-menuitem-link .p-menuitem-text {
-  color: #334155 !important; /* Forzar texto oscuro */
-}
-
-.custom-menubar.p-menubar .p-menuitem .p-menuitem-content .p-menuitem-link .p-menuitem-icon {
-  color: #334155 !important; /* Forzar icono oscuro */
-  margin-right: 0.5rem !important;
-}
-
-/* Estados hover y focus */
-.custom-menubar.p-menubar .p-menuitem .p-menuitem-content .p-menuitem-link:hover .p-menuitem-text,
-.custom-menubar.p-menubar .p-menuitem .p-menuitem-content .p-menuitem-link:focus .p-menuitem-text {
-  color: #2563eb !important;
-}
-
-.custom-menubar.p-menubar .p-menuitem .p-menuitem-content .p-menuitem-link:hover .p-menuitem-icon,
-.custom-menubar.p-menubar .p-menuitem .p-menuitem-content .p-menuitem-link:focus .p-menuitem-icon {
-  color: #2563eb !important;
-}
-
-/* También aplicar a elementos anidados */
-.custom-menubar.p-menubar * {
-  color: #334155 !important;
-}
-
-.custom-menubar.p-menubar .p-menuitem-text {
-  color: #334155 !important;
-}
-
-.custom-menubar.p-menubar .p-menuitem-icon {
-  color: #334155 !important;
-}
-
-/* Mejoras para submenús - mantener el tema */
-.p-submenu-list {
-  min-width: 200px !important;
-  margin-top: 0.5rem !important;
-  background: white !important;
-  border: 1px solid #e2e8f0 !important;
-  border-radius: 8px !important;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
-  padding: 0.5rem 0 !important;
-}
-
-.p-submenu-list .p-menuitem-link {
-  padding: 0.75rem 1rem !important;
-  color: #475569 !important; /* slate-600 */
-  border-radius: 6px !important;
-  margin: 0.25rem !important;
-  background: transparent !important;
-}
-
-.p-submenu-list .p-menuitem-link:hover {
-  background: #f8fafc !important; /* slate-50 */
-  color: #2563eb !important; /* blue-600 */
-}
-
-.p-submenu-list .p-menuitem-link:focus {
-  background: #f1f5f9 !important; /* slate-100 */
-  color: #2563eb !important;
-  outline: none !important;
-}
-
-.p-submenu-list .p-menuitem-link .p-menuitem-text {
-  color: inherit !important;
-}
-
-.p-submenu-list .p-menuitem-link .p-menuitem-icon {
-  color: inherit !important;
-  margin-right: 0.5rem !important;
-}
-
-/* Separadores */
-.p-menuitem-separator {
-  margin: 0.5rem 0.25rem !important;
-  border-top: 1px solid #e2e8f0 !important; /* slate-200 */
-  background: none !important;
-}
-
-/* Botones del header - SOLO para el área del usuario */
-.p-button.p-button-text {
-  border: none !important;
-  background: transparent !important;
-}
-
-/* Botones del usuario específicamente */
-.p-menubar .p-button.p-button-text {
-  color: #475569 !important; /* slate-600 */
-}
-
-.p-menubar .p-button.p-button-text:hover {
-  background: rgba(59, 130, 246, 0.1) !important;
-}
-
-.p-menubar .p-button.p-button-text .p-button-label {
-  color: inherit !important;
-  font-weight: 500 !important;
-}
-
-.p-menubar .p-button.p-button-text .p-button-icon {
-  color: inherit !important;
-}
-
-/* Mejoras para toast */
-.p-toast {
-  z-index: 1100 !important;
-}
-
-.p-toast .p-toast-message {
-  backdrop-filter: blur(10px) !important;
-  border: 1px solid rgba(226, 232, 240, 0.3) !important;
-}
-
-/* Asegurar que todos los textos sean visibles - EXCEPTO botones principales */
-.p-component:not(.p-button) {
-  color: #334155 !important;
-}
-
-/* Los botones principales mantienen su tema original */
-.p-button:not(.p-button-text) {
-  /* No sobrescribir - usar tema original */
-}
-
-/* Solo los botones de texto en el menubar */
-.p-menubar .p-button-text {
-  color: #475569 !important;
-}
-
-/* Estilos específicos para el menú desplegable */
-.p-menubar .p-submenu-list {
-  background: white !important;
-}
-
-.p-menubar .p-submenu-list .p-menuitem {
-  background: transparent !important;
-}
-
-.p-menubar .p-submenu-list .p-menuitem .p-menuitem-content {
-  background: transparent !important;
-}
-
-/* Asegurar visibilidad en modo oscuro si existe */
-@media (prefers-color-scheme: dark) {
-  .p-menubar .p-menuitem-link {
-    color: #64748b !important;
+/* Responsive para el nombre de usuario */
+@media (max-width: 768px) {
+  .iggsad-user-name {
+    display: none;
   }
-  
-  .p-submenu-list {
-    background: #1e293b !important;
-    border-color: #334155 !important;
-  }
-  
-  .p-submenu-list .p-menuitem-link {
-    color: #cbd5e1 !important;
-  }
+}
+
+/* ===== TRANSICIONES DE PÁGINA ===== */
+.router-view {
+  transition: var(--iggsad-transition-normal);
+}
+
+/* Evitar que la página salte cuando aparece/desaparece el header */
+.iggsad-main-content {
+  min-height: calc(100vh - 80px); /* Altura aproximada del header */
+}
+
+/* Cuando estamos en login, usar toda la altura */
+.iggsad-main-content:only-child {
+  min-height: 100vh;
+}
+
+/* ===== ESTADOS DE LA APLICACIÓN ===== */
+
+/* Estado de carga global */
+.app-loading .iggsad-header {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.app-loading .iggsad-main-content {
+  filter: blur(1px);
+}
+
+/* Estado offline */
+.app-offline .iggsad-header::after {
+  content: '⚠️ Sin conexión';
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--iggsad-warning-600, #f59e0b);
+  color: white;
+  padding: var(--iggsad-spacing-xs) var(--iggsad-spacing-md);
+  border-radius: 0 0 var(--iggsad-radius-sm) var(--iggsad-radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 1001;
 }
 </style>

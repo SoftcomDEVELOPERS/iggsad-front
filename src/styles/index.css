@@ -1,0 +1,244 @@
+/* 
+ * ===== ESTILOS CENTRALIZADOS - src/styles/index.css =====
+ * Archivo central para importar todos los estilos del sistema
+ */
+
+/* ===== ESTILOS BASE ===== */
+@import '@/assets/tailwind.css';
+
+/* ===== LAYOUT PRINCIPAL ===== */
+@import './app-layout.css';
+
+/* ===== COMPONENTES ===== */
+@import './dashboard.css';
+
+
+/* ===== CLASES UTILITARIAS GLOBALES ===== */
+
+/* Contenedores de página estándar */
+.page-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 var(--iggsad-spacing-lg);
+}
+
+.page-header {
+  margin-bottom: var(--iggsad-spacing-2xl);
+}
+
+.page-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--iggsad-surface-800);
+  margin-bottom: var(--iggsad-spacing-md);
+  line-height: 1.2;
+}
+
+.page-subtitle {
+  color: var(--iggsad-surface-600);
+  font-size: 1.125rem;
+  line-height: 1.5;
+}
+
+/* Cards estándar */
+.iggsad-card {
+  background: var(--iggsad-surface-white);
+  border-radius: var(--iggsad-radius-lg);
+  box-shadow: var(--iggsad-shadow-md);
+  overflow: hidden;
+  transition: all var(--iggsad-transition-normal);
+}
+
+.iggsad-card:hover {
+  box-shadow: var(--iggsad-shadow-lg);
+  transform: translateY(-1px);
+}
+
+.iggsad-card-header {
+  padding: var(--iggsad-spacing-lg);
+  border-bottom: 1px solid var(--iggsad-surface-200);
+  background: var(--iggsad-surface-50);
+}
+
+.iggsad-card-content {
+  padding: var(--iggsad-spacing-lg);
+}
+
+.iggsad-card-footer {
+  padding: var(--iggsad-spacing-md) var(--iggsad-spacing-lg);
+  border-top: 1px solid var(--iggsad-surface-200);
+  background: var(--iggsad-surface-50);
+}
+
+/* Texto con tokens */
+.iggsad-text-primary {
+  color: var(--iggsad-primary-600);
+}
+
+.iggsad-text-secondary {
+  color: var(--iggsad-surface-600);
+}
+
+.iggsad-text-muted {
+  color: var(--iggsad-surface-500);
+}
+
+.iggsad-text-success {
+  color: var(--dashboard-success);
+}
+
+.iggsad-text-warning {
+  color: var(--dashboard-warning);
+}
+
+.iggsad-text-error {
+  color: var(--dashboard-error);
+}
+
+/* Spacing helpers */
+.iggsad-spacing-xs { margin: var(--iggsad-spacing-xs); }
+.iggsad-spacing-sm { margin: var(--iggsad-spacing-sm); }
+.iggsad-spacing-md { margin: var(--iggsad-spacing-md); }
+.iggsad-spacing-lg { margin: var(--iggsad-spacing-lg); }
+.iggsad-spacing-xl { margin: var(--iggsad-spacing-xl); }
+
+.iggsad-spacing-x-xs { margin-left: var(--iggsad-spacing-xs); margin-right: var(--iggsad-spacing-xs); }
+.iggsad-spacing-x-sm { margin-left: var(--iggsad-spacing-sm); margin-right: var(--iggsad-spacing-sm); }
+.iggsad-spacing-x-md { margin-left: var(--iggsad-spacing-md); margin-right: var(--iggsad-spacing-md); }
+.iggsad-spacing-x-lg { margin-left: var(--iggsad-spacing-lg); margin-right: var(--iggsad-spacing-lg); }
+
+.iggsad-spacing-y-xs { margin-top: var(--iggsad-spacing-xs); margin-bottom: var(--iggsad-spacing-xs); }
+.iggsad-spacing-y-sm { margin-top: var(--iggsad-spacing-sm); margin-bottom: var(--iggsad-spacing-sm); }
+.iggsad-spacing-y-md { margin-top: var(--iggsad-spacing-md); margin-bottom: var(--iggsad-spacing-md); }
+.iggsad-spacing-y-lg { margin-top: var(--iggsad-spacing-lg); margin-bottom: var(--iggsad-spacing-lg); }
+
+/* Border radius helpers */
+.iggsad-rounded-sm { border-radius: var(--iggsad-radius-sm); }
+.iggsad-rounded-md { border-radius: var(--iggsad-radius-md); }
+.iggsad-rounded-lg { border-radius: var(--iggsad-radius-lg); }
+.iggsad-rounded-xl { border-radius: var(--iggsad-radius-xl); }
+
+/* Shadow helpers */
+.iggsad-shadow-sm { box-shadow: var(--iggsad-shadow-sm); }
+.iggsad-shadow-md { box-shadow: var(--iggsad-shadow-md); }
+.iggsad-shadow-lg { box-shadow: var(--iggsad-shadow-lg); }
+
+/* Transition helpers */
+.iggsad-transition-fast { transition: all var(--iggsad-transition-fast); }
+.iggsad-transition-normal { transition: all var(--iggsad-transition-normal); }
+.iggsad-transition-slow { transition: all var(--iggsad-transition-slow); }
+
+/* ===== ESTADOS GLOBALES ===== */
+
+/* Loading state */
+.iggsad-loading {
+  opacity: 0.7;
+  pointer-events: none;
+  position: relative;
+}
+
+.iggsad-loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid var(--iggsad-surface-300);
+  border-top-color: var(--iggsad-primary-600);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Error state */
+.iggsad-error {
+  color: var(--dashboard-error);
+  background: #fef2f2; /* red-50 */
+  border: 1px solid #fecaca; /* red-200 */
+  border-radius: var(--iggsad-radius-md);
+  padding: var(--iggsad-spacing-md);
+}
+
+/* Success state */
+.iggsad-success {
+  color: var(--dashboard-success);
+  background: #f0fdf4; /* green-50 */
+  border: 1px solid #bbf7d0; /* green-200 */
+  border-radius: var(--iggsad-radius-md);
+  padding: var(--iggsad-spacing-md);
+}
+
+/* Warning state */
+.iggsad-warning {
+  color: var(--dashboard-warning);
+  background: #fffbeb; /* amber-50 */
+  border: 1px solid #fed7aa; /* amber-200 */
+  border-radius: var(--iggsad-radius-md);
+  padding: var(--iggsad-spacing-md);
+}
+
+/* Info state */
+.iggsad-info {
+  color: var(--iggsad-primary-600);
+  background: var(--iggsad-surface-50);
+  border: 1px solid var(--iggsad-surface-200);
+  border-radius: var(--iggsad-radius-md);
+  padding: var(--iggsad-spacing-md);
+}
+
+/* ===== RESPONSIVE HELPERS ===== */
+
+/* Mostrar/ocultar por breakpoint */
+@media (max-width: 768px) {
+  .iggsad-hidden-mobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .iggsad-hidden-desktop {
+    display: none !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .iggsad-hidden-small {
+    display: none !important;
+  }
+}
+
+/* Stack en mobile */
+@media (max-width: 768px) {
+  .iggsad-stack-mobile {
+    flex-direction: column !important;
+  }
+  
+  .iggsad-stack-mobile > * {
+    width: 100% !important;
+  }
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  .iggsad-no-print {
+    display: none !important;
+  }
+  
+  .iggsad-card {
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+  
+  .page-container {
+    max-width: none;
+    padding: 0;
+  }
+}

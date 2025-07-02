@@ -164,7 +164,7 @@ export function useUserDashboard() {
       }
       
       // Usar el método del store para actualizar el perfil
-      await authStore.updateUserProfile({
+      await authStore.updateDashboardConfig({
         dashboard: updatedConfig
       })
       
@@ -193,7 +193,7 @@ export function useUserDashboard() {
       }
       
       // Usar el método del store para actualizar el perfil
-      await authStore.updateUserProfile({
+      await authStore.updateDashboardConfig({
         dashboard: updatedDashboardConfig
       })
       
@@ -260,7 +260,7 @@ export function useUserDashboard() {
       }
       
       // Usar el método del store para actualizar el perfil
-      await authStore.updateUserProfile({
+      await authStore.updateDashboardConfig({
         dashboard: resetConfig
       })
       
@@ -417,7 +417,7 @@ export function useUserDashboard() {
       }
       
       // Usar el método del store para actualizar el perfil
-      await authStore.updateUserProfile({
+      await authStore.updateDashboardConfig({
         dashboard: config.dashboard
       })
       

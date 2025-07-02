@@ -5,76 +5,8 @@
 
 import { definePreset } from '@primeuix/themes';
 import Nora from '@primeuix/themes/nora';
-
-/**
- * ===== TOKENS PERSONALIZADOS IGGSAD =====
- * Estos tokens se pueden usar en toda la aplicación como {iggsad.primary.main}
- */
-const iggsadTokens = {
-  // Sistema de colores principal
-  primary: {
-    main: '#2563eb',      // Azul principal del sistema
-    light: '#3b82f6',     // Azul claro para hover
-    dark: '#1d4ed8',      // Azul oscuro para activo
-    50: '#eff6ff',        // Backgrounds muy claros
-    100: '#dbeafe',       // Backgrounds claros
-    600: '#2563eb',       // Color principal (mantener compatibilidad)
-    700: '#1d4ed8',       // Color oscuro (mantener compatibilidad)
-    800: '#1e40af'        // Color muy oscuro
-  },
-  
-  // Sistema de superficies (slate)
-  surface: {
-    white: '#ffffff',     // Blanco puro
-    50: '#f8fafc',        // Background principal
-    100: '#f1f5f9',       // Background secundario
-    200: '#e2e8f0',       // Bordes suaves
-    300: '#cbd5e1',       // Bordes normales
-    500: '#64748b',       // Texto secundario
-    600: '#475569',       // Texto medio
-    700: '#334155',       // Texto principal (mantener compatibilidad)
-    800: '#1e293b',       // Texto oscuro
-    900: '#0f172a'        // Texto muy oscuro
-  },
-  
-  // Sistema de espaciado
-  spacing: {
-    xs: '0.25rem',        // 4px
-    sm: '0.5rem',         // 8px
-    md: '1rem',           // 16px
-    lg: '1.5rem',         // 24px
-    xl: '2rem'            // 32px
-  },
-  
-  // Sistema de border radius
-  radius: {
-    sm: '6px',            // Pequeño (inputs, botones)
-    md: '8px',            // Medio (cards pequeñas)
-    lg: '12px',           // Grande (cards principales)
-    xl: '16px'            // Extra grande (modales)
-  },
-  
-  // Sistema de sombras
-  shadows: {
-    sm: '0 1px 3px rgba(0, 0, 0, 0.1)',
-    md: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-    lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-    xl: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
-  },
-  
-  // Sistema de tipografía
-  fonts: {
-    primary: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-    mono: "'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace"
-  },
-  
-  // Transiciones estándar
-  transitions: {
-    fast: '0.15s ease',
-    normal: '0.2s ease',
-    slow: '0.3s ease'
-  }
-}
+// IMPORTAR TOKENS CUSTOM
+import './custom-tokens.css' 
 
 /**
  * ===== TEMA PRINCIPAL GESTION PROCESAL =====
@@ -441,60 +373,5 @@ export const GestionProcesalTheme = definePreset(Nora, {
   }
 });
 
-/**
- * ===== EXPORTAR TOKENS PARA USO DIRECTO =====
- * Permite usar en CSS: var(--iggsad-primary-main)
- */
-export const iggsadCSSTokens = iggsadTokens;
 
-/**
- * ===== FUNCIÓN PARA APLICAR TOKENS CSS =====
- * Inyecta las variables CSS personalizadas en :root
- */
-export const applyIggsadTokens = () => {
-  const tokenStyles = document.createElement('style');
-  tokenStyles.id = 'iggsad-css-tokens';
-  
-  const cssVars = Object.entries(iggsadTokens).map(([category, values]) => {
-    if (typeof values === 'object') {
-      return Object.entries(values).map(([key, value]) => 
-        `  --iggsad-${category}-${key}: ${value};`
-      ).join('\n');
-    }
-    return `  --iggsad-${category}: ${values};`;
-  }).join('\n');
-  
-  tokenStyles.textContent = `
-:root {
-${cssVars}
-}`;
-  
-  if (!document.getElementById('iggsad-css-tokens')) {
-    document.head.appendChild(tokenStyles);
-    console.log('✅ Tokens CSS Iggsad aplicados');
-  }
-};
 
-// 📚 Documentación de uso en comentarios
-/*
-TOKENS DISPONIBLES COMO CSS VARIABLES:
-
-Colores:
-  --iggsad-primary-main: #2563eb
-  --iggsad-surface-700: #334155
-  
-Espaciado:
-  --iggsad-spacing-sm: 0.5rem
-  --iggsad-spacing-md: 1rem
-  
-Radio:
-  --iggsad-radius-sm: 6px
-  --iggsad-radius-lg: 12px
-  
-Uso en CSS:
-  .mi-clase {
-    color: var(--iggsad-primary-main);
-    padding: var(--iggsad-spacing-md);
-    border-radius: var(--iggsad-radius-sm);
-  }
-*/

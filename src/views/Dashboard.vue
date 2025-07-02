@@ -5,7 +5,7 @@
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-3xl font-bold text-slate-800 mb-2">
-            Sistema de Gestión Procesal
+            Bienvenido, {{ `${authStore.user?.firstName} ${authStore.user?.lastName}` || 'Usuario' }}
           </h1>
           <p class="text-slate-600">
             Dashboard principal - {{ new Date().toLocaleDateString('es-ES', { 
@@ -557,87 +557,5 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.dashboard-grid-section {
-  background: white;
-  border-radius: 5px;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
 
-.dashboard-grid-section.config-mode-active {
-  border: 2px solid #3b82f6;
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-}
-
-/* Banner de modo configuración */
-.config-mode-banner {
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-  border: 1px solid #93c5fd;
-  border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 1.5rem;
-  animation: slideDown 0.3s ease-out;
-}
-
-.banner-content {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.banner-text {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.banner-text strong {
-  color: #1e40af;
-  font-weight: 600;
-}
-
-.banner-text span {
-  color: #1e40af;
-  font-size: 0.875rem;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ESTILOS ORIGINALES */
-/* Clases para estilos básicos */
-.transition-shadow {
-  transition: box-shadow 0.2s ease-in-out;
-}
-
-.transition-colors {
-  transition: background-color 0.2s ease-in-out;
-}
-
-.hover\:shadow-lg:hover {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-}
-
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-/* Drawer fullscreen usando las clases nativas de PrimeVue */
-.filter-drawer :deep(.p-drawer-full .p-drawer) {
-  height: 100vh !important;
-  width: 100vw !important;
-}
 </style>

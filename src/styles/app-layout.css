@@ -1,0 +1,349 @@
+/* 
+ * ===== ESTILOS DEL LAYOUT PRINCIPAL (App.vue) =====
+ * Archivo: src/styles/app-layout.css
+ * 
+ * Solo estilos de layout que no se pueden configurar en el tema PrimeVue
+ * Todo el resto (menubar, botones, submenús) ya está en primevue-theme.js
+ */
+
+/* ===== LAYOUT PRINCIPAL ===== */
+#app {
+  font-family: var(--iggsad-font-primary);
+  color: var(--iggsad-surface-700);
+  background: var(--iggsad-surface-50);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== HEADER ===== */
+.iggsad-header {
+  background: var(--iggsad-surface-white);
+  border-bottom: 1px solid var(--iggsad-surface-200);
+  box-shadow: var(--iggsad-shadow-sm);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.iggsad-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--iggsad-spacing-md) var(--iggsad-spacing-xl);
+  max-width: 1400px;
+  margin: 0 auto;
+  gap: var(--iggsad-spacing-lg);
+}
+
+/* ===== BRANDING ===== */
+.iggsad-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--iggsad-spacing-md);
+  flex-shrink: 0;
+}
+
+.iggsad-logo {
+  height: 40px;
+  width: auto;
+  transition: var(--iggsad-transition-fast);
+}
+
+.iggsad-logo:hover {
+  transform: scale(1.05);
+}
+
+.iggsad-logo-fallback {
+  font-size: 2rem;
+  color: var(--iggsad-primary-600);
+  transition: var(--iggsad-transition-fast);
+}
+
+.iggsad-logo-fallback:hover {
+  color: var(--iggsad-primary-700);
+  transform: scale(1.1);
+}
+
+.iggsad-brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.iggsad-brand-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--iggsad-surface-800);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.iggsad-brand-subtitle {
+  font-size: 0.875rem;
+  color: var(--iggsad-surface-500);
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* ===== NAVEGACIÓN ===== */
+.iggsad-main-navigation {
+  flex: 1;
+  /* 
+   * ✅ NO NECESITA ESTILOS - Todo está configurado en primevue-theme.js:
+   * - Background transparente
+   * - Items con hover/focus azul
+   * - Submenús con sombra y border-radius
+   * - Separadores 
+   * - Estados activos
+   */
+}
+
+/* ===== CONTROLES DE USUARIO ===== */
+.iggsad-user-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--iggsad-spacing-xs);
+  flex-shrink: 0;
+}
+
+.iggsad-user-button {
+  /* 
+   * ✅ ESTILO BASE YA EN TEMA - Solo añadimos transición específica
+   */
+  transition: var(--iggsad-transition-fast);
+}
+
+.iggsad-user-button:hover {
+  transform: translateY(-1px);
+}
+
+/* ===== CONTENIDO PRINCIPAL ===== */
+.iggsad-main-content {
+  flex: 1;
+  overflow: auto;
+}
+
+/* ===== RESPONSIVE ===== */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .iggsad-header-content {
+    padding: var(--iggsad-spacing-md) var(--iggsad-spacing-lg);
+  }
+}
+
+/* Mobile Grande */
+@media (max-width: 768px) {
+  .iggsad-header-content {
+    flex-direction: column;
+    gap: var(--iggsad-spacing-md);
+    padding: var(--iggsad-spacing-md);
+  }
+
+  .iggsad-brand {
+    order: 1;
+    justify-content: center;
+  }
+
+  .iggsad-main-navigation {
+    order: 2;
+    width: 100%;
+  }
+
+  .iggsad-user-controls {
+    order: 3;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .iggsad-brand-title {
+    font-size: 1.25rem;
+  }
+
+  .iggsad-brand-subtitle {
+    font-size: 0.75rem;
+  }
+}
+
+/* Mobile Pequeño */
+@media (max-width: 640px) {
+  .iggsad-brand-text {
+    display: none;
+  }
+
+  .iggsad-header-content {
+    padding: var(--iggsad-spacing-sm);
+  }
+
+  .iggsad-user-controls {
+    gap: var(--iggsad-spacing-xs);
+  }
+
+  .iggsad-logo {
+    height: 32px;
+  }
+}
+
+/* Mobile Muy Pequeño */
+@media (max-width: 480px) {
+  .iggsad-header-content {
+    gap: var(--iggsad-spacing-sm);
+    padding: var(--iggsad-spacing-xs) var(--iggsad-spacing-sm);
+  }
+
+  .iggsad-main-navigation {
+    font-size: 0.875rem;
+  }
+}
+
+/* ===== MEJORAS DE ACCESIBILIDAD ===== */
+
+/* Respetar preferencias de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  .iggsad-user-button:hover,
+  .iggsad-logo:hover,
+  .iggsad-logo-fallback:hover {
+    transform: none;
+  }
+  
+  * {
+    transition: none !important;
+  }
+}
+
+/* Focus visible mejorado */
+.iggsad-user-button:focus-visible {
+  outline: 2px solid var(--iggsad-primary-600);
+  outline-offset: 2px;
+}
+
+/* Alto contraste */
+@media (prefers-contrast: high) {
+  .iggsad-header {
+    border-bottom-width: 2px;
+  }
+  
+  .iggsad-brand-title {
+    font-weight: 800;
+  }
+}
+
+/* ===== MODO OSCURO (PREPARADO) ===== */
+@media (prefers-color-scheme: dark) {
+  /* 
+   * Cuando implementemos modo oscuro, solo necesitaremos
+   * cambiar los tokens CSS y todo se adaptará automáticamente:
+   * 
+   * :root {
+   *   --iggsad-surface-white: #1e293b;
+   *   --iggsad-surface-50: #0f172a;
+   *   --iggsad-surface-700: #f1f5f9;
+   *   etc...
+   * }
+   */
+}
+
+/* ===== TOAST MEJORAS ===== */
+.p-toast {
+  z-index: 1100;
+  /* El resto del estilo ya está en toast.styles.js */
+}
+
+/* ===== VALIDACIÓN: ASEGURAR QUE MENUBAR FUNCIONA ===== */
+
+/* Verificar que el tema se aplica correctamente */
+.p-menubar {
+  border: none;
+  background: transparent;
+}
+
+/* Verificar que los colores se mantienen */
+.p-menubar .p-menuitem .p-menuitem-content .p-menuitem-link {
+  color: var(--iggsad-surface-700);
+}
+
+/* Verificar que el hover azul se mantiene */
+.p-menubar .p-menuitem .p-menuitem-content .p-menuitem-link:hover,
+.p-menubar .p-menuitem .p-menuitem-content .p-menuitem-link:focus {
+  background: var(--iggsad-primary-600);
+  color: white;
+}
+
+/* ===== ESTADOS DE CARGA ===== */
+.iggsad-header[data-loading="true"] {
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.iggsad-header[data-loading="true"] .iggsad-user-controls {
+  filter: blur(1px);
+}
+
+/* ===== ANIMACIONES SUTILES ===== */
+.iggsad-header {
+  transition: var(--iggsad-transition-normal);
+}
+
+.iggsad-main-content {
+  transition: var(--iggsad-transition-slow);
+}
+
+/* Fade in para el contenido */
+.iggsad-main-content > * {
+  animation: fadeInContent 0.3s ease-out;
+}
+
+@keyframes fadeInContent {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== UTILIDADES ESPECÍFICAS DEL LAYOUT ===== */
+
+/* Espaciado consistente para páginas */
+.iggsad-page-container {
+  padding: var(--iggsad-spacing-lg);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.iggsad-page-header {
+  margin-bottom: var(--iggsad-spacing-xl);
+}
+
+.iggsad-page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--iggsad-surface-800);
+  margin-bottom: var(--iggsad-spacing-sm);
+}
+
+.iggsad-page-subtitle {
+  color: var(--iggsad-surface-600);
+  font-size: 1.125rem;
+}
+
+/* ===== DEBUG MODE (Solo desarrollo) ===== */
+@media (max-width: 999999px) {
+  .debug-layout .iggsad-header-content {
+    outline: 2px dashed red;
+  }
+  
+  .debug-layout .iggsad-brand {
+    outline: 2px dashed blue;
+  }
+  
+  .debug-layout .iggsad-main-navigation {
+    outline: 2px dashed green;
+  }
+  
+  .debug-layout .iggsad-user-controls {
+    outline: 2px dashed orange;
+  }
+}

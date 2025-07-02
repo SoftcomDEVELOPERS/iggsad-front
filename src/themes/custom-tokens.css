@@ -20,7 +20,7 @@
   --iggsad-primary-950: #172554;
   
   /* Surface - Escala de grises slate */
-  --iggsad-surface-0: #ffffff;        /* Blanco puro */
+  --iggsad-surface-white: #ffffff;        /* Blanco puro */
   --iggsad-surface-50: #f8fafc;       /* Background principal */
   --iggsad-surface-100: #f1f5f9;      /* Background secundario */
   --iggsad-surface-200: #e2e8f0;      /* Bordes suaves */
@@ -34,15 +34,17 @@
   --iggsad-surface-950: #020617;      /* Negro casi puro */
   
   /* ===== SISTEMA DE ESPACIADO ===== */
-  --iggsad-spacing-xs: 0.25rem;       /* 4px */
+  --iggsad-spacing-zero: 0;           /* 0px probar */
+  --iggsad-spacing-xs: 0rem;       /* 4px */
   --iggsad-spacing-sm: 0.5rem;        /* 8px */
   --iggsad-spacing-md: 1rem;          /* 16px */
   --iggsad-spacing-lg: 1.5rem;        /* 24px */
   --iggsad-spacing-xl: 2rem;          /* 32px */
   --iggsad-spacing-2xl: 3rem;         /* 48px */
+
   
   /* ===== SISTEMA DE BORDER RADIUS ===== */
-  --iggsad-radius-none: 0px;
+  --iggsad-radius-zero: 0px;
   --iggsad-radius-sm: 6px;            /* Pequeño (inputs, botones) */
   --iggsad-radius-md: 8px;            /* Medio (cards pequeñas) */
   --iggsad-radius-lg: 12px;           /* Grande (cards principales) */
@@ -87,7 +89,7 @@
   
   /* Header del layout principal */
   --iggsad-header-height: 4rem;         /* 64px - altura del header */
-  --iggsad-header-bg: var(--iggsad-surface-0);
+  --iggsad-header-bg: var(--iggsad-surface-white);
   --iggsad-header-border: var(--iggsad-surface-200);
   --iggsad-header-shadow: var(--iggsad-shadow-sm);
   
@@ -109,7 +111,7 @@
   --iggsad-user-button-hover-color: var(--iggsad-primary-600);
   
   /* Submenús */
-  --iggsad-submenu-bg: var(--iggsad-surface-0);
+  --iggsad-submenu-bg: var(--iggsad-surface-white);
   --iggsad-submenu-border: var(--iggsad-surface-200);
   --iggsad-submenu-radius: var(--iggsad-radius-md);
   --iggsad-submenu-shadow: var(--iggsad-shadow-lg);
@@ -117,13 +119,13 @@
   
   /* ===== VARIABLES PARA DASHBOARD ===== */
   --iggsad-dashboard-bg: var(--iggsad-surface-50);
-  --iggsad-card-bg: var(--iggsad-surface-0);
+  --iggsad-card-bg: var(--iggsad-surface-white);
   --iggsad-card-radius: var(--iggsad-radius-lg);
   --iggsad-card-shadow: var(--iggsad-shadow-md);
   --iggsad-card-padding: var(--iggsad-spacing-lg);
   
   /* ===== VARIABLES PARA FILTERS ===== */
-  --iggsad-filter-panel-bg: var(--iggsad-surface-0);
+  --iggsad-filter-panel-bg: var(--iggsad-surface-white);
   --iggsad-filter-input-height: 2.5rem;  /* 40px */
   --iggsad-filter-input-padding: var(--iggsad-spacing-sm) var(--iggsad-spacing-md);
   
@@ -156,7 +158,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     /* Invertir superficie para modo oscuro */
-    --iggsad-surface-0: #0f172a;
+    --iggsad-surface-white: #0f172a;
     --iggsad-surface-50: #1e293b;
     --iggsad-surface-100: #334155;
     --iggsad-surface-700: #cbd5e1;
@@ -207,7 +209,7 @@
 
 /* Backgrounds */
 .iggsad-bg-primary { background-color: var(--iggsad-primary-600); }
-.iggsad-bg-surface { background-color: var(--iggsad-surface-0); }
+.iggsad-bg-surface { background-color: var(--iggsad-surface-white); }
 .iggsad-bg-muted { background-color: var(--iggsad-surface-50); }
 
 /* ===== LAYOUT HELPERS ===== */
@@ -239,7 +241,7 @@
 /* Asegurar que los tokens funcionen con clases PrimeVue */
 .p-component {
   --primary-color: var(--iggsad-primary-600);
-  --surface-0: var(--iggsad-surface-0);
+  --surface-0: var(--iggsad-surface-white);
   --surface-700: var(--iggsad-surface-700);
 }
 

@@ -56,6 +56,9 @@ export const useAuthStore = defineStore('auth', {
         // Paso 1: Hacer login (las cookies se establecen automáticamente)
         console.log('Enviando credenciales al servidor...')
         const loginResponse = await authService.login(payload)
+
+        const fullUser = loginResponse?.data?.user;
+        console.log('Datos completos del usuario al hacer login: ', fullUser);
         
         // Paso 2: Obtener datos del usuario
         console.log('Obteniendo datos del usuario...')
@@ -65,11 +68,15 @@ export const useAuthStore = defineStore('auth', {
         console.log('Datos del usuario obtenidos:', { user, frontPermissions, userProfile });
         
         // Paso 3: Guardar en el store
-        this.user = user
+        this.user = {
+          ...fullUser,
+          ...user // Combinar datos completos del login con los obtenidos
+        }
+
         this.frontPermissions = frontPermissions
         this.userProfile = userProfile || getDefaultUserProfile() // ✨ NUEVO
         
-        console.log('Login exitoso:', { user, frontPermissions, userProfile: this.userProfile })
+        console.log('Login exitoso:', { user: this.user, frontPermissions, userProfile: this.userProfile })
         return loginResponse
         
       } catch (error) {
