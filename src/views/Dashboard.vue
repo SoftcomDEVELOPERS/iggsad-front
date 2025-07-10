@@ -54,9 +54,11 @@
           <Button 
             icon="pi pi-search" 
             label="Buscar"
-            @click="performSearch"
+            @click="performSearchAndRedirect"
+            :loading="expedientesStore.isLoading"
             :disabled="!canPerformSearch"
             :severity="canPerformSearch ? undefined : 'secondary'"
+            class="search-button"
           />
         </div>
       </div>
@@ -112,11 +114,10 @@
     <!-- Drawer de filtros avanzado ORIGINAL -->
     <Drawer 
       v-model:visible="showFilters" 
-      position="bottom" 
-      :modal="!drawerFullscreen"
-      :dismissable-mask="!drawerFullscreen"
-      class="filter-drawer"
-      :style="drawerFullscreen ? 'height: 100vh; width: 100vw;' : 'height: 75vh;'"
+      header="Filtros de Búsqueda"
+      position="right" 
+      class="filters-drawer" 
+      :style="{ width: drawerWidth }"
     >
       <template #header>
         <div class="flex items-center justify-between w-full">
@@ -140,18 +141,10 @@
         @apply-filters="handleApplyFilters"
         @clear-filters="handleClearFilters"
         @filter-change="handleFilterChange"
-        @search-expediente="handleExpedienteSearch"
+        @search-expediente="handleExpedienteSearchAndRedirect"
         @toggle-fullscreen="handleToggleFullscreen"
       />
     </Drawer>
-
-    <ExpedientesDrawer
-      v-model:visible="showExpedientesDrawer"
-      :expedientes="expedientesStore.expedientes"
-      :loading="expedientesStore.isLoading"
-      :pagination="expedientesStore.pagination"
-      @page="expedientesStore.changePage"
-    />
 
   </div>
 </template>
@@ -162,12 +155,12 @@ import { useRouter } from 'vue-router'
 import Button from 'primevue/button'
 import Drawer from 'primevue/drawer'
 import Dock from '@/components/Dock.vue'
-import ExpedientesDrawer from '@/components/expedientes/ExpedientesDrawer.vue'
 import FilterPanel from '@/components/filters/FilterPanel.vue'
 import SearchBar from '@/components/SearchBar.vue'
 import { useExpedientesStore } from '@/stores/expedientes'
 import { useToast } from '@/composables/useToast'
-import DarkModeToggle from '@/components/DarkModeToggle.vue'
+import { useUserProfile } from '@/composables/useUserProfile'
+
 
 //Componente del grid intuitivo
 import DashboardGrid from '@/components/dashboard/DashboardGrid.vue'
@@ -191,7 +184,9 @@ const {
   getCardData
 } = useUserDashboard()
 
+const { addRecentSearch } = useUserProfile()
 
+const drawerWidth = computed(() => drawerFullScreen.value ? '100vw' : '50rem')
 // Estado reactivo ORIGINAL
 const searchQuery = ref('')
 const showFilters = ref(false)
@@ -216,29 +211,6 @@ const stats = ref({
   urgentCases: 5,
   totalClients: 89
 })
-
-const recentSearches = ref([
-  { 
-    id: 1, 
-    expediente: 'EXP-2024-001', 
-    cliente: 'García López, María',
-    deuda: '€25,450'
-  },
-  { 
-    id: 2, 
-    expediente: 'EXP-2024-045', 
-    cliente: 'Empresas del Norte S.L.',
-    deuda: '€87,230'
-  },
-  { 
-    id: 3, 
-    expediente: 'EXP-2024-023', 
-    cliente: 'Martín Rodríguez, Juan',
-    deuda: '€12,800'
-  }
-])
-
-
 
 
 // Items del Dock ORIGINALES
@@ -373,28 +345,46 @@ const handleToggleConfigMode = () => {
 // Métodos ORIGINALES (SIN CAMBIOS)
 const toggleFilters = () => {
   showFilters.value = !showFilters.value
-  
   // Siempre abrir en modo minimizado
   if (showFilters.value) {
     drawerFullscreen.value = false
   }
 }
 
-const addToRecentSearches = (query) => {
-  const newSearch = {
+// const addToRecentSearches = (query) => {
+//   const newSearch = {
+//     id: Date.now(),
+//     expediente: query.includes('EXP-') ? query : `EXP-2024-${Math.floor(Math.random() * 999).toString().padStart(3, '0')}`,
+//     cliente: query.includes('EXP-') ? 'Cliente Ejemplo' : query,
+//     deuda: `€${(Math.random() * 100000).toFixed(0)}`
+//   }
+  
+//   const exists = recentSearches.value.find(s => s.expediente === newSearch.expediente)
+//   if (!exists) {
+//     recentSearches.value.unshift(newSearch)
+//     if (recentSearches.value.length > 5) {
+//       recentSearches.value = recentSearches.value.slice(0, 5)
+//     }
+//   }
+// }
+
+const addToRecentSearches = async (query) => {
+  const searchData = {
     id: Date.now(),
     expediente: query.includes('EXP-') ? query : `EXP-2024-${Math.floor(Math.random() * 999).toString().padStart(3, '0')}`,
-    cliente: query.includes('EXP-') ? 'Cliente Ejemplo' : query,
-    deuda: `€${(Math.random() * 100000).toFixed(0)}`
+    cliente: query.includes('EXP-') ? 
+      expedientesStore.expedientes[0]?.nombreTitular || 'Cliente no encontrado' : 
+      `Cliente para ${query}`,
+    deuda: expedientesStore.expedientes[0]?.principal ? 
+      `€${expedientesStore.expedientes[0].principal}` : 
+      `€${(Math.random() * 50000 + 1000).toFixed(2)}`,
+    timestamp: new Date().toISOString()
   }
   
-  const exists = recentSearches.value.find(s => s.expediente === newSearch.expediente)
-  if (!exists) {
-    recentSearches.value.unshift(newSearch)
-    if (recentSearches.value.length > 5) {
-      recentSearches.value = recentSearches.value.slice(0, 5)
-    }
-  }
+  // Usar useUserProfile para persistir
+  await addRecentSearch(searchData)
+  
+  console.log('📝 Búsqueda añadida al historial:', searchData)
 }
 
 // Método para mostrar mensaje de validación ORIGINAL
@@ -445,6 +435,57 @@ const performSearch = async () => {
   } catch (error) {
     console.error('❌ Error en búsqueda desde Dashboard:', error)
     searchResults.value = []
+  }
+}
+
+const performSearchAndRedirect = async () => {
+  const expedienteQuery = searchQuery.value || persistentExpedienteSearch.value
+  
+  if (!expedienteQuery || !expedienteQuery.trim()) {
+    console.warn('⚠️ No se puede buscar sin número de expediente')
+    showSearchValidation()
+    return
+  }
+  
+  try {
+    console.log('🔍 Búsqueda CON redirección desde Dashboard:', expedienteQuery.trim())
+    
+    // Actualizar estado persistente
+    if (persistentExpedienteSearch.value !== expedienteQuery.trim()) {
+      persistentExpedienteSearch.value = expedienteQuery.trim()
+    }
+    
+    // Realizar búsqueda
+    await expedientesStore.searchExpedientes(persistentFilters.value, expedienteQuery.trim())
+    
+    // Añadir a búsquedas recientes usando useUserProfile
+    await addRecentSearch({
+      id: Date.now(),
+      expediente: expedienteQuery.trim(),
+      cliente: expedientesStore.expedientes[0]?.nombreTitular || 'Cliente no encontrado',
+      deuda: expedientesStore.expedientes[0]?.principal ? `€${expedientesStore.expedientes[0].principal}` : '€0',
+      timestamp: new Date().toISOString()
+    })
+    
+    // Preparar parámetros para la URL
+    const queryParams = {
+      search: expedienteQuery.trim(),
+      ...persistentFilters.value
+    }
+    
+    // Redirigir a ExpedientesView
+    router.push({
+      name: 'Expedientes',
+      query: queryParams
+    })
+    
+    showSuccess('Redirigiendo...', 'Mostrando resultados en la vista de expedientes')
+    
+    console.log('✅ Búsqueda y redirección completada')
+    
+  } catch (error) {
+    console.error('❌ Error en búsqueda desde Dashboard:', error)
+    showError('Error en la búsqueda', 'No se pudieron cargar los expedientes')
   }
 }
 
@@ -506,39 +547,85 @@ const handleFilterChange = (filterData) => {
   persistentFilters.value = { ...filterData }
 }
 
-const handleExpedienteSearch = async (expediente) => {
-  console.log('🔍 Búsqueda desde FilterPanel:', expediente)
+// const handleExpedienteSearch = async (expediente) => {
+//   console.log('🔍 Búsqueda desde FilterPanel:', expediente)
   
-  // Solo actualizar sin disparar watchers
-  persistentExpedienteSearch.value = expediente || ''
+//   // Solo actualizar sin disparar watchers
+//   persistentExpedienteSearch.value = expediente || ''
   
-  // Sincronizar searchQuery directamente
-  if (expediente !== searchQuery.value) {
-    searchQuery.value = expediente || ''
+//   // Sincronizar searchQuery directamente
+//   if (expediente !== searchQuery.value) {
+//     searchQuery.value = expediente || ''
+//   }
+  
+//   // Los resultados ya están en el store desde FilterPanel
+//   if (expedientesStore.hasExpedientes) {
+//     searchResults.value = expedientesStore.expedientes.map(exp => ({
+//       id: exp.id,
+//       number: exp.numero,
+//       client: exp.nombreTitular,               // ← antes 'exp.cliente'
+//       lastUpdate: 'Hace 2h',
+//       priority: exp.embargos === 'Sí' ? 'high' : 'normal',    // ejemplo de prioridad
+//       status: exp.embargos === 'Sí' ? 'embargado' : 'normal',
+//       statusText: exp.embargos
+//     }))
+    
+//     if (expediente) {
+//       addToRecentSearches(expediente)
+//     }
+//   }
+// }
+
+const handleExpedienteSearchAndRedirect = async (expediente) => {
+  console.log('🔍 Búsqueda desde FilterPanel CON redirección:', expediente)
+  
+  if (!expediente || !expediente.trim()) {
+    showWarn('Búsqueda vacía', 'Por favor ingrese un número de expediente')
+    return
   }
   
-  // Los resultados ya están en el store desde FilterPanel
-  if (expedientesStore.hasExpedientes) {
-    searchResults.value = expedientesStore.expedientes.map(exp => ({
-      id: exp.id,
-      number: exp.numero,
-      client: exp.nombreTitular,               // ← antes 'exp.cliente'
-      lastUpdate: 'Hace 2h',
-      priority: exp.embargos === 'Sí' ? 'high' : 'normal',    // ejemplo de prioridad
-      status: exp.embargos === 'Sí' ? 'embargado' : 'normal',
-      statusText: exp.embargos
-    }))
+  try {
+    // Sincronizar estados
+    persistentExpedienteSearch.value = expediente.trim()
+    searchQuery.value = expediente.trim()
     
-    if (expediente) {
-      addToRecentSearches(expediente)
+    // Realizar búsqueda
+    await expedientesStore.searchExpedientes(persistentFilters.value, expediente.trim())
+    
+    // Añadir a búsquedas recientes usando useUserProfile
+    await addRecentSearch({
+      id: Date.now(),
+      expediente: expediente.trim(),
+      cliente: expedientesStore.expedientes[0]?.nombreTitular || 'Cliente no encontrado',
+      deuda: expedientesStore.expedientes[0]?.principal ? `€${expedientesStore.expedientes[0].principal}` : '€0',
+      timestamp: new Date().toISOString()
+    })
+    
+    // Preparar parámetros para la URL
+    const queryParams = {
+      search: expediente.trim(),
+      ...persistentFilters.value
     }
+    
+    // Redirigir a ExpedientesView
+    router.push({
+      name: 'Expedientes',
+      query: queryParams
+    })
+    
+    showSuccess('Búsqueda completada', 'Mostrando resultados en la vista de expedientes')
+    
+    console.log('✅ Búsqueda desde FilterPanel y redirección completada')
+    
+  } catch (error) {
+    console.error('❌ Error en búsqueda desde FilterPanel:', error)
+    showError('Error en la búsqueda', 'No se pudieron cargar los expedientes')
   }
 }
 
 // Método para alternar pantalla completa del drawer ORIGINAL
 const toggleDrawerFullscreen = () => {
   drawerFullscreen.value = !drawerFullscreen.value
-  console.log('Drawer fullscreen:', drawerFullscreen.value)
 }
 
 // Mantener este método para recibir eventos del FilterPanel ORIGINAL
@@ -578,5 +665,15 @@ onMounted(() => {
 </script>
 
 <style scoped>
+:deep(.filters-drawer) {
+  .p-drawer-header {
+    background: linear-gradient(135deg, var(--iggsad-surface-50) 0%, var(--iggsad-surface-100) 100%);
+    border-bottom: 2px solid var(--iggsad-surface-200);
+    padding: var(--iggsad-spacing-lg);
+  }
 
+  .p-drawer-content {
+    padding: 0;
+  }
+}
 </style>

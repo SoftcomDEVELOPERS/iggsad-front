@@ -112,7 +112,9 @@ router.isReady().then(async () => {
     console.log('✅ Router listo y estado de autenticación verificado')
 
     if (authStore.isAuthenticated) {
-      await loadUserProfile()
+      const { loadProfile } = useUserProfile()
+      console.log('🔐 Usuario autenticado, cargando perfil...')
+      await loadProfile()
       router.push({ name: 'Dashboard' })
      }
   } catch (e) {

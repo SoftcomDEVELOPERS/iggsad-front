@@ -20,6 +20,50 @@ const routes = [
     component: () => import('@/views/Dashboard.vue'),
     meta: { requiresAuth: true, public: false }
   },
+  {
+    path: '/expedientes',
+    name: 'Expedientes',
+    component: () => import('@/views/Expedientes.vue'),
+    meta: { 
+      requiresAuth: true, 
+      public: false,
+     // requiredPermission: 'expedientes-view' 
+    }
+  },
+  
+  // RUTAS ADICIONALES DE EXPEDIENTES
+  // {
+  //   path: '/expedientes/nuevo',
+  //   name: 'ExpedienteNuevo',
+  //   component: () => import('@/views/expedientes/ExpedienteCreate.vue'),
+  //   meta: { 
+  //     requiresAuth: true, 
+  //     public: false,
+  //     requiredPermission: 'expedientes-create' 
+  //   }
+  // },
+  // {
+  //   path: '/expedientes/:id',
+  //   name: 'ExpedienteDetail',
+  //   component: () => import('@/views/expedientes/ExpedienteDetail.vue'),
+  //   meta: { 
+  //     requiresAuth: true, 
+  //     public: false,
+  //     requiredPermission: 'expedientes-view' 
+  //   },
+  //   props: true
+  // },
+  // {
+  //   path: '/expedientes/:id/edit',
+  //   name: 'ExpedienteEdit',
+  //   component: () => import('@/views/expedientes/ExpedienteEdit.vue'),
+  //   meta: { 
+  //     requiresAuth: true, 
+  //     public: false,
+  //     requiredPermission: 'expedientes-edit' 
+  //   },
+  //   props: true
+  // },
   
   // ✨ RUTA DE RECUPERACIÓN DE CONTRASEÑA (para reset con token del email)
   {

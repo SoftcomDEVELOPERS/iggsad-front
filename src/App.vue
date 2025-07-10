@@ -132,6 +132,35 @@ const menuItems = ref([
     ]
   },
   {
+    label: 'Expedientes', // ✨ NUEVA SECCIÓN
+    icon: 'pi pi-folder-open',
+    items: [
+      {
+        label: 'Todos los Expedientes',
+        icon: 'pi pi-list',
+        command: () => router.push('/expedientes')
+      },
+      {
+        label: 'Nuevo Expediente',
+        icon: 'pi pi-plus',
+        command: () => router.push('/expedientes/nuevo')
+      },
+      {
+        separator: true
+      },
+      {
+        label: 'Búsqueda Avanzada',
+        icon: 'pi pi-search',
+        command: () => router.push('/expedientes?advanced=true')
+      },
+      {
+        label: 'Expedientes Urgentes',
+        icon: 'pi pi-exclamation-triangle',
+        command: () => router.push('/expedientes?urgent=true')
+      }
+    ]
+  },
+  {
     label: 'Audiencias',
     icon: 'pi pi-calendar',
     items: [
