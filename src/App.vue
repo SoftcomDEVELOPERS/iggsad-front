@@ -5,7 +5,7 @@
     <ConfirmDialog />
     
     <!-- Header principal - SOLO mostrar si NO estamos en login -->
-    <header v-if="!isLoginPage" class="iggsad-header">
+    <header v-if="!isPublicPage" class="iggsad-header">
       <div class="iggsad-header-content">
         <!-- Logo y branding -->
         <div class="iggsad-brand">
@@ -35,6 +35,8 @@
               <span v-if="authStore.user" class="iggsad-user-name">
                 {{ authStore.user.firstName || authStore.user.username || 'Usuario' }}
               </span>
+
+              <DarkModeToggle />
               
               <Button 
                 icon="pi pi-user" 
@@ -71,7 +73,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
@@ -81,20 +83,22 @@ import Button from 'primevue/button'
 import Toast from 'primevue/toast'
 import ConfirmDialog from 'primevue/confirmdialog'
 
+import DarkModeToggle from '@/components/DarkModeToggle.vue'
+import { useAppLayout } from '@/composables/useAppLayout'
+
 // ===== COMPOSABLES =====
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
 const { showSuccess, showError } = useToast()
+const { initializeTheme } = useAppLayout()
 
 // ===== ESTADO =====
 const logoError = ref(false)
 
 // ===== COMPUTED =====
 // 🔧 CORREGIDO: Verificar si estamos en la página de login
-const isLoginPage = computed(() => {
-  return route.name === 'Login' || route.path === '/login'
-})
+const isPublicPage = computed(() => route.meta.public === true)
 
 // ===== MENÚ DE NAVEGACIÓN =====
 const menuItems = ref([
@@ -218,81 +222,12 @@ const goToSettings = () => {
   router.push('/configuracion')
 }
 
+onMounted(() => {
+  initializeTheme()
+})
+
 </script>
 
 <style>
-/* 
- * ===== IMPORTAR ESTILOS SEPARADOS =====
- * Los estilos del layout están en un archivo separado para mejor organización
- */
 @import '@/styles/app-layout.css';
-
-/* ===== SOLO ESTILOS ESPECÍFICOS QUE NO ESTÁN EN EL ARCHIVO SEPARADO ===== */
-
-/* Estilo específico para el nombre de usuario */
-.iggsad-user-name {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--iggsad-surface-600);
-  margin-right: var(--iggsad-spacing-sm);
-  padding: var(--iggsad-spacing-xs) var(--iggsad-spacing-sm);
-  background: var(--iggsad-surface-100);
-  border-radius: var(--iggsad-radius-sm);
-  transition: var(--iggsad-transition-fast);
-}
-
-.iggsad-user-name:hover {
-  background: var(--iggsad-surface-200);
-  color: var(--iggsad-surface-700);
-}
-
-/* Responsive para el nombre de usuario */
-@media (max-width: 768px) {
-  .iggsad-user-name {
-    display: none;
-  }
-}
-
-/* ===== TRANSICIONES DE PÁGINA ===== */
-.router-view {
-  transition: var(--iggsad-transition-normal);
-}
-
-/* Evitar que la página salte cuando aparece/desaparece el header */
-.iggsad-main-content {
-  min-height: calc(100vh - 80px); /* Altura aproximada del header */
-}
-
-/* Cuando estamos en login, usar toda la altura */
-.iggsad-main-content:only-child {
-  min-height: 100vh;
-}
-
-/* ===== ESTADOS DE LA APLICACIÓN ===== */
-
-/* Estado de carga global */
-.app-loading .iggsad-header {
-  opacity: 0.7;
-  pointer-events: none;
-}
-
-.app-loading .iggsad-main-content {
-  filter: blur(1px);
-}
-
-/* Estado offline */
-.app-offline .iggsad-header::after {
-  content: '⚠️ Sin conexión';
-  position: fixed;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--iggsad-warning-600, #f59e0b);
-  color: white;
-  padding: var(--iggsad-spacing-xs) var(--iggsad-spacing-md);
-  border-radius: 0 0 var(--iggsad-radius-sm) var(--iggsad-radius-sm);
-  font-size: 0.75rem;
-  font-weight: 600;
-  z-index: 1001;
-}
 </style>

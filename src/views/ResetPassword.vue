@@ -1,42 +1,35 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-primary-50 to-slate-100 flex items-center justify-center p-3 sm:p-4 lg:p-6">
-    <div class="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl">
-      <Card class="shadow-xl sm:shadow-2xl border-0 backdrop-blur-sm bg-white/90 card-enter-active">
-        <template #header>
-          <div class="text-center px-4 sm:px-6 bg-gradient-to-r from-primary-600 to-primary-700">
-            <!-- Logo/Icono -->
-            <div class="mb-4 sm:mb-6">
-              <div class="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 mx-auto mb-4 sm:mb-6 flex items-center justify-center">
-                <img 
-                  src="/logoBalanza.png" 
-                  alt="Gestión Procesal Logo" 
-                  class="w-full h-full object-contain drop-shadow-lg"
-                />
-              </div>
-            </div>
-            
-            <!-- Título -->
-            <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold mb-2">Nueva Contraseña</h1>
-            <p class="text-primary-100 text-sm sm:text-base font-medium">Establezca una contraseña segura</p>
+  <AuthLayout>
+    <template #header>
+      <div class="text-center px-4 sm:px-6 bg-gradient-to-r from-primary-600 to-primary-700">
+        <div class="mb-4 sm:mb-6">
+          <div class="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 mx-auto mb-4 sm:mb-6 flex items-center justify-center">
+            <img
+              src="/images/logoBalanza.png"
+              alt="Gestión Procesal Logo"
+              class="w-full h-full object-contain drop-shadow-lg"
+            />
           </div>
-        </template>
-        
-        <template #content>
-          <div class="px-4 sm:px-6 py-6 sm:py-8">
-            <ResetPasswordForm :token="resetToken" />
-          </div>
-        </template>
-        
-        <template #footer>
-          <div class="px-4 sm:px-6 py-3 sm:py-4 bg-slate-50 text-center border-t">
-            <div class="text-xs text-slate-500">
-              Su nueva contraseña debe cumplir con los requisitos de seguridad
-            </div>
-          </div>
-        </template>
-      </Card>
-    </div>
-  </div>
+        </div>
+        <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold mb-2 text-white">Nueva Contraseña</h1>
+        <p class="text-primary-100 text-sm sm:text-base font-medium">Establezca una contraseña segura</p>
+      </div>
+    </template>
+
+    <template #content>
+      <div class="px-4 sm:px-6 py-6 sm:py-8 flex justify-center">
+        <ResetPasswordForm />
+      </div>
+    </template>
+
+    <template #footer>
+      <div class="px-4 sm:px-6 py-3 sm:py-4 bg-slate-50 text-center border-t">
+        <p class="text-xs sm:text-sm text-slate-500">
+          © 2025 Gestión Procesal. Todos los derechos reservados.
+        </p>
+      </div>
+    </template>
+  </AuthLayout>
 </template>
 
 <script setup>
@@ -45,6 +38,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
 import Card from 'primevue/card'
+import AuthLayout from '@/components/AuthLayout.vue'
 import ResetPasswordForm from '@/components/ResetPasswordForm.vue'
 
 const route = useRoute()

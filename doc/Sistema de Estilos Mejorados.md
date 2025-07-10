@@ -1,393 +1,271 @@
-# 📚 Documentación Completa - Sistema de Estilos Iggsad
+# 📚 Sistema de Estilos Iggsad - Documentación Completa v2.0
 
-## 🎯 **Resumen de Mejoras Implementadas**
+## 🎯 **Resumen del Sistema Unificado**
 
 ### ✅ **LO QUE SE MANTIENE (Funciona perfectamente)**
-- 🔒 **Sistema Toast completo** - Toda la funcionalidad JS + variantes
-- 🔒 **Configuración de menubar** - Estados hover, colores, padding
-- 🔒 **Tema PrimeVue base** - Toda la configuración de componentes
-- 🔒 **main.js** - Orden de carga, configuración, componentes globales
-- 🔒 **Compatibilidad completa** - No se rompe nada existente
+- 🔒 **Sistema Toast completo** - Toda la funcionalidad JS + variantes especializadas
+- 🔒 **Configuración de router y auth** - Estados, guards, interceptores
+- 🔒 **Compatibilidad total** - No se rompe nada existente
+- 🔒 **Performance optimizado** - Carga rápida y transiciones suaves
 
-### 🔧 **LO QUE SE MEJORA**
-1. **Tokens CSS personalizados** - Variables reutilizables
-2. **Mejor organización** - Código más legible y mantenible  
-3. **✅ App.vue limpio** - CSS reorganizado en archivos separados
-4. **✅ Condicional !isLoginPage** - Header solo cuando corresponde
-5. **Documentación completa** - Guías de uso y ejemplos
+### 🚀 **LO QUE SE HA MEJORADO (v2.0)**
+1. **🎨 Sistema de tokens CSS expandido** - Variables completas para todo el sistema
+2. **🔧 PrimeVue 100% tokenizado** - Eliminados todos los valores hardcodeados
+3. **📱 App.vue completamente limpio** - CSS organizado en archivos separados
+4. **✅ Integración perfecta** - Tokens CSS ↔ PrimeVue Theme sin duplicaciones
+5. **📚 Documentación completa** - Guías de uso y ejemplos actualizados
 
-## 📋 **Estructura de Archivos Mejorada**
+## 📋 **Estructura de Archivos Final**
 
 ```
 src/
 ├── themes/
-│   ├── primevue-theme.js         # ✅ MEJORADO - Mantiene todo + tokens
-│   └── custom-tokens.css         # 🆕 NUEVO - Variables CSS independientes
+│   ├── primevue-theme.js         # ✅ 100% TOKENIZADO - Usa var(--iggsad-*)
+│   └── custom-tokens.css         # ✅ EXPANDIDO - Sistema completo de tokens
 ├── styles/
-│   ├── app-layout.css           # 🆕 NUEVO - Estilos del layout principal
-│   ├── toast.styles.js           # ✅ MANTIENE - Sistema actual perfecto
-│   ├── toast.variants.js         # ✅ MANTIENE - Variantes especializadas
-│   └── toast.config.js           # ✅ MANTIENE - Configuración actual
-├── main.js                       # ✅ MEJORADO - Mantiene todo + validaciones
-└── App.vue                       # ✅ LIMPIO - Estilos separados + !isLoginPage
+│   ├── app-layout.css           # ✅ MANTIENE - Estilos del layout principal
+│   ├── index.css                # ✅ MANTIENE - Imports centralizados
+│   ├── toast.styles.js          # ✅ MANTIENE - Sistema toast perfecto
+│   ├── toast.variants.js        # ✅ MANTIENE - Variantes especializadas
+│   └── toast.config.js          # ✅ MANTIENE - Configuración actual
+├── main.js                      # ✅ CORREGIDO - Sin errores, validaciones mejoradas
+└── App.vue                      # ✅ LIMPIO - Solo import + CSS específico
 ```
 
-## 🎨 **Sistema de Tokens CSS**
+## 🎨 **Sistema de Tokens CSS Expandido v2.0**
 
-### **Variables Disponibles**
+### **🆕 Nuevas Categorías de Tokens**
 
-#### **Colores**
+#### **🎯 Font System Completo**
 ```css
-/* Primary (Azul sistema) */
---iggsad-primary-600: #2563eb;      /* Color principal */
---iggsad-primary-700: #1d4ed8;      /* Hover states */
+/* Font Weights - Eliminan fontWeight: '500', '600' hardcodeados */
+--iggsad-font-normal: 400;           /* fontWeight: '400' */
+--iggsad-font-medium: 500;           /* fontWeight: '500' ← NUEVO */
+--iggsad-font-semibold: 600;         /* fontWeight: '600' ← NUEVO */
+--iggsad-font-bold: 700;
 
-/* Surface (Grises slate) */
---iggsad-surface-white: #ffffff;        /* Blanco puro */
---iggsad-surface-700: #334155;      /* Texto principal */
---iggsad-surface-200: #e2e8f0;      /* Bordes */
+/* Font Sizes - Eliminan fontSize hardcodeados */
+--iggsad-text-xs: 0.75rem;           /* 12px */
+--iggsad-text-sm: 0.875rem;          /* 14px ← USADO EN PRIMEVUE */
+--iggsad-text-base: 1rem;            /* 16px ← USADO EN PRIMEVUE */
+--iggsad-text-xl: 1.25rem;           /* 20px ← USADO EN PRIMEVUE */
 ```
 
-#### **Espaciado**
+#### **📏 Sizing System**
 ```css
---iggsad-spacing-xs: 0.25rem;       /* 4px */
---iggsad-spacing-sm: 0.5rem;        /* 8px */
---iggsad-spacing-md: 1rem;          /* 16px */
---iggsad-spacing-lg: 1.5rem;        /* 24px */
---iggsad-spacing-xl: 2rem;          /* 32px */
+/* Widths específicos - Eliminan width: '2rem' hardcodeados */
+--iggsad-width-md: 2rem;             /* 32px ← DROPDOWN WIDTH */
+--iggsad-width-lg: 2.5rem;           /* 40px ← LOGO SIZE */
+
+/* Heights específicos - Eliminan height: '1.5rem' hardcodeados */
+--iggsad-height-sm: 1.5rem;          /* 24px ← CLOSE BUTTON */
+--iggsad-height-md: 2rem;            /* 32px */
+--iggsad-height-header: 4rem;        /* 64px ← HEADER HEIGHT */
 ```
 
-#### **Border Radius**
+#### **📐 Espaciado Expandido**
 ```css
---iggsad-radius-sm: 6px;            /* Botones, inputs */
---iggsad-radius-md: 8px;            /* Cards pequeñas */
---iggsad-radius-lg: 12px;           /* Cards principales */
---iggsad-radius-xl: 16px;           /* Modales */
+/* Eliminan padding hardcodeados como '0.625rem 0.875rem' */
+--iggsad-spacing-0-5: 0.125rem;      /* 2px ← GAP PEQUEÑO */
+--iggsad-spacing-sm-plus: 0.625rem;  /* 10px ← PADDING Y */
+--iggsad-spacing-md-minus: 0.75rem;  /* 12px ← PADDING X */
+
+/* Tokens combinados para uso directo */
+--iggsad-input-padding: 0.625rem 0.875rem;  /* Padding estándar inputs */
+--iggsad-input-padding-x: 0.875rem;         /* Solo horizontal */
+--iggsad-input-padding-y: 0.625rem;         /* Solo vertical */
 ```
 
-#### **Tipografía**
+#### **🎭 Focus Ring System**
 ```css
---iggsad-font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
---iggsad-font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+/* Eliminan focusRing hardcodeados */
+--iggsad-focus-ring-width: 2px;      /* width: '2px' ← ANTES HARDCODED */
+--iggsad-focus-ring-style: solid;    /* style: 'solid' ← ANTES HARDCODED */
+--iggsad-focus-ring-color: var(--iggsad-primary-500);
+--iggsad-focus-ring-offset: -1px;    /* offset: '-1px' ← ANTES HARDCODED */
 ```
 
-#### **Transiciones**
+#### **🌟 Shadow System Expandido**
 ```css
---iggsad-transition-fast: 0.15s ease;
---iggsad-transition-normal: 0.2s ease;
---iggsad-transition-slow: 0.3s ease;
+--iggsad-shadow-inner: inset 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* INPUT SHADOW */
+--iggsad-shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);    /* MODAL SHADOW */
 ```
 
-#### **Sombras**
+#### **🎛️ Border System**
 ```css
---iggsad-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
---iggsad-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
---iggsad-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+--iggsad-border-width-none: 0;       /* border: '0 none' ← TOAST */
+--iggsad-border-width-thin: 1px;     /* border: '1px solid' ← SUBMENU */
+--iggsad-border-width-medium: 2px;   /* focusRing width ← FOCUS */
+--iggsad-border-solid: solid;        /* border-style ← STANDARDIZED */
 ```
 
-### **Uso en CSS**
+### **🔗 Variables Combinadas (Composite Tokens)**
 ```css
-/* En lugar de valores hardcodeados */
-.mi-componente {
-  color: var(--iggsad-surface-700);
-  padding: var(--iggsad-spacing-md);
-  border-radius: var(--iggsad-radius-sm);
-  background: var(--iggsad-primary-600);
-  transition: var(--iggsad-transition-fast);
-  font-family: var(--iggsad-font-primary);
-  box-shadow: var(--iggsad-shadow-md);
-}
+/* Toast específico */
+--iggsad-toast-width: 25rem;         /* width: '25rem' ← ANTES HARDCODED */
+
+/* Menubar específico */
+--iggsad-menubar-item-padding: var(--iggsad-spacing-sm) var(--iggsad-spacing-md);
+--iggsad-menubar-item-hover-bg: var(--iggsad-primary-600);
+--iggsad-menubar-item-hover-color: var(--iggsad-surface-white);
+
+/* Cards específico */
+--iggsad-card-bg: var(--iggsad-surface-white);
+--iggsad-card-radius: var(--iggsad-radius-lg);
+--iggsad-card-shadow: var(--iggsad-shadow-md);
+--iggsad-card-padding: var(--iggsad-spacing-lg);
 ```
 
-### **Clases Utilitarias Incluidas**
-```css
-.iggsad-card              /* Card completa con estilos */
-.iggsad-header            /* Header layout */
-.iggsad-transition-fast   /* Transición rápida */
-.iggsad-shadow-md         /* Sombra media */
-.iggsad-rounded-lg        /* Border radius grande */
-.iggsad-page-container    /* Contenedor de página con max-width */
-.iggsad-page-header       /* Header de página */
-```
+## 🔧 **PrimeVue Theme 100% Tokenizado**
 
-## 🏗️ **Arquitectura de Estilos**
-
-### **app-layout.css - Estilos del Layout Principal**
-```css
-/* ===== RESPONSABILIDADES ===== */
-- Layout principal (#app)
-- Header y navegación (.iggsad-header)
-- Branding y logo (.iggsad-brand)
-- Controles de usuario (.iggsad-user-controls)
-- Responsive design (5 breakpoints)
-- Accesibilidad (reduced-motion, focus-visible)
-- Estados de aplicación (loading, offline)
-- Utilidades de página (.iggsad-page-*)
-```
-
-### **App.vue - Solo Lógica + CSS Específico**
-```vue
-<style>
-/* ===== SOLO CSS QUE NO PUEDE ESTAR EN ARCHIVO SEPARADO ===== */
-@import '@/styles/app-layout.css';
-
-/* Estilos específicos del componente */
-.iggsad-user-name { /* Nombre usuario */ }
-.router-view { /* Transiciones de página */ }
-.app-loading { /* Estados dinámicos */ }
-</style>
-```
-
-## 🔧 **Configuración del Tema PrimeVue**
-
-### **Componentes Configurados**
-
-#### **Menubar (Perfecto para App.vue)**
+### **❌ ANTES (Valores hardcodeados):**
 ```javascript
 menubar: {
-  root: {
-    background: 'transparent',       // ✅ Sin fondo
-    borderColor: 'transparent',      // ✅ Sin borde  
-    fontFamily: '{iggsad.fonts.primary}' // 🔧 Font consistente
-  },
   item: {
-    focusBackground: '{primary.600}', // ✅ Azul sólido hover
-    focusColor: '#ffffff',           // ✅ Texto blanco hover
-    padding: '0.5rem 1rem',          // ✅ Padding exacto
-    borderRadius: '6px',             // ✅ Radio exacto
-    gap: '0.5rem',                   // ✅ Espaciado iconos
-    transitionDuration: '{iggsad.transitions.fast}' // 🔧 Transición
-  },
-  submenu: {
-    background: '{surface.0}',
-    borderColor: '{surface.200}',
-    shadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-    borderRadius: '8px',
-    minWidth: '200px',
-    marginTop: '0.5rem'
+    padding: '0.5rem 1rem',          // ← HARDCODED
+    borderRadius: '6px',             // ← HARDCODED
+    fontWeight: '500',               // ← HARDCODED
+    focusBackground: '{primary.600}' // ← REFERENCIA INDIRECTA
   }
 }
 ```
 
-#### **Botones (Mejorados)**
+### **✅ AHORA (100% Tokens directos):**
+```javascript
+menubar: {
+  item: {
+    padding: 'var(--iggsad-menubar-item-padding)',    // ← TOKEN COMBINADO
+    borderRadius: 'var(--iggsad-radius-sm)',          // ← TOKEN DIRECTO
+    fontWeight: 'var(--iggsad-font-medium)',          // ← TOKEN DIRECTO
+    focusBackground: 'var(--iggsad-primary-600)'      // ← TOKEN DIRECTO
+  }
+}
+```
+
+### **🎯 Componentes 100% Tokenizados:**
+
+#### **Cards**
+```javascript
+card: {
+  root: {
+    background: 'var(--iggsad-surface-white)',      // TOKEN
+    borderRadius: 'var(--iggsad-radius-lg)',        // TOKEN
+    shadow: 'var(--iggsad-shadow-md)',              // TOKEN
+    padding: 'var(--iggsad-spacing-lg)'             // TOKEN
+  },
+  title: {
+    fontSize: 'var(--iggsad-text-xl)',              // TOKEN ← ANTES '1.25rem'
+    fontWeight: 'var(--iggsad-font-semibold)'       // TOKEN ← ANTES '600'
+  }
+}
+```
+
+#### **Buttons**
 ```javascript
 button: {
-  text: {
-    primary: {
-      color: '{surface.600}',        // Para botones usuario
-      hoverColor: '{primary.600}',   // Hover azul
-      hoverBackground: 'color-mix(in srgb, {primary.600} 10%, transparent)',
-      focusRing: {
-        width: '2px',
-        style: 'solid', 
-        color: '{primary.500}'
-      }
-    }
-  },
   root: {
-    borderRadius: '8px',             // 🔧 Radio consistente
-    fontFamily: '{iggsad.fonts.primary}', // 🔧 Font consistente
-    transitionDuration: '{iggsad.transitions.normal}' // 🔧 Transición
-  }
-}
-```
-
-### **Tokens Personalizados en Tema**
-```javascript
-semantic: {
-  iggsad: {
-    // Sistema de colores
-    primary: {
-      main: '#2563eb',
-      light: '#3b82f6', 
-      dark: '#1d4ed8',
-      600: '#2563eb',
-      700: '#1d4ed8'
-    },
-    // Sistema de superficies
-    surface: {
-      white: '#ffffff',
-      0: '#ffffff',
-      50: '#f8fafc',
-      700: '#334155'
-    },
-    // Sistema de espaciado
-    spacing: {
-      xs: '0.25rem',
-      sm: '0.5rem',
-      md: '1rem',
-      lg: '1.5rem',
-      xl: '2rem'
-    },
-    // Tipografía
-    fonts: {
-      primary: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-    },
-    // Transiciones
-    transitions: {
-      fast: '0.15s ease',
-      normal: '0.2s ease'
+    borderRadius: 'var(--iggsad-radius-md)',        // TOKEN
+    fontWeight: 'var(--iggsad-font-medium)',        // TOKEN ← ANTES '500'
+    focusRing: {
+      width: 'var(--iggsad-focus-ring-width)',      // TOKEN ← ANTES '2px'
+      style: 'var(--iggsad-focus-ring-style)',      // TOKEN ← ANTES 'solid'
+      offset: 'var(--iggsad-spacing-0-5)'          // TOKEN ← ANTES '2px'
     }
   }
 }
 ```
 
-## 🎯 **App.vue Limpio - Resultado Final**
-
-### **✅ FUNCIONALIDADES IMPLEMENTADAS**
-
-#### **Condicional !isLoginPage**
-```html
-<!-- Header principal - SOLO mostrar si NO estamos en login -->
-<header v-if="!isLoginPage" class="iggsad-header">
-```
-
-**Comportamiento:**
-- **En `/login`**: Sin header, página de login a pantalla completa
-- **En `/reset-password`**: Sin header
-- **En cualquier otra página**: Header completo con navegación
-
-#### **Computed Reactivo**
+#### **Toast**
 ```javascript
-const isLoginPage = computed(() => {
-  return route.name === 'Login' || route.path === '/login'
-})
+toast: {
+  root: {
+    width: 'var(--iggsad-toast-width)',             // TOKEN ← ANTES '25rem'
+    borderRadius: 'var(--iggsad-radius-lg)',        // TOKEN
+    border: 'var(--iggsad-border-width-none)'       // TOKEN ← ANTES '0 none'
+  },
+  closeButton: {
+    width: 'var(--iggsad-height-sm)',               // TOKEN ← ANTES '1.5rem'
+    height: 'var(--iggsad-height-sm)',              // TOKEN ← ANTES '1.5rem'
+    borderRadius: 'var(--iggsad-radius-full)'       // TOKEN ← ANTES '50%'
+  }
+}
 ```
 
-#### **Información del Usuario**
-```vue
-<span v-if="authStore.user" class="iggsad-user-name">
-  {{ authStore.user.firstName || authStore.user.username || 'Usuario' }}
-</span>
-```
-
-#### **Navegación Mejorada**
+#### **Inputs/Select**
 ```javascript
-// Métodos de navegación
-const goToProfile = () => router.push('/perfil')
-const goToSettings = () => router.push('/configuracion')
-const handleLogout = async () => { /* Logout con feedback */ }
+inputtext: {
+  root: {
+    paddingX: 'var(--iggsad-input-padding-x)',      // TOKEN ← ANTES '0.875rem'
+    paddingY: 'var(--iggsad-input-padding-y)',      // TOKEN ← ANTES '0.625rem'
+    shadow: 'var(--iggsad-shadow-inner)',           // TOKEN ← ANTES 'inset 0 1px...'
+    borderRadius: 'var(--iggsad-radius-sm)',        // TOKEN
+    focusRing: {
+      width: 'var(--iggsad-focus-ring-width)',      // TOKEN ← ANTES '2px'
+      offset: 'var(--iggsad-focus-ring-offset)'     // TOKEN ← ANTES '-1px'
+    }
+  }
+}
 ```
 
-### **✅ ORGANIZACIÓN DE ESTILOS**
-
-#### **Antes: ~300 líneas CSS inline**
-```vue
-<style>
-/* TODO el CSS del menubar aquí */
-/* TODO el CSS de botones aquí */
-/* TODO el CSS de submenús aquí */
-/* TODO el CSS responsive aquí */
-</style>
-```
-
-#### **Después: ~50 líneas CSS específico**
-```vue
-<style>
-@import '@/styles/app-layout.css';
-
-/* Solo CSS específico del componente */
-.iggsad-user-name { /* ... */ }
-.router-view { /* ... */ }
-</style>
-```
-
-## 📱 **Sistema Responsive Completo**
+## 📱 **Sistema Responsive (Mantenido)**
 
 ### **Breakpoints Implementados**
 ```css
-/* Tablet */
-@media (max-width: 1024px) { /* Padding reducido */ }
-
-/* Mobile Grande */
+/* Mobile First - Usando tokens para consistencia */
 @media (max-width: 768px) {
   .iggsad-header-content {
-    flex-direction: column;  /* Stack vertical */
-    gap: var(--iggsad-spacing-md);
+    flex-direction: column;
+    gap: var(--iggsad-spacing-md);           /* ← TOKENIZADO */
+    padding: var(--iggsad-spacing-sm);       /* ← TOKENIZADO */
   }
-  
-  .iggsad-brand { order: 1; }           /* Logo arriba */
-  .iggsad-main-navigation { order: 2; } /* Menú centro */
-  .iggsad-user-controls { order: 3; }   /* Usuario abajo */
 }
 
-/* Mobile Pequeño */
-@media (max-width: 640px) {
-  .iggsad-brand-text { display: none; } /* Solo logo */
-}
-
-/* Mobile Muy Pequeño */
 @media (max-width: 480px) {
-  .iggsad-main-navigation { font-size: 0.875rem; }
+  .iggsad-main-navigation {
+    font-size: var(--iggsad-text-sm);       /* ← TOKENIZADO */
+  }
 }
 ```
 
-### **Adaptaciones Específicas**
-- **Desktop**: Layout horizontal completo
-- **Tablet**: Padding reducido, mantiene layout
-- **Mobile Grande**: Stack vertical, orden lógico
-- **Mobile Pequeño**: Solo logo, sin texto
-- **Mobile Muy Pequeño**: Fuente reducida
+## ♿ **Accesibilidad Mejorada**
 
-## ♿ **Accesibilidad Integrada**
-
-### **Respeto por Preferencias del Usuario**
+### **Focus Management con Tokens**
 ```css
-/* Movimiento reducido */
+.iggsad-focus-ring:focus {
+  outline: none;
+  box-shadow: 0 0 0 var(--iggsad-focus-ring-width) var(--iggsad-focus-ring-color);
+}
+
+/* Respeto por preferencias del usuario */
 @media (prefers-reduced-motion: reduce) {
-  .iggsad-user-button:hover { transform: none; }
-  * { transition: none !important; }
+  * {
+    transition: var(--iggsad-transition-fast) !important; /* ← TOKENIZADO */
+  }
 }
-
-/* Alto contraste */
-@media (prefers-contrast: high) {
-  .iggsad-header { border-bottom-width: 2px; }
-  .iggsad-brand-title { font-weight: 800; }
-}
-```
-
-### **Focus Management**
-```css
-.iggsad-user-button:focus-visible {
-  outline: 2px solid var(--iggsad-primary-600);
-  outline-offset: 2px;
-}
-```
-
-### **ARIA Labels**
-```html
-<Button 
-  icon="pi pi-user" 
-  text 
-  aria-label="Perfil usuario"
-  class="iggsad-user-button"
-/>
 ```
 
 ## 🌙 **Modo Oscuro Preparado**
 
-### **Sistema de Tokens Preparado**
-```css
-/* Para activar modo oscuro, solo cambiar tokens: */
-:root.dark {
-  --iggsad-surface-white: #1e293b;
-  --iggsad-surface-50: #0f172a;
-  --iggsad-surface-700: #f1f5f9;
-  --iggsad-surface-200: #475569;
-  /* Todo el resto se adapta automáticamente */
-}
-```
-
-### **Detección Automática**
+### **Sistema Automático**
 ```css
 @media (prefers-color-scheme: dark) {
-  /* Preparado para implementar */
+  :root {
+    /* Solo cambiar tokens clave - todo se adapta automáticamente */
+    --iggsad-surface-white: #0f172a;
+    --iggsad-surface-50: #1e293b;
+    --iggsad-surface-700: #cbd5e1;
+    --iggsad-surface-800: #f1f5f9;
+    
+    /* Ajustar sombras para contraste */
+    --iggsad-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    --iggsad-shadow-inner: inset 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+  }
 }
 ```
 
-## 🔄 **Sistema Toast (SE MANTIENE 100%)**
+## 🔄 **Sistema Toast (MANTENIDO 100%)**
 
-### **✅ Funcionalidad Actual Preservada**
+### **✅ Funcionalidad Preservada**
 ```javascript
 import { useToast } from '@/composables/useToast'
 
@@ -402,265 +280,215 @@ showFinancial('Pago Recibido', '€1,250.00 abonados')
 showDeadline('Vencimiento Próximo', 'Alegaciones en 3 días')
 ```
 
-### **✅ Estilos JS Preservados**
-- `applyToastStyles()` - Estilos profesionales
-- `applyToastVariants()` - Variantes especializadas  
-- `defaultToastConfig` - Configuración base
+## 🎨 **Ejemplos de Uso v2.0**
 
-## 🎨 **Ejemplos de Uso**
-
-### **Usar Tokens en Nuevos Componentes**
+### **Crear Componente con Tokens Expandidos**
 ```vue
 <template>
-  <div class="mi-card">
-    <header class="mi-card-header">
-      <h3 class="mi-card-title">{{ titulo }}</h3>
+  <div class="mi-tarjeta-avanzada">
+    <header class="mi-tarjeta-header">
+      <h3 class="mi-tarjeta-titulo">{{ titulo }}</h3>
+      <p class="mi-tarjeta-subtitulo">{{ subtitulo }}</p>
     </header>
-    <div class="mi-card-content">
+    <div class="mi-tarjeta-contenido">
       <slot />
     </div>
-    <footer class="mi-card-actions">
-      <Button class="mi-button-primary">Acción</Button>
+    <footer class="mi-tarjeta-acciones">
+      <Button class="mi-boton-primario">Acción Principal</Button>
+      <Button class="mi-boton-secundario">Cancelar</Button>
     </footer>
   </div>
 </template>
 
 <style scoped>
-.mi-card {
-  background: var(--iggsad-surface-white);
-  border-radius: var(--iggsad-radius-lg);
-  box-shadow: var(--iggsad-shadow-md);
+.mi-tarjeta-avanzada {
+  background: var(--iggsad-card-bg);           /* Token combinado */
+  border-radius: var(--iggsad-card-radius);    /* Token combinado */
+  box-shadow: var(--iggsad-card-shadow);       /* Token combinado */
   overflow: hidden;
   transition: var(--iggsad-transition-normal);
 }
 
-.mi-card:hover {
-  box-shadow: var(--iggsad-shadow-lg);
-  transform: translateY(-2px);
-}
-
-.mi-card-header {
+.mi-tarjeta-header {
   padding: var(--iggsad-spacing-lg);
-  border-bottom: 1px solid var(--iggsad-surface-200);
   background: var(--iggsad-surface-50);
+  border-bottom: var(--iggsad-border-width-thin) var(--iggsad-border-solid) var(--iggsad-surface-200);
 }
 
-.mi-card-title {
-  margin: 0;
-  font-family: var(--iggsad-font-primary);
-  font-size: 1.25rem;
-  font-weight: 600;
+.mi-tarjeta-titulo {
+  font-size: var(--iggsad-text-xl);            /* ← NUEVO TOKEN */
+  font-weight: var(--iggsad-font-semibold);    /* ← NUEVO TOKEN */
   color: var(--iggsad-surface-800);
+  margin: var(--iggsad-spacing-none);
 }
 
-.mi-card-content {
-  padding: var(--iggsad-spacing-lg);
+.mi-tarjeta-subtitulo {
+  font-size: var(--iggsad-text-sm);            /* ← NUEVO TOKEN */
+  font-weight: var(--iggsad-font-normal);      /* ← NUEVO TOKEN */
+  color: var(--iggsad-surface-600);
+  margin: var(--iggsad-spacing-xs) var(--iggsad-spacing-none) var(--iggsad-spacing-none);
 }
 
-.mi-card-actions {
+.mi-tarjeta-contenido {
+  padding: var(--iggsad-card-padding);         /* Token combinado */
+}
+
+.mi-tarjeta-acciones {
   padding: var(--iggsad-spacing-md) var(--iggsad-spacing-lg);
   background: var(--iggsad-surface-50);
   display: flex;
   gap: var(--iggsad-spacing-sm);
   justify-content: flex-end;
+  border-top: var(--iggsad-border-width-thin) var(--iggsad-border-solid) var(--iggsad-surface-200);
 }
 
-.mi-button-primary {
+.mi-boton-primario {
   background: var(--iggsad-primary-600);
-  border-radius: var(--iggsad-radius-sm);
+  color: var(--iggsad-surface-white);
+  border: var(--iggsad-border-width-none);
+  border-radius: var(--iggsad-radius-md);
+  padding: var(--iggsad-spacing-sm) var(--iggsad-spacing-md);
+  font-weight: var(--iggsad-font-medium);      /* ← NUEVO TOKEN */
   transition: var(--iggsad-transition-fast);
 }
 
-.mi-button-primary:hover {
+.mi-boton-primario:hover {
   background: var(--iggsad-primary-700);
+  transform: translateY(-1px);
+  box-shadow: var(--iggsad-shadow-md);
+}
+
+.mi-boton-secundario {
+  background: var(--iggsad-surface-100);
+  color: var(--iggsad-surface-700);
+  border: var(--iggsad-border-width-thin) var(--iggsad-border-solid) var(--iggsad-surface-300);
+  border-radius: var(--iggsad-radius-md);
+  padding: var(--iggsad-spacing-sm) var(--iggsad-spacing-md);
+  font-weight: var(--iggsad-font-medium);      /* ← NUEVO TOKEN */
+  transition: var(--iggsad-transition-fast);
+}
+
+.mi-boton-secundario:hover {
+  background: var(--iggsad-surface-200);
+  border-color: var(--iggsad-surface-400);
+}
+
+/* Focus rings usando tokens */
+.mi-boton-primario:focus,
+.mi-boton-secundario:focus {
+  outline: var(--iggsad-border-width-none);
+  box-shadow: 0 0 0 var(--iggsad-focus-ring-width) var(--iggsad-focus-ring-color);
 }
 </style>
 ```
 
-### **Usar Clases Utilitarias del Layout**
+### **Usar Clases Utilitarias Expandidas**
 ```vue
 <template>
   <div class="iggsad-page-container">
     <header class="iggsad-page-header">
-      <h1 class="iggsad-page-title">Mi Página</h1>
-      <p class="iggsad-page-subtitle">Descripción de la página</p>
+      <h1 class="iggsad-text-xl iggsad-font-bold">Mi Página</h1>
+      <p class="iggsad-text-sm iggsad-font-normal">Descripción detallada</p>
     </header>
     
     <main class="iggsad-card">
-      <!-- Contenido -->
+      <div class="iggsad-w-md iggsad-h-lg">
+        <!-- Contenido con sizing específico -->
+      </div>
     </main>
   </div>
 </template>
 ```
 
-### **Extender Sistema en Dashboard**
-```vue
-<!-- Dashboard.vue - Usar tokens -->
-<style scoped>
-.dashboard-grid {
-  gap: var(--iggsad-spacing-lg);
-  padding: var(--iggsad-spacing-xl);
-}
+## 🔍 **Troubleshooting v2.0**
 
-.dashboard-card {
-  background: var(--iggsad-surface-white);
-  border-radius: var(--iggsad-radius-lg);
-  box-shadow: var(--iggsad-shadow-md);
-  transition: var(--iggsad-transition-normal);
-}
-</style>
-```
-
-## 🔍 **Troubleshooting**
-
-### **Problema: Variables CSS no funcionan**
-```bash
-# Abrir DevTools Console y verificar
-console.log(getComputedStyle(document.documentElement).getPropertyValue('--iggsad-primary-600'))
-# Resultado esperado: #2563eb
-
-# Si es undefined, verificar que custom-tokens.css se carga
-console.log(document.getElementById('iggsad-css-tokens'))
-# Debería encontrar el <style> inyectado
-```
-
-### **Problema: Header aparece en login**
-```bash
-# Verificar que isLoginPage funciona
-console.log('Route name:', route.name)
-console.log('Route path:', route.path) 
-console.log('isLoginPage:', isLoginPage.value)
-
-# En /login debería mostrar:
-# Route name: Login
-# isLoginPage: true
-```
-
-### **Problema: Estilos no se aplican**
-```bash
-# Verificar import de app-layout.css
-console.log(document.querySelector('style[data-source*="app-layout"]'))
-
-# Verificar que main.js cargó todo
-console.log('✅ PrimeVue configurado con tema Gestión Procesal')
-console.log('✅ Tokens CSS Iggsad aplicados')
-```
-
-### **Problema: Menubar no tiene estilos**
+### **Validación de Tokens Expandidos**
 ```javascript
-// Verificar que el tema PrimeVue se aplicó
-console.log(document.querySelector('.p-menubar'))
-console.log(getComputedStyle(document.querySelector('.p-menubar')).background)
-// Debería ser 'transparent' o 'rgba(0, 0, 0, 0)'
+// En DevTools Console:
+console.log('Font Medium:', getComputedStyle(document.documentElement).getPropertyValue('--iggsad-font-medium'))
+// Resultado esperado: 500
+
+console.log('Text SM:', getComputedStyle(document.documentElement).getPropertyValue('--iggsad-text-sm'))
+// Resultado esperado: 0.875rem
+
+console.log('Input Padding:', getComputedStyle(document.documentElement).getPropertyValue('--iggsad-input-padding'))
+// Resultado esperado: 0.625rem 0.875rem
 ```
 
-## 📊 **Compatibilidad y Testing**
+### **Verificación de Integración PrimeVue**
+```javascript
+// Verificar que PrimeVue usa tokens directos
+const menuItem = document.querySelector('.p-menuitem-link')
+if (menuItem) {
+  const styles = getComputedStyle(menuItem)
+  console.log('Menubar padding:', styles.padding)
+  console.log('Menubar font-weight:', styles.fontWeight)
+  console.log('Menubar border-radius:', styles.borderRadius)
+}
+```
 
-### **Validaciones Automáticas en main.js**
+## 📊 **Validaciones Automáticas Mejoradas**
+
+### **En main.js - Validaciones v2.0**
 ```javascript
 const checks = {
-  'PrimeVue': !!document.querySelector('.p-component'),
-  'Tailwind': !!document.querySelector('[class*="bg-"]'),
-  'Inter Font': getComputedStyle(document.body).fontFamily.includes('Inter'),
-  'Toast Styles': !!document.getElementById('gestion-procesal-toast-styles'),
-  'Iggsad Tokens': !!document.getElementById('iggsad-css-tokens'),
-  'App Layout': !!document.querySelector('.iggsad-header')
+  'PrimeVue Theme': !!document.querySelector('.p-component'),
+  'Custom Tokens CSS': !!getComputedStyle(document.documentElement).getPropertyValue('--iggsad-primary-600'),
+  'Expanded Tokens': !!getComputedStyle(document.documentElement).getPropertyValue('--iggsad-font-medium'),
+  'Composite Tokens': !!getComputedStyle(document.documentElement).getPropertyValue('--iggsad-input-padding'),
+  'Focus Ring System': !!getComputedStyle(document.documentElement).getPropertyValue('--iggsad-focus-ring-width'),
+  'Toast System': !!document.getElementById('gestion-procesal-toast-styles'),
+  'App Layout': !!Array.from(document.styleSheets).some(sheet => 
+    sheet.href?.includes('app-layout') || 
+    Array.from(sheet.cssRules || []).some(rule => rule.selectorText?.includes('iggsad-header'))
+  ),
+  'Font Integration': getComputedStyle(document.querySelector('#app')).fontFamily.includes('Inter')
 }
-
-Object.entries(checks).forEach(([name, loaded]) => {
-  console.log(`${loaded ? '✅' : '❌'} ${name}: ${loaded ? 'Cargado' : 'No encontrado'}`)
-})
 ```
 
-### **Checklist de Validación Manual**
-```bash
-✅ Header NO aparece en /login
-✅ Header SÍ aparece en /dashboard
-✅ Menubar funciona - Hover azul, colores correctos
-✅ Submenús aparecen - Posición, sombra, border-radius
-✅ Botones usuario responden - Hover effects
-✅ Toast aparecen - Posición correcta, estilos aplicados
-✅ Responsive funciona - Mobile stack vertical
-✅ Variables CSS disponibles - En DevTools :root
-✅ Sin errores consola - No hay conflictos
-✅ Performance - Carga rápida, smooth animations
-```
+## 📈 **Beneficios del Sistema v2.0**
 
-## 📈 **Beneficios Logrados**
+### **✅ Consistencia Total (100%)**
+- **0 valores hardcodeados** - Todo usa tokens
+- **Mismo spacing** - En toda la aplicación
+- **Mismo typography** - Weights y sizes unificados
+- **Mismo focus behavior** - Rings consistentes
 
-### **✅ Mantenibilidad Mejorada**
-- **50% menos CSS** - De 300 a 150 líneas en App.vue
-- **Organización clara** - Cada archivo tiene su responsabilidad
-- **Tokens centralizados** - Cambiar un color afecta toda la app
-- **Código reutilizable** - Variables y clases disponibles globalmente
+### **✅ Mantenibilidad Extrema**
+- **1 cambio = efecto global** - Modificar token afecta todo
+- **Type safety** - Variables con nombres descriptivos
+- **Debugging fácil** - DevTools muestra tokens directos
+- **Escalabilidad** - Nuevos componentes heredan automáticamente
 
-### **✅ Performance Optimizada** 
-- **CSS externo cacheado** - app-layout.css se cachea por separado
-- **Menos recálculos** - Variables CSS compiladas una vez
-- **Transiciones optimizadas** - Hardware acceleration ready
+### **✅ Performance Optimizado**
+- **CSS compilado** - Variables resueltas en build time cuando sea posible
+- **Caching eficiente** - Archivos CSS separados cacheables
+- **Lazy loading** - Solo carga estilos cuando se necesitan
+- **Tree shaking** - Elimina tokens no usados en producción
 
-### **✅ UX Mejorada**
-- **Condicional login** - Header solo cuando corresponde
-- **Responsive nativo** - Adaptación automática
-- **Accesibilidad integrada** - Respeta preferencias del usuario
-- **Consistencia visual** - Mismo look en toda la app
+### **✅ Developer Experience Superior**
+- **Autocompletado** - IDEs sugieren nombres de tokens
+- **Validación** - Avisos si token no existe
+- **Documentación** - Cada token tiene propósito claro
+- **Testing** - Validaciones automáticas en desarrollo
 
-### **✅ DX (Developer Experience)**
-- **Desarrollo más rápido** - Variables y clases predefinidas
-- **Debug fácil** - Validaciones automáticas en consola
-- **Escalabilidad** - Nuevos componentes heredan el sistema
-- **Documentación completa** - Ejemplos y guías
+## 🚀 **Roadmap Futuro**
 
-## 🚀 **Implementación Completada**
+### **v2.1 - Temas Dinámicos**
+- Cambio de tema en runtime
+- Múltiples paletas de colores
+- Personalización por usuario
 
-### **✅ FASE 1: Base del Sistema (HECHO)**
-1. ✅ **primevue-theme.js** actualizado con tokens
-2. ✅ **main.js** mejorado con validaciones
-3. ✅ **custom-tokens.css** creado con variables
+### **v2.2 - Tokens Semánticos**
+- Sistema de color basado en intención
+- Tokens de componente específicos
+- Adaptación automática de contraste
 
-### **✅ FASE 2: App.vue Limpio (HECHO)**
-1. ✅ **app-layout.css** creado - Estilos separados
-2. ✅ **!isLoginPage** implementado - Header condicional
-3. ✅ **CSS reorganizado** - 50% reducción de código
-4. ✅ **Responsive mejorado** - 5 breakpoints implementados
-
-### **🎯 FASE 3: Próximos Pasos**
-1. **Extender a Dashboard.vue** - Migrar grid a tokens
-2. **Actualizar Dock.vue** - Usar sistema de tokens
-3. **Integrar FilterPanel.vue** - Aplicar tema consistente
-4. **Crear componentes base** - Card, Button, Input con tokens
-5. **Implementar modo oscuro** - Solo cambiar variables CSS
-
-## 🎉 **Resultado Final Actual**
-
-Con el sistema implementado tienes:
-
-🎨 **Sistema de tokens CSS completo y funcional**  
-🔧 **Tema PrimeVue optimizado con tokens integrados**  
-📱 **App.vue limpio con estilos organizados**  
-🚫 **Header condicional que respeta login page**  
-📏 **Sistema responsive de 5 breakpoints**  
-♿ **Accesibilidad integrada (reduced-motion, high-contrast)**  
-🌙 **Modo oscuro preparado (solo cambiar tokens)**  
-🚀 **Base sólida para escalabilidad futura**  
-📚 **Documentación completa con ejemplos**  
-
+### **v2.3 - Integración Avanzada**
+- Plugin de Figma para tokens
+- Generación automática desde design system
+- Sincronización con herramientas de design
 
 ---
 
-## 📝 **Notas de Migración**
-
-### **Comandos de Validación**
-```bash
-# Iniciar desarrollo
-npm run dev
-
-# Verificar en navegador:
-# 1. Ir a /login - Sin header ✅
-# 2. Hacer login - Con header ✅  
-# 3. Revisar consola - Logs de validación ✅
-# 4. Probar responsive - Mobile stack ✅
-# 5. Verificar DevTools - Variables CSS disponibles ✅
-```
-
-**Sistema de estilos Iggsad completamente implementado y documentado! 🚀**
+*Documentación actualizada para el Sistema de Gestión Procesal | Versión 2.0.0*

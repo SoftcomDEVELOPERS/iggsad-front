@@ -1,8 +1,4 @@
-/* ===== TOKENS CSS PERSONALIZADOS IGGSAD =====
- * Variables CSS que se pueden usar en toda la aplicación
- * Compatibles con el tema PrimeVue y preparadas para App.vue
- */
-
+/* Custom CSS Variables for IGGSAD Design System */
 :root {
   /* ===== SISTEMA DE COLORES ===== */
   
@@ -20,7 +16,7 @@
   --iggsad-primary-950: #172554;
   
   /* Surface - Escala de grises slate */
-  --iggsad-surface-white: #ffffff;        /* Blanco puro */
+  --iggsad-surface-white: #ffffff;    /* Blanco puro */
   --iggsad-surface-50: #f8fafc;       /* Background principal */
   --iggsad-surface-100: #f1f5f9;      /* Background secundario */
   --iggsad-surface-200: #e2e8f0;      /* Bordes suaves */
@@ -33,23 +29,46 @@
   --iggsad-surface-900: #0f172a;      /* Texto muy oscuro */
   --iggsad-surface-950: #020617;      /* Negro casi puro */
   
-  /* ===== SISTEMA DE ESPACIADO ===== */
-  --iggsad-spacing-zero: 0;           /* 0px probar */
-  --iggsad-spacing-xs: 0rem;       /* 4px */
+  /* ===== SISTEMA DE ESPACIADO EXPANDIDO ===== */
+  --iggsad-spacing-none: 0;           /* 0px */
+  --iggsad-spacing-px: 1px;           /* 1px */
+  --iggsad-spacing-0-5: 0.125rem;     /* 2px */
+  --iggsad-spacing-xs: 0.25rem;       /* 4px */
   --iggsad-spacing-sm: 0.5rem;        /* 8px */
+  --iggsad-spacing-sm-plus: 0.625rem; /* 10px - Para padding: '0.625rem' */
+  --iggsad-spacing-md-minus: 0.75rem; /* 12px */
   --iggsad-spacing-md: 1rem;          /* 16px */
   --iggsad-spacing-lg: 1.5rem;        /* 24px */
   --iggsad-spacing-xl: 2rem;          /* 32px */
   --iggsad-spacing-2xl: 3rem;         /* 48px */
+  --iggsad-spacing-3xl: 4rem;         /* 64px */
 
+  /* ===== SISTEMA DE SIZING ===== */
+  /* Widths específicos */
+  --iggsad-width-none: 0;
+  --iggsad-width-xs: 1rem;            /* 16px */
+  --iggsad-width-sm: 1.5rem;          /* 24px */
+  --iggsad-width-md: 2rem;            /* 32px - Para dropdown: '2rem' */
+  --iggsad-width-lg: 2.5rem;          /* 40px */
+  --iggsad-width-xl: 3rem;            /* 48px */
   
+  /* Heights específicos */
+  --iggsad-height-none: 0;
+  --iggsad-height-xs: 1rem;           /* 16px */
+  --iggsad-height-sm: 1.5rem;         /* 24px - Para closeButton */
+  --iggsad-height-md: 2rem;           /* 32px */
+  --iggsad-height-lg: 2.5rem;         /* 40px */
+  --iggsad-height-xl: 3rem;           /* 48px */
+  --iggsad-height-header: 4rem;       /* 64px - altura del header */
+
   /* ===== SISTEMA DE BORDER RADIUS ===== */
-  --iggsad-radius-zero: 0px;
+  --iggsad-radius-none: 0px;
   --iggsad-radius-sm: 6px;            /* Pequeño (inputs, botones) */
   --iggsad-radius-md: 8px;            /* Medio (cards pequeñas) */
   --iggsad-radius-lg: 12px;           /* Grande (cards principales) */
   --iggsad-radius-xl: 16px;           /* Extra grande (modales) */
-  --iggsad-radius-full: 9999px;       /* Circular */
+  --iggsad-radius-2xl: 24px;          /* Muy grande */
+  --iggsad-radius-full: 9999px;       /* Circular - Para closeButton: '50%' */
   
   /* ===== SISTEMA DE SOMBRAS ===== */
   --iggsad-shadow-none: none;
@@ -57,25 +76,62 @@
   --iggsad-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --iggsad-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --iggsad-shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --iggsad-shadow-inner: inset 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* Para inputs */
   
-  /* ===== SISTEMA DE TIPOGRAFÍA ===== */
+  /* ===== SISTEMA DE TIPOGRAFÍA EXPANDIDO ===== */
   --iggsad-font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --iggsad-font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
   
-  /* Tamaños de fuente */
+  /* Font weights */
+  --iggsad-font-thin: 100;
+  --iggsad-font-light: 300;
+  --iggsad-font-normal: 400;
+  --iggsad-font-medium: 500;           /* Para fontWeight: '500' */
+  --iggsad-font-semibold: 600;         /* Para fontWeight: '600' */
+  --iggsad-font-bold: 700;
+  --iggsad-font-extrabold: 800;
+  --iggsad-font-black: 900;
+  
+  /* Font sizes */
   --iggsad-text-xs: 0.75rem;          /* 12px */
-  --iggsad-text-sm: 0.875rem;         /* 14px */
-  --iggsad-text-base: 1rem;           /* 16px */
+  --iggsad-text-sm: 0.875rem;         /* 14px - Para fontSize: '0.875rem' */
+  --iggsad-text-base: 1rem;           /* 16px - Para fontSize: '1rem' */
   --iggsad-text-lg: 1.125rem;         /* 18px */
-  --iggsad-text-xl: 1.25rem;          /* 20px */
+  --iggsad-text-xl: 1.25rem;          /* 20px - Para fontSize: '1.25rem' */
   --iggsad-text-2xl: 1.5rem;          /* 24px */
+  --iggsad-text-3xl: 1.875rem;        /* 30px */
+  --iggsad-text-4xl: 2.25rem;         /* 36px */
+  
+  /* Line heights */
+  --iggsad-leading-none: 1;
+  --iggsad-leading-tight: 1.25;
+  --iggsad-leading-snug: 1.375;
+  --iggsad-leading-normal: 1.5;
+  --iggsad-leading-relaxed: 1.625;
+  --iggsad-leading-loose: 2;
   
   /* ===== SISTEMA DE TRANSICIONES ===== */
   --iggsad-transition-fast: 0.15s ease;
   --iggsad-transition-normal: 0.2s ease;
   --iggsad-transition-slow: 0.3s ease;
+  --iggsad-transition-colors: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+  --iggsad-transition-transform: transform 0.15s ease;
+  --iggsad-transition-opacity: opacity 0.15s ease;
+  
+  /* ===== SISTEMA DE BORDERS ===== */
+  --iggsad-border-width-none: 0;
+  --iggsad-border-width-thin: 1px;
+  --iggsad-border-width-medium: 2px;  /* Para focusRing: '2px' */
+  --iggsad-border-width-thick: 4px;
+  
+  /* Border styles */
+  --iggsad-border-solid: solid;
+  --iggsad-border-dashed: dashed;
+  --iggsad-border-dotted: dotted;
   
   /* ===== Z-INDEX SYSTEM ===== */
+  --iggsad-z-auto: auto;
+  --iggsad-z-base: 0;
   --iggsad-z-dropdown: 1000;
   --iggsad-z-sticky: 1020;
   --iggsad-z-fixed: 1030;
@@ -83,18 +139,33 @@
   --iggsad-z-modal: 1050;
   --iggsad-z-popover: 1060;
   --iggsad-z-tooltip: 1070;
-  --iggsad-z-toast: 1100;               /* Para toasts */
+  --iggsad-z-toast: 1100;
   
-  /* ===== VARIABLES ESPECÍFICAS PARA APP.VUE ===== */
+  /* ===== VARIABLES COMBINADAS PARA COMPONENTES ===== */
+  
+  /* Focus ring (usado en muchos componentes) */
+  --iggsad-focus-ring-width: var(--iggsad-border-width-medium);
+  --iggsad-focus-ring-style: var(--iggsad-border-solid);
+  --iggsad-focus-ring-color: var(--iggsad-primary-500);
+  --iggsad-focus-ring-offset: -1px;
+  --iggsad-focus-ring: var(--iggsad-focus-ring-width) var(--iggsad-focus-ring-style) var(--iggsad-focus-ring-color);
+  
+  /* Input/Select padding estándar */
+  --iggsad-input-padding-x: var(--iggsad-spacing-md-minus); /* 0.875rem */
+  --iggsad-input-padding-y: var(--iggsad-spacing-sm-plus);  /* 0.625rem */
+  --iggsad-input-padding: var(--iggsad-input-padding-y) var(--iggsad-input-padding-x);
+  
+  /* Toast width estándar */
+  --iggsad-toast-width: 25rem;
   
   /* Header del layout principal */
-  --iggsad-header-height: 4rem;         /* 64px - altura del header */
+  --iggsad-header-height: var(--iggsad-height-header);
   --iggsad-header-bg: var(--iggsad-surface-white);
   --iggsad-header-border: var(--iggsad-surface-200);
   --iggsad-header-shadow: var(--iggsad-shadow-sm);
   
   /* Logo y branding */
-  --iggsad-logo-size: 2.5rem;           /* 40px - tamaño del logo */
+  --iggsad-logo-size: var(--iggsad-height-lg);  /* 40px */
   --iggsad-title-color: var(--iggsad-surface-800);
   --iggsad-subtitle-color: var(--iggsad-surface-600);
   
@@ -103,58 +174,34 @@
   --iggsad-menubar-item-radius: var(--iggsad-radius-sm);
   --iggsad-menubar-item-color: var(--iggsad-surface-700);
   --iggsad-menubar-item-hover-bg: var(--iggsad-primary-600);
-  --iggsad-menubar-item-hover-color: #ffffff;
+  --iggsad-menubar-item-hover-color: var(--iggsad-surface-white);
   
   /* Botones de usuario */
   --iggsad-user-button-color: var(--iggsad-surface-600);
   --iggsad-user-button-hover-bg: color-mix(in srgb, var(--iggsad-primary-600) 10%, transparent);
   --iggsad-user-button-hover-color: var(--iggsad-primary-600);
   
-  /* Submenús */
-  --iggsad-submenu-bg: var(--iggsad-surface-white);
-  --iggsad-submenu-border: var(--iggsad-surface-200);
-  --iggsad-submenu-radius: var(--iggsad-radius-md);
-  --iggsad-submenu-shadow: var(--iggsad-shadow-lg);
-  --iggsad-submenu-min-width: 200px;
-  
-  /* ===== VARIABLES PARA DASHBOARD ===== */
-  --iggsad-dashboard-bg: var(--iggsad-surface-50);
+  /* Cards */
   --iggsad-card-bg: var(--iggsad-surface-white);
   --iggsad-card-radius: var(--iggsad-radius-lg);
   --iggsad-card-shadow: var(--iggsad-shadow-md);
   --iggsad-card-padding: var(--iggsad-spacing-lg);
   
-  /* ===== VARIABLES PARA FILTERS ===== */
-  --iggsad-filter-panel-bg: var(--iggsad-surface-white);
-  --iggsad-filter-input-height: 2.5rem;  /* 40px */
-  --iggsad-filter-input-padding: var(--iggsad-spacing-sm) var(--iggsad-spacing-md);
-  
-  /* ===== ESTADOS VISUALES ===== */
-  
-  /* Estados de enfoque */
-  --iggsad-focus-ring-width: 2px;
-  --iggsad-focus-ring-color: var(--iggsad-primary-500);
-  --iggsad-focus-ring-offset: -1px;
-  --iggsad-focus-ring: var(--iggsad-focus-ring-width) solid var(--iggsad-focus-ring-color);
-  
-  /* Estados de error */
+  /* Estados de error/éxito/warning */
   --iggsad-error-color: #dc2626;
   --iggsad-error-bg: #fef2f2;
   --iggsad-error-border: #fecaca;
   
-  /* Estados de éxito */
   --iggsad-success-color: #059669;
   --iggsad-success-bg: #ecfdf5;
   --iggsad-success-border: #a7f3d0;
   
-  /* Estados de advertencia */
   --iggsad-warning-color: #d97706;
   --iggsad-warning-bg: #fffbeb;
   --iggsad-warning-border: #fed7aa;
 }
 
 /* ===== MODO OSCURO ===== */
-/* Preparado para futuras implementaciones */
 @media (prefers-color-scheme: dark) {
   :root {
     /* Invertir superficie para modo oscuro */
@@ -169,80 +216,59 @@
     --iggsad-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
     --iggsad-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
     --iggsad-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+    --iggsad-shadow-inner: inset 0 1px 2px 0 rgba(0, 0, 0, 0.15);
   }
 }
 
-/* ===== CLASES UTILITARIAS USANDO TOKENS ===== */
+/* ===== CLASES UTILITARIAS EXPANDIDAS ===== */
 
-/* Espaciado */
+/* Font weights */
+.iggsad-font-normal { font-weight: var(--iggsad-font-normal); }
+.iggsad-font-medium { font-weight: var(--iggsad-font-medium); }
+.iggsad-font-semibold { font-weight: var(--iggsad-font-semibold); }
+.iggsad-font-bold { font-weight: var(--iggsad-font-bold); }
+
+/* Font sizes */
+.iggsad-text-xs { font-size: var(--iggsad-text-xs); }
+.iggsad-text-sm { font-size: var(--iggsad-text-sm); }
+.iggsad-text-base { font-size: var(--iggsad-text-base); }
+.iggsad-text-lg { font-size: var(--iggsad-text-lg); }
+.iggsad-text-xl { font-size: var(--iggsad-text-xl); }
+
+/* Widths y Heights */
+.iggsad-w-sm { width: var(--iggsad-width-sm); }
+.iggsad-w-md { width: var(--iggsad-width-md); }
+.iggsad-w-lg { width: var(--iggsad-width-lg); }
+
+.iggsad-h-sm { height: var(--iggsad-height-sm); }
+.iggsad-h-md { height: var(--iggsad-height-md); }
+.iggsad-h-lg { height: var(--iggsad-height-lg); }
+
+/* Espaciado expandido */
+.iggsad-p-xs { padding: var(--iggsad-spacing-xs); }
 .iggsad-p-sm { padding: var(--iggsad-spacing-sm); }
 .iggsad-p-md { padding: var(--iggsad-spacing-md); }
 .iggsad-p-lg { padding: var(--iggsad-spacing-lg); }
 
-.iggsad-m-sm { margin: var(--iggsad-spacing-sm); }
-.iggsad-m-md { margin: var(--iggsad-spacing-md); }
-.iggsad-m-lg { margin: var(--iggsad-spacing-lg); }
+.iggsad-px-sm { padding-left: var(--iggsad-spacing-sm); padding-right: var(--iggsad-spacing-sm); }
+.iggsad-py-sm { padding-top: var(--iggsad-spacing-sm); padding-bottom: var(--iggsad-spacing-sm); }
 
-/* Border radius */
-.iggsad-rounded-sm { border-radius: var(--iggsad-radius-sm); }
-.iggsad-rounded-md { border-radius: var(--iggsad-radius-md); }
-.iggsad-rounded-lg { border-radius: var(--iggsad-radius-lg); }
+/* Borders */
+.iggsad-border { border: var(--iggsad-border-width-thin) var(--iggsad-border-solid) var(--iggsad-surface-200); }
+.iggsad-border-2 { border: var(--iggsad-border-width-medium) var(--iggsad-border-solid) var(--iggsad-surface-200); }
 
-/* Sombras */
-.iggsad-shadow-sm { box-shadow: var(--iggsad-shadow-sm); }
-.iggsad-shadow-md { box-shadow: var(--iggsad-shadow-md); }
-.iggsad-shadow-lg { box-shadow: var(--iggsad-shadow-lg); }
-
-/* Transiciones */
-.iggsad-transition-fast { transition: all var(--iggsad-transition-fast); }
-.iggsad-transition-normal { transition: all var(--iggsad-transition-normal); }
-.iggsad-transition-slow { transition: all var(--iggsad-transition-slow); }
-
-/* Tipografía */
-.iggsad-font-primary { font-family: var(--iggsad-font-primary); }
-.iggsad-font-mono { font-family: var(--iggsad-font-mono); }
-
-/* Colores de texto */
-.iggsad-text-primary { color: var(--iggsad-surface-700); }
-.iggsad-text-secondary { color: var(--iggsad-surface-600); }
-.iggsad-text-muted { color: var(--iggsad-surface-500); }
-
-/* Backgrounds */
-.iggsad-bg-primary { background-color: var(--iggsad-primary-600); }
-.iggsad-bg-surface { background-color: var(--iggsad-surface-white); }
-.iggsad-bg-muted { background-color: var(--iggsad-surface-50); }
-
-/* ===== LAYOUT HELPERS ===== */
-
-/* Header layout */
-.iggsad-header {
-  height: var(--iggsad-header-height);
-  background: var(--iggsad-header-bg);
-  border-bottom: 1px solid var(--iggsad-header-border);
-  box-shadow: var(--iggsad-header-shadow);
-}
-
-/* Card layout */
-.iggsad-card {
-  background: var(--iggsad-card-bg);
-  border-radius: var(--iggsad-card-radius);
-  box-shadow: var(--iggsad-card-shadow);
-  padding: var(--iggsad-card-padding);
-}
-
-/* Focus ring helper */
+/* Focus ring helper mejorado */
 .iggsad-focus-ring:focus {
   outline: none;
   box-shadow: 0 0 0 var(--iggsad-focus-ring-width) var(--iggsad-focus-ring-color);
 }
 
-/* ===== COMPATIBILIDAD CON PRIMEVUE ===== */
-
-/* Asegurar que los tokens funcionen con clases PrimeVue */
+/* ===== COMPATIBILIDAD CON PRIMEVUE EXPANDIDA ===== */
 .p-component {
   --primary-color: var(--iggsad-primary-600);
   --surface-0: var(--iggsad-surface-white);
   --surface-700: var(--iggsad-surface-700);
+  --font-family: var(--iggsad-font-primary);
 }
 
 /* Override para menubar específico */
@@ -260,4 +286,71 @@
 .iggsad-menubar .p-menuitem-link:hover {
   background: var(--iggsad-menubar-item-hover-bg);
   color: var(--iggsad-menubar-item-hover-color);
+}
+
+
+/* ===== MODO OSCURO MEJORADO ===== */
+/* Activado por clase .dark en html */
+
+html.dark {
+  /* === COLORES PRINCIPALES === */
+  /* Primary mantiene los azules pero más vibrantes */
+  --iggsad-primary-400: #93c5fd;      /* Más claro para contraste */
+  --iggsad-primary-500: #60a5fa;      /* Más vibrante */
+  --iggsad-primary-600: #3b82f6;      /* Base, ligeramente más claro */
+  
+  /* === SUPERFICIES INVERTIDAS === */
+  --iggsad-surface-white: #0f172a;    /* Navy muy oscuro */
+  --iggsad-surface-50: #1e293b;       /* Slate 800 */
+  --iggsad-surface-100: #334155;      /* Slate 700 */
+  --iggsad-surface-200: #475569;      /* Slate 600 */
+  --iggsad-surface-300: #64748b;      /* Slate 500 */
+  --iggsad-surface-400: #94a3b8;      /* Slate 400 - Se mantiene */
+  --iggsad-surface-500: #cbd5e1;      /* Slate 300 */
+  --iggsad-surface-600: #e2e8f0;      /* Slate 200 */
+  --iggsad-surface-700: #f1f5f9;      /* Slate 100 - texto principal */
+  --iggsad-surface-800: #f8fafc;      /* Slate 50 - texto oscuro */
+  --iggsad-surface-900: #ffffff;      /* Blanco - texto muy oscuro */
+  
+  /* === SOMBRAS OSCURAS === */
+  --iggsad-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --iggsad-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+  --iggsad-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+  --iggsad-shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+  --iggsad-shadow-inner: inset 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  
+  /* === VARIABLES ESPECÍFICAS === */
+  --iggsad-header-bg: var(--iggsad-surface-white);
+  --iggsad-header-border: var(--iggsad-surface-200);
+  --iggsad-card-bg: var(--iggsad-surface-white);
+  
+  /* === ESTADOS === */
+  --iggsad-error-color: #f87171;      /* Más suave */
+  --iggsad-error-bg: #1f2937;         /* Fondo oscuro */
+  --iggsad-error-border: #374151;     /* Borde sutil */
+  
+  --iggsad-success-color: #4ade80;    /* Más vibrante */
+  --iggsad-success-bg: #1f2937;       /* Fondo oscuro */
+  --iggsad-success-border: #374151;   /* Borde sutil */
+  
+  --iggsad-warning-color: #fbbf24;    /* Más vibrante */
+  --iggsad-warning-bg: #1f2937;       /* Fondo oscuro */
+  --iggsad-warning-border: #374151;   /* Borde sutil */
+}
+
+/* === TRANSICIONES SUAVES === */
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+* {
+  transition: background-color 0.2s ease, 
+              border-color 0.2s ease, 
+              color 0.2s ease,
+              box-shadow 0.2s ease;
+}
+
+/* === CLASES HELPER === */
+.dark-mode-transition {
+  transition: all var(--iggsad-transition-normal);
 }

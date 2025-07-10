@@ -16,6 +16,7 @@
             }) }}
           </p>
         </div>
+
         <div class="text-right">
           <p class="text-sm text-slate-500">Último acceso</p>
           <p class="text-slate-700 font-medium">{{ lastAccess }}</p>
@@ -143,6 +144,15 @@
         @toggle-fullscreen="handleToggleFullscreen"
       />
     </Drawer>
+
+    <ExpedientesDrawer
+      v-model:visible="showExpedientesDrawer"
+      :expedientes="expedientesStore.expedientes"
+      :loading="expedientesStore.isLoading"
+      :pagination="expedientesStore.pagination"
+      @page="expedientesStore.changePage"
+    />
+
   </div>
 </template>
 
@@ -152,10 +162,12 @@ import { useRouter } from 'vue-router'
 import Button from 'primevue/button'
 import Drawer from 'primevue/drawer'
 import Dock from '@/components/Dock.vue'
+import ExpedientesDrawer from '@/components/expedientes/ExpedientesDrawer.vue'
 import FilterPanel from '@/components/filters/FilterPanel.vue'
 import SearchBar from '@/components/SearchBar.vue'
 import { useExpedientesStore } from '@/stores/expedientes'
 import { useToast } from '@/composables/useToast'
+import DarkModeToggle from '@/components/DarkModeToggle.vue'
 
 //Componente del grid intuitivo
 import DashboardGrid from '@/components/dashboard/DashboardGrid.vue'
@@ -179,11 +191,13 @@ const {
   getCardData
 } = useUserDashboard()
 
+
 // Estado reactivo ORIGINAL
 const searchQuery = ref('')
 const showFilters = ref(false)
 const searchResults = ref([])
 const lastAccess = ref('14 Jun 2025, 09:30')
+const showExpedientesDrawer = ref(false)
 
 // Estado persistente de filtros ORIGINAL
 const persistentFilters = ref({})
@@ -410,18 +424,22 @@ const performSearch = async () => {
     }
     
     await expedientesStore.searchExpedientes(persistentFilters.value, expedienteQuery.trim())
-    
+    // Abrimos el Drawer de resultados
+    showExpedientesDrawer.value = true
+
+    console.log('📂 Drawer de expedientes abierto con resultados ->', expedientesStore.expedientes)
     searchResults.value = expedientesStore.expedientes.map(exp => ({
       id: exp.id,
       number: exp.numero,
-      client: exp.cliente,
+      client: exp.nombreTitular,               // ← antes 'exp.cliente'
       lastUpdate: 'Hace 2h',
-      priority: exp.estado === 'Activo' ? 'high' : 'normal',
-      status: exp.estado.toLowerCase(),
-      statusText: exp.estado
+      priority: exp.embargos === 'Sí' ? 'high' : 'normal',    // ejemplo de prioridad
+      status: exp.embargos === 'Sí' ? 'embargado' : 'normal',
+      statusText: exp.embargos
     }))
     
     addToRecentSearches(expedienteQuery.trim())
+    
     console.log('✅ Búsqueda desde Dashboard completada:', searchResults.value.length)
     
   } catch (error) {
@@ -448,17 +466,20 @@ const handleApplyFilters = async (filterData) => {
   // No hacer búsqueda automática aquí, ya la hace el FilterPanel
   // Solo actualizar el estado local
   console.log('✅ Filtros guardados correctamente')
+  // 2) Cerrar panel de filtros y abrir drawer de expedientes
+  showFilters.value = false
+  showExpedientesDrawer.value = true
   
   // Si tenemos resultados en el store, sincronizarlos
   if (expedientesStore.hasExpedientes) {
     searchResults.value = expedientesStore.expedientes.map(exp => ({
       id: exp.id,
       number: exp.numero,
-      client: exp.cliente,
+      client: exp.nombreTitular,               // ← antes 'exp.cliente'
       lastUpdate: 'Hace 2h',
-      priority: exp.estado === 'Activo' ? 'high' : 'normal',
-      status: exp.estado.toLowerCase(),
-      statusText: exp.estado
+      priority: exp.embargos === 'Sí' ? 'high' : 'normal',    // ejemplo de prioridad
+      status: exp.embargos === 'Sí' ? 'embargado' : 'normal',
+      statusText: exp.embargos
     }))
     console.log('🔄 Resultados sincronizados desde store:', searchResults.value.length)
   }
@@ -501,11 +522,11 @@ const handleExpedienteSearch = async (expediente) => {
     searchResults.value = expedientesStore.expedientes.map(exp => ({
       id: exp.id,
       number: exp.numero,
-      client: exp.cliente,
+      client: exp.nombreTitular,               // ← antes 'exp.cliente'
       lastUpdate: 'Hace 2h',
-      priority: exp.estado === 'Activo' ? 'high' : 'normal',
-      status: exp.estado.toLowerCase(), 
-      statusText: exp.estado
+      priority: exp.embargos === 'Sí' ? 'high' : 'normal',    // ejemplo de prioridad
+      status: exp.embargos === 'Sí' ? 'embargado' : 'normal',
+      statusText: exp.embargos
     }))
     
     if (expediente) {

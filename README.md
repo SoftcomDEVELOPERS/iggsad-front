@@ -1,97 +1,199 @@
-Aquí tienes un resumen fiel de todo lo que contiene **iggsad-front**, tras explorar cada archivo y carpeta:
+# iggsad-front
 
----
+Frontend del proyecto IGGSAD: Sistema Distribuido con .NET 9 (Microservicios y Vue 3)
 
 ## 📁 Estructura general
 
+```plaintext
+.
+├─ logoBalanza.png
+├─ .env*                  # Variables de entorno (VITE_SSO_URL, VITE_COREAPI_URL, VITE_DEV_PORT)
+├─ .env.development       # Entorno de desarrollo
+├─ .env.production        # Entorno de producción
+├─ .gitignore             # Reglas de Git
+├─ Caddyfile              # Proxy HTTPS local → SSO/API
+├─ index.html             # HTML principal
+├─ package.json           # Dependencias y scripts (Vite, Tailwind, PrimeVue…)
+├─ pnpm-lock.yaml         # Lockfile de pnpm
+├─ postcss.config.js      # Config de PostCSS
+├─ tailwind.config.js     # Configuración de TailwindCSS
+├─ vite.config.js         # Alias, plugins y proxy de desarrollo
+├─ README.md              # Documentación del frontend
+└─ src/                   # Código fuente
+   ├─ assets/             # Recursos estáticos y CSS
+   │   └─ tailwind.css    # Import de utilidades Tailwind
+   ├─ components/         # Componentes reutilizables
+   │   ├─ dashboard/      # Dashboard y grid
+   │   │   ├─ cards/      # Cards del dashboard
+   │   │   │   ├─ ChatCard.vue
+   │   │   │   ├─ CustomCard.vue
+   │   │   │   ├─ NotificationsCard.vue
+   │   │   │   ├─ QuickActionsCard.vue
+   │   │   │   ├─ RecentSearchesCard.vue
+   │   │   │   ├─ StatCard.vue
+   │   │   │   ├─ StatsDashboard.vue
+   │   │   │   ├─ GridCard.vue
+   │   │   └─ DashboardGrid.vue
+   │   ├─ filters/        # Panel de filtros y secciones
+   │   │   ├─ sections/
+   │   │   │   ├─ FilterDate.vue
+   │   │   │   ├─ FilterDateRange.vue
+   │   │   │   ├─ FilterField.vue
+   │   │   │   ├─ FilterMultiSelect.vue
+   │   │   │   ├─ FilterNumber.vue
+   │   │   ├─ FilterPanel.vue
+   │   │   ├─ FilterPanel.styles.css
+   │   │   ├─ FilterSelect.vue
+   │   │   ├─ FilterText.vue
+   │   │   ├─ FloatingActiveFilters.vue
+   │   │   └─ index.js
+   │   ├─ AuthLayout.vue
+   │   ├─ DarkModeToggle.vue
+   │   ├─ Dock.vue
+   │   ├─ LoginForm.vue
+   │   ├─ ResetPasswordForm.vue
+   │   └─ SearchBar.vue
+   ├─ composables/        # Composables reuse
+   │   ├─ useAppLayout.js
+   │   ├─ useFilterPanel.js
+   │   ├─ useToast.js
+   │   └─ useUserDashboard.js
+   ├─ constants/          # Constantes y opciones
+   │   └─ filterOptions.js
+   ├─ router/             # Definición de rutas y guards
+   │   └─ index.js
+   ├─ services/           # Lógica HTTP y auth
+   │   ├─ httpInterceptor.js
+   │   ├─ auth.services.js
+   │   ├─ jwtServices.js
+   │   └─ expedientes.services.js
+   ├─ stores/             # Pinia stores
+   │   ├─ auth.js         # Gestión de sesión y recuperación
+   │   └─ expedientes.js  # Estado de expedientes
+   ├─ styles/             # CSS global y componentes
+   │   ├─ components/
+   │   │   ├─ app-layout.css
+   │   │   ├─ dashboard.css
+   │   │   ├─ index.css
+   │   │   ├─ toast.config.js
+   │   │   ├─ toast.styles.js
+   │   │   └─ toast.variants.js
+   ├─ themes/             # Temas y tokens
+   │   ├─ custom-tokens.css
+   │   └─ primevue-theme.js
+   ├─ types/              # Definiciones TypeScript
+   │   └─ vue-grid-layout.d.ts
+   ├─ utils/              # Utilidades y mocks
+   │   └─ defaultUserProfile.js
+   ├─ views/              # Vistas principales
+   │   ├─ App.vue
+   │   ├─ Dashboard.vue
+   │   ├─ Login.vue
+   │   ├─ ResetPassword.vue
+   ├─ main.js             # Punto de entrada: Vue, Pinia, PrimeVue, routing
+   └─ style.css           # Estilos globales (dark/light)
 ```
-front/  
-├─ .env*                  # Variables de entorno (VITE_SSO_URL, etc.)  
-├─ Caddyfile              # Proxy local HTTPS → SSO/API  
-├─ package.json           # Dependencias: Vue 3, Vite, Tailwind, PrimeVue, Pinia, @tanstack/vue-query, Zod…  
-├─ vite.config.js         # Configuración de Vite + proxy a SSO en dev  
-├─ tailwind.config.js     # TailwindCSS  
-├─ public/                # index.html, favicon, estáticos  
-├─ src/                   # Código fuente  
-│  ├─ main.js             # Bootstrapping de la app: crea Vue, Pinia, PrimeVue, monta router, inicializa interceptor HTTP y checkAuth  
-│  ├─ assets/             # Tailwind imports y otros recursos  
-│  ├─ themes/             # primevue-theme.js: tema personalizado  
-│  ├─ router/             # index.js: definición de rutas y guards (login → landing + checks de permisos)  
-│  ├─ services/           #  
-│  │   ├─ httpInterceptor.js   #  
-│  │   │  – Sobrescribe window.fetch para:  
-│  │   │     • Incluir `credentials: 'include'` en todas las peticiones a `/api` o VITE_SSO_URL  
-│  │   │     • Gestionar refresh tokens (evitar bucles, 401 → redirige a login)  
-│  │   │     • Centralizar headers JSON y errores HTTP  
-│  │   ├─ auth.services.js     # login, logout, fetchMe(), refreshToken() usando fetch directo a `${VITE_SSO_URL}/auth/...`  
-│  │   └─ jwtServices.js       # parseJwt(token) para extraer payload y expiración  
-│  ├─ stores/             #  
-│  │   └─ auth.js             # Pinia store “auth”:  
-│  │       • state: `{ user, frontPermissions, isLoading }`  
-│  │       • getters: `isAuthenticated`, `canAccess(permission)`  
-│  │       • actions: `login()`, `logout()`, `checkAuth()` que llama a auth.services.fetchMe() y refreshToken()  
-│  ├─ composables/        # useFilterPanel.js: lógica reusable para paneles de filtros  
-│  ├─ constants/          # filterOptions.js: opciones de filtros en UI  
-│  ├─ components/         #  
-│  │   └─ filters/sections/FilterSection*.vue   # Secciones de filtro reutilizables  
-│  ├─ views/              #  
-│  │   ├─ Login.vue            # Formulario de login  
-│  │   └─ Dashboard.vue      # Dashboard / página principal  
-│  └─ style.css           # Estilos globales adicionales  
-└─ .git/                  # Control de versiones (hooks, configuración…)  
+
+```plaintext
+front/
+├─ .env\*                  # Variables de entorno (VITE\_SSO\_URL, VITE\_COREAPI\_URL, VITE\_DEV\_PORT)
+├─ Caddyfile              # Proxy HTTPS local → SSO/API
+├─ package.json           # Dependencias y scripts (Vite, Tailwind, PrimeVue, Pinia, etc.)
+├─ vite.config.js         # Alias, plugins y proxy de desarrollo
+├─ tailwind.config.js     # Configuración de TailwindCSS
+├─ public/                # index.html, favicon y recursos estáticos
+├─ src/                   # Código fuente
+│  ├─ main.js             # Bootstrapping: Vue, Pinia, PrimeVue, interceptor HTTP, checkAuth
+│  ├─ App.vue             # Layout principal con header, Menubar y router-view
+│  ├─ router/index.js     # Definición de rutas y guards (login, dashboard, reset-password, permisos)
+│  ├─ services/           # httpInterceptor.js, auth.services.js, jwtServices.js
+│  ├─ stores/             # auth.js (Pinia store con login, logout, checkAuth y recuperación de contraseña)
+│  ├─ composables/        # useFilterPanel.js, useUserDashboard.js, useToast.js, etc.
+│  ├─ constants/          # filterOptions.js: opciones para filtros UI
+│  ├─ components/         # Reutilizables (SearchBar, Dock, DashboardGrid, filtros…)
+│  ├─ views/              # Login.vue, ResetPassword.vue, Dashboard.vue, etc.
+│  └─ styles/             # Tailwind imports y estilos globales (app-layout, toast, theme)
+└─ .git/                  # Control de versiones y hooks internos
+
 ```
 
----
+## 🔧 Dependencias y scripts
+- **Framework**: Vue 3 + Composition API
+- **Build**: Vite
+- **UI**: PrimeVue 4, PrimeIcons, @primeuix/themes
+- **Estado**: Pinia 3
+- **Consultas**: @tanstack/vue-query 5
+- **CSS**: Tailwind CSS 3
+- **Extras**: Zod, js-cookie, grid-layout-plus
 
-## 🔧 Herramientas y flujo de ejecución
-
-1. **Arranque**
-
-   * `pnpm install`
-   * `npm run dev` → Vite levanta server + Caddy proxy a SSO/API
-2. **Autenticación**
-
-   * `main.js` inicializa el interceptor (`httpInterceptor.js`) y ejecuta `authStore.checkAuth()`.
-   * Si el usuario no está autenticado o expira el token, el interceptor/redirección de rutas lleva al login.
-3. **Peticiones HTTP**
-
-   * Toda llamada a API pasa por `httpInterceptor.js`, que:
-
-     * Añade JSON headers + `credentials: 'include'`.
-     * Intercepta 401 para refrescar el token o forzar login.
-     * Proporciona `httpClient.get/post/put/delete()` (aunque `auth.services.js` usa `fetch` directo para login/refresh).
-4. **Gestión de permisos**
-
-   * Después de login, `authStore.fetchMe()` recupera `{ user, frontPermissions }`.
-   * El guard de rutas (`router.beforeEach`) bloquea rutas según `meta.requiresAuth` y `meta.requiredPermission`.
-
----
+**Scripts** (package.json):
+```json
+{
+  "dev": "vite",
+  "build": "vite build",
+  "preview": "vite preview",
+  "start:caddy": "caddy run --config Caddyfile"
+}
+````
 
 ## ⚙️ Configuración y entornos
 
-* **.env** variables comunes
-* **.env.development** (ej. `VITE_SSO_URL=https://localhost:5116/api`)
-* **.env.production** (URLs reales)
-* **Caddyfile**: HTTPS local + proxy automático de cookies a backend
-* **vite.config.js**: integra alias (`@` → `src`), plugin de devtools y proxy de desarrollo a SSO/API
+* **.env.development** / **.env.production**: URLs de SSO/API, puertos
+* **Caddyfile**: HTTPS local + proxy de cookies
+* **vite.config.js**: Alias (`@`→`src`), proxy `/api`→SSO, plugins y certificados self-signed
+* **tailwind.config.js**: Breakpoints personalizados y configuración extendida
+
+## 🚀 Flujo de ejecución
+
+1. `pnpm install`
+2. `npm run dev` (Vite + Caddy local)
+3. **main.js** monta la aplicación, interceptores y verifica autenticación
+4. `authStore.checkAuth()` redirige al login o al dashboard según el estado
+
+## 🔐 Autenticación y autorización
+
+* **httpInterceptor.js**:
+
+  * Sobreescribe `window.fetch` para incluir cookies y JSON headers
+  * Maneja respuestas 401 (refresh token / logout automático) y 403
+* **services/auth.services.js**:
+
+  * `login()`, `logout()`, `fetchMe()`, `refreshToken()`
+  * **Recuperación de contraseña**: `requestPasswordReset()`, `verifyResetToken()`, `resetPassword()`, `changePassword()`
+* **stores/auth.js**:
+
+  * `doLogin()`, `checkAuth()`, `logout()`, `tryRefreshToken()`
+  * Acciones de recuperación: `requestPasswordReset()`, `verifyResetToken()`, `resetPassword()`, `changePassword()`
+
+## 🌐 Rutas principales
+
+```javascript
+// src/router/index.js
+themes: [
+  { path: '/login',            name: 'Login',        component: Login.vue,        meta: { public: true } },
+  { path: '/',                  name: 'Dashboard',    component: Dashboard.vue,    meta: { requiresAuth: true } },
+  { path: '/reset-password',    name: 'ResetPassword',component: ResetPassword.vue,meta: { public: true }, beforeEnter: /* valida token */ },
+  // ... rutas protegidas con meta.requiredPermission
+]
+```
+
+## 🔍 Filtros y búsquedas
+
+* **useFilterPanel.js**: lógica para panel de filtros avanzados
+* **filterOptions.js**: listado de opciones reutilizables
+* **SearchBar.vue** + **FilterPanel.vue**: componentes de UI con validación y eventos
+
+## 🎨 UI y estilos
+
+* **PrimeVue** configurado en main.js con `GestionProcesalTheme`
+* **Tailwind** para estilos globales y utilidades (dark mode, focus rings)
+* **Toast**: servicio de notificaciones con variantes personalizadas
+
+## 🗝️ Puntos clave
+
+* **httpInterceptor.js** es la fuente de verdad para todas las peticiones API
+* **auth.services & stores/auth** gestionan completo ciclo de sesión y recuperación de contraseña
+* **Integración de recuperación** incluye rutas, vista (ResetPassword.vue), servicio y store
+* **UI modular**: DashboardGrid, Dock, SearchBar, FilterPanel…
 
 ---
-
-## 🗂 Puntos clave a retener
-
-* **httpInterceptor.js** es la única fuente de verdad para todas las peticiones (`window.fetch` sobrescrito).
-* **auth.services.js** concentra login/refresh/logout/fetchMe pero usa `fetch` “a pelo” apuntando a `VITE_SSO_URL`.
-* **stores/auth.js** une servicios y router guards: controla estado de sesión, tokens, permisos y redirecciones.
-* La **UI** usa PrimeVue + Tailwind + Zod para validación (aunque por ahora Zod solo está instalado, no ampliamente usado).
-* Solo hay dos vistas activas (Login y Landing); el resto está comentado como ejemplo.
-
----
-
-Con esto tienes un “mapa mental” completo del frontend. La parte de recuperación de contraseña que vamos a añadir debe integrarse en:
-
-1. Nuevas **vistas** en `src/views/`
-2. **Rutas** en `router/index.js`
-3. Eventualmente **servicios** reutilizando `httpInterceptor.js` (no duplicar `fetch`)
-4. Opcionalmente nuevas **acciones** en `stores/auth.js` si quieres manejar estado del token de recuperación allí.
-
-Dime cómo quieres avanzar y en qué punto concreto profundizamos.

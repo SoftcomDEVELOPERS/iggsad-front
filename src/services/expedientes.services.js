@@ -17,39 +17,39 @@ export const expedientesService = {
       queryParams.append('pageSize', params.pageSize || 50)
       
       // Query de búsqueda
-      if (params.searchQuery) {
+      if (params.searchQuery) 
         queryParams.append('q', params.searchQuery)
-      }
+      
       
       // Filtros específicos
-      if (params.cliente && params.cliente.length > 0) {
+      if (params.cliente && params.cliente.length > 0) 
         params.cliente.forEach(c => queryParams.append('cliente', c))
-      }
       
-      if (params.cartera && params.cartera.length > 0) {
+      
+      if (params.cartera && params.cartera.length > 0) 
         params.cartera.forEach(c => queryParams.append('cartera', c))
-      }
       
-      if (params.estadoExpediente && params.estadoExpediente.length > 0) {
+      
+      if (params.estadoExpediente && params.estadoExpediente.length > 0) 
         params.estadoExpediente.forEach(e => queryParams.append('estadoExpediente', e))
-      }
       
-      if (params.fechaExpediente && params.fechaExpediente[0] && params.fechaExpediente[1]) {
+      
+      if (params.fechaExpediente && params.fechaExpediente[0] && params.fechaExpediente[1]) 
         queryParams.append('fechaDesde', params.fechaExpediente[0].toISOString())
         queryParams.append('fechaHasta', params.fechaExpediente[1].toISOString())
-      }
       
-      if (params.referencia) {
+      
+      if (params.referencia) 
         queryParams.append('referencia', params.referencia)
-      }
       
-      if (params.contrato) {
+      
+      if (params.contrato) 
         queryParams.append('contrato', params.contrato)
-      }
       
-      if (params.nig) {
+      
+      if (params.nig) 
         queryParams.append('nig', params.nig)
-      }
+      
       
       // ... agregar más filtros según necesidades
       

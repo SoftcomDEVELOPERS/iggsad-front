@@ -7,23 +7,18 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: () => import('@/views/Login.vue'),
-    meta: { requiresAuth: false },
+    meta: { requiresAuth: false, public: true },
     beforeEnter: (to, from, next) => {
       const auth = useAuthStore()
-      if (auth.isAuthenticated) {
-        return next({ name: 'Landing Page' })
-      }
+      if (auth.isAuthenticated) return next({ name: 'Dashboard' })
       next()
     }
   },
   {
     path: '/',
-    name: 'Landing Page',
+    name: 'Dashboard',
     component: () => import('@/views/Dashboard.vue'),
-    meta: {
-      requiresAuth: true,
-      requiredPermission: 'landing-accessView' // ejemplo: 'expediente-readView'
-    }
+    meta: { requiresAuth: true, public: false }
   },
   
   // ✨ RUTA DE RECUPERACIÓN DE CONTRASEÑA (para reset con token del email)
@@ -31,18 +26,11 @@ const routes = [
     path: '/reset-password',
     name: 'ResetPassword',
     component: () => import('@/views/ResetPassword.vue'),
-    meta: { requiresAuth: false },
+    meta: { requiresAuth: false, public: true },
     beforeEnter: (to, from, next) => {
       const auth = useAuthStore()
-      if (auth.isAuthenticated) {
-        return next({ name: 'Landing Page' })
-      }
-      
-      // Verificar que hay un token en la query
-      if (!to.query.token) {
-        return next({ name: 'Login' })
-      }
-      
+      if (auth.isAuthenticated) return next({ name: 'Dashboard' })
+      if (!to.query.token) return next({ name: 'Login' }) // Verificar que hay un token en la query
       next()
     }
   },
@@ -69,22 +57,21 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const auth = useAuthStore()
   console.log("IsAuthenticated -> ",auth.isAuthenticated);
-  console.log("authStore -> ", auth.user);
   
-  if (!to.meta.requiresAuth) {
-    return next()
-  }
-
+  if (!to.meta.requiresAuth) return next()
+  
   if (!auth.isAuthenticated) {
     const ok = await auth.checkAuth().catch(() => false)
+    console.log("checkAuth ok -> ", ok);
     if (!ok) return next({ name: 'Login' })
   }
 
   const required = to.meta.requiredPermission || to.meta.requiredPermission === null
+  console.log("required -> ", required);
   if (required && !auth.canAccess(required)) {
-    return next({ name: 'Landing Page' }) // o tu 403
+    console.log("auth.canAccess(required) -> ", auth.canAccess(required));
+    return next({ name: 'Dashboard' }) // o tu 403
   }
-
   next()
 })
 

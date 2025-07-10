@@ -2,10 +2,12 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import { createPinia } from 'pinia'
+import { useUserProfile } from '@/composables/useUserProfile'
 
 // ===== ESTILOS BASE =====
 import './assets/tailwind.css'
-import './styles/index.css'  
+import './styles/index.css'
+import './styles/app-layout.css'  
 
 // ===== TEMA MEJORADO =====
 import { GestionProcesalTheme } from './themes/primevue-theme.js'
@@ -36,6 +38,8 @@ import ConfirmDialog from 'primevue/confirmdialog'
 import Message from 'primevue/message';
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
 
 // ===== SERVICIOS =====
 
@@ -48,11 +52,9 @@ const pinia = createPinia()
 app.use(pinia)
 
 // ===== INICIALIZAR INTERCEPTOR =====
-
 initializeHttpInterceptor()
 
 // ===== CONFIGURAR PRIMEVUE =====
-
 try {
   app.use(PrimeVue, {
     theme: {
@@ -69,37 +71,28 @@ try {
   console.error('❌ Error configurando PrimeVue:', error)
 }
 
-// ===== APLICAR TOKENS CSS PERSONALIZADOS =====
-// 🔧 NUEVO: Inyectar variables CSS para uso directo
-try {
-  applyIggsadTokens()
-} catch (error) {
-  console.error('❌ Error aplicando tokens CSS:', error)
-}
-
 // ===== REGISTRAR DIRECTIVAS =====
-
 app.directive('tooltip', TooltipDirective)
 
-// ===== REGISTRAR COMPONENTES GLOBALES =====
+// ===== REGISTRAR SERVICIOS =====
+app.use(ToastService, defaultToastConfig)
+app.use(ConfirmationService)
 
+// ===== REGISTRAR PLUGINS =====
 app.component('Form', Form)
-app.component('Message', Message)
+
+// ===== REGISTRAR COMPONENTES GLOBALES =====
 app.component('Toast', Toast)
+app.component('Message', Message)
+app.component('ConfirmDialog', ConfirmDialog)
 app.component('IconField', IconField)
 app.component('InputIcon', InputIcon)
+app.component('DataTable', DataTable)
+app.component('Column', Column)
 
-// ===== CONFIGURAR TOAST SERVICE =====
 
-try {
-  app.use(ToastService, defaultToastConfig)
-  console.log('✅ ToastService configurado')
-} catch (error) {
-  console.error('❌ Error configurando ToastService:', error)
-}
 
 // ===== APLICAR ESTILOS TOAST =====
-
 try {
   applyToastStyles()    // Estilos profesionales
   applyToastVariants()  // Variantes especializadas
@@ -108,13 +101,7 @@ try {
   console.error('❌ Error aplicando estilos Toast:', error)
 }
 
-// ===== CONFIGURAR CONFIRMACIÓN =====
-
-app.use(ConfirmationService)
-app.component('ConfirmDialog', ConfirmDialog)
-
 // ===== CONFIGURAR ROUTER Y MONTAR =====
-
 app.use(router)
 
 router.isReady().then(async () => {
@@ -122,11 +109,12 @@ router.isReady().then(async () => {
   try {
     const authStore = useAuthStore()
     await authStore.checkAuth()
-    console.log('🔐 Verificación de autenticación completada. isAuthenticated ->', authStore.isAuthenticated)
+    console.log('✅ Router listo y estado de autenticación verificado')
 
     if (authStore.isAuthenticated) {
-      router.push({ name: 'Landing Page' })
-    } 
+      await loadUserProfile()
+      router.push({ name: 'Dashboard' })
+     }
   } catch (e) {
     console.error('❌ Error al verificar autenticación:', e)
   }
@@ -135,22 +123,6 @@ router.isReady().then(async () => {
   try {
     app.mount('#app')
     console.log('🚀 Aplicación montada exitosamente tras router.isReady()')
-    
-    // 🔧 VALIDAR QUE ESTILOS SE APLICARON CORRECTAMENTE
-    const toastStyles = document.getElementById('gestion-procesal-toast-styles')
-    const iggsadTokens = document.getElementById('iggsad-css-tokens')
-    
-    if (toastStyles) {
-      console.log('✅ Estilos Toast verificados')
-    } else {
-      console.warn('⚠️ Estilos Toast no encontrados')
-    }
-    
-    if (iggsadTokens) {
-      console.log('✅ Tokens CSS Iggsad verificados')
-    } else {
-      console.warn('⚠️ Tokens CSS no encontrados')
-    }
     
   } catch (error) {
     console.error('❌ Error montando aplicación:', error)
@@ -167,73 +139,5 @@ app.config.errorHandler = (err, vm, info) => {
   if (err.message?.includes('toast') || err.message?.includes('theme')) {
     console.warn('⚠️ Error de estilos detectado, continuando...')
     return
-  }
-}
-
-// ===== VALIDACIONES POST-MOUNT =====
-// 🔧 CORREGIDO: Ejecutar validaciones DESPUÉS de que Vue renderice
-function runPostMountValidations() {
-  // Esperar un tick para que Vue termine de renderizar
-  setTimeout(() => {
-    const checks = {
-      'PrimeVue': !!document.querySelector('.p-component'),
-      'Tailwind': !!document.querySelector('[class*="bg-"], [class*="text-"], [class*="flex"], [class*="grid"]'),
-      'Inter Font': getComputedStyle(document.body).fontFamily.includes('Inter'),
-      'Toast Styles': !!document.getElementById('gestion-procesal-toast-styles'),
-      'Iggsad Tokens': !!document.getElementById('iggsad-css-tokens'),
-      'Router View': !!document.querySelector('#app router-view, #app > main'),
-      'Menubar': !!document.querySelector('.p-menubar')
-    }
-    
-    console.log('\n🔍 === VALIDACIÓN DEL SISTEMA ===')
-    Object.entries(checks).forEach(([name, loaded]) => {
-      console.log(`${loaded ? '✅' : '❌'} ${name}: ${loaded ? 'Cargado' : 'No encontrado'}`)
-    })
-    
-    // Validaciones específicas adicionales
-    if (checks['PrimeVue']) {
-      const primeComponents = document.querySelectorAll('.p-component').length
-      console.log(`📊 Componentes PrimeVue encontrados: ${primeComponents}`)
-    }
-    
-    if (checks['Tailwind']) {
-      const tailwindClasses = document.querySelectorAll('[class*="bg-"], [class*="text-"], [class*="p-"], [class*="m-"], [class*="flex"], [class*="grid"]').length
-      console.log(`📊 Elementos con clases Tailwind: ${tailwindClasses}`)
-    }
-    
-    // Verificar tokens CSS específicos
-    const rootStyles = getComputedStyle(document.documentElement)
-    const iggsadPrimary = rootStyles.getPropertyValue('--iggsad-primary-600')
-    const iggsadSurface = rootStyles.getPropertyValue('--iggsad-surface-white')
-    
-    if (iggsadPrimary) {
-      console.log(`🎨 Token --iggsad-primary-600: ${iggsadPrimary}`)
-    }
-    if (iggsadSurface) {
-      console.log(`🎨 Token --iggsad-surface-white: ${iggsadSurface}`)
-    }
-    
-    console.log('=== FIN VALIDACIÓN ===\n')
-  }, 100) // 100ms es suficiente para que Vue renderice
-}
-
-// ===== DETECTAR MODO DESARROLLO =====
-if (import.meta.env.DEV) {
-  console.log('🔧 Modo desarrollo - Logs adicionales habilitados')
-  
-  // Ejecutar validaciones después del mount
-  router.isReady().then(() => {
-    // Esperar a que el router haya terminado de cargar la primera ruta
-    setTimeout(runPostMountValidations, 200)
-  })
-  
-  // También ejecutar cuando la página esté completamente cargada
-  if (document.readyState === 'loading') {
-    window.addEventListener('load', () => {
-      setTimeout(runPostMountValidations, 300)
-    })
-  } else {
-    // Si ya está cargada, ejecutar inmediatamente
-    setTimeout(runPostMountValidations, 100)
   }
 }

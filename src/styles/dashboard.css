@@ -1,11 +1,3 @@
-/* 
- * ===== DASHBOARD.VUE - ESTILOS CON SISTEMA DE TOKENS =====
- * Archivo: src/styles/dashboard.css
- * 
- * Migración de estilos hardcodeados a sistema de tokens
- * SIN TOCAR NADA DE LA LÓGICA - Solo estilos organizados
- */
-
 /* ===== LAYOUT PRINCIPAL ===== */
 .dashboard-container {
   min-height: 100vh;

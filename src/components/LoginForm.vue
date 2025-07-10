@@ -151,9 +151,9 @@
         <Button 
           @click="toggleResetMode"
           text
-          label="Volver al login"
+          label="← Volver al login"
           fluid
-          class="text-slate-600"
+          class="text-slate-400"
           :disabled="isResetLoading"
         />
       </div>

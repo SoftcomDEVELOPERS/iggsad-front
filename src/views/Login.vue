@@ -1,90 +1,62 @@
+<!-- src/views/Login.vue -->
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-primary-50 to-slate-100 flex items-center justify-center p-3 sm:p-4 lg:p-6">
-    <div class="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl">
-      <Card class="shadow-xl sm:shadow-2xl border-0 backdrop-blur-sm bg-white/90 card-enter-active">
-        <template #header>
-          <div class="text-center px-4 sm:px-6 bg-gradient-to-r from-primary-600 to-primary-700">
-            <!-- Logo/Icono -->
-            <div class="mb-4 sm:mb-6">
-              <div class="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 mx-auto mb-4 sm:mb-6 flex items-center justify-center">
-                <!-- Aquí va tu logo existente -->
-                <img 
-                  src="/images/logoBalanza.png" 
-                  alt="Gestión Procesal Logo" 
-                  class="w-full h-full object-contain drop-shadow-lg"
-                />
-                <!-- Fallback si no tienes la imagen aún -->
-                <!-- <i class="pi pi-balance-scale text-4xl sm:text-5xl md:text-6xl text-white drop-shadow-lg"></i> -->
-              </div>
-            </div>
-            
-            <!-- Título -->
-            <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold mb-2">Gestión Procesal</h1>
-            <p class="text-primary-100 text-sm sm:text-base font-medium">Acceso a Gestión Procesal</p>
-          </div>
-        </template>
-        
-        <template #content>
-          <div class="px-4 sm:px-6 py-6 sm:py-8 flex justify-center">
-            <LoginForm />
-          </div>
-        </template>
-        
-        <template #footer>
-          <div class="px-4 sm:px-6 py-3 sm:py-4 bg-slate-50 text-center border-t">
-            <p class="text-xs sm:text-sm text-slate-500">
-              © 2025 Gestión Procesal. Todos los derechos reservados.
-            </p>
-            <div class="flex flex-col sm:flex-row justify-center items-center space-y-1 sm:space-y-0 sm:space-x-4 mt-2">
-              <Button 
-                text 
-                size="small"
-                class="text-xs sm:text-sm text-slate-400 hover:text-primary-600 p-1"
-              >
-                Términos y Condiciones
-              </Button>
-              <span class="text-slate-300 hidden sm:inline">•</span>
-              <Button 
-                text 
-                size="small"
-                class="text-xs sm:text-sm text-slate-400 hover:text-primary-600 p-1"
-              >
-                Política de Privacidad
-              </Button>
-            </div>
-          </div>
-        </template>
-      </Card>
-      
-      <!-- Información adicional -->
-      <div class="mt-6 sm:mt-8 text-center">
-        <div class="bg-white/60 backdrop-blur-sm rounded-lg p-3 sm:p-4 shadow-sm">
-          <h3 class="text-sm sm:text-base font-semibold text-slate-700 mb-2 sm:mb-3">Acceso Seguro</h3>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 text-xs sm:text-sm text-slate-600">
-            <div class="flex items-center justify-center space-x-1 sm:space-x-2 py-1">
-              <i class="pi pi-shield text-green-600 text-sm sm:text-base"></i>
-              <span>Cifrado SSL</span>
-            </div>
-            <div class="flex items-center justify-center space-x-1 sm:space-x-2 py-1">
-              <i class="pi pi-lock text-blue-600 text-sm sm:text-base"></i>
-              <span>Datos Protegidos</span>
-            </div>
-            <div class="flex items-center justify-center space-x-1 sm:space-x-2 py-1">
-              <i class="pi pi-verified text-purple-600 text-sm sm:text-base"></i>
-              <span>LOPD Compliant</span>
-            </div>
+  <AuthLayout>
+    <template #header>
+      <div class="text-center px-4 sm:px-6 bg-gradient-to-r from-primary-600 to-primary-700">
+        <div class="mb-4 sm:mb-6">
+          <div class="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 mx-auto flex items-center justify-center">
+            <img
+              src="/images/logoBalanza.png"
+              alt="Gestión Procesal Logo"
+              class="w-full h-full object-contain drop-shadow-lg"
+            />
           </div>
         </div>
+        <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold mb-2">Gestión Procesal</h1>
+        <p class="text-primary-100 text-sm sm:text-base font-medium">Acceso a Gestión Procesal</p>
       </div>
-    </div>
-  </div>
+    </template>
+
+    <template #content>
+      <div class="px-4 sm:px-6 py-6 sm:py-8 flex justify-center">
+        <LoginForm />
+      </div>
+    </template>
+
+    <template #footer>
+      <div class="px-4 sm:px-6 py-3 sm:py-4 bg-slate-50 text-center border-t">
+        <p class="text-xs sm:text-sm text-slate-500">
+          © 2025 Gestión Procesal. Todos los derechos reservados.
+        </p>
+        <!-- <div class="flex flex-col sm:flex-row justify-center items-center space-y-1 sm:space-y-0 sm:space-x-4 mt-2">
+          <Button
+            text
+            size="small"
+            class="text-xs sm:text-sm text-slate-400 hover:text-primary-600 p-1"
+          >
+            Términos y Condiciones
+          </Button>
+          <span class="text-slate-300 hidden sm:inline">•</span>
+          <Button
+            text
+            size="small"
+            class="text-xs sm:text-sm text-slate-400 hover:text-primary-600 p-1"
+          >
+            Política de Privacidad
+          </Button>
+        </div> -->
+      </div>
+    </template>
+  </AuthLayout>
 </template>
 
 <script setup>
-import LoginForm from "@/components/LoginForm.vue";
-import Card from "primevue/card";
-import Button from "primevue/button";
+import AuthLayout from '@/components/AuthLayout.vue'
+import LoginForm from '@/components/LoginForm.vue'
+import Button from 'primevue/button'
 </script>
+
+
 
 <style scoped>
 /* Animaciones y efectos adicionales */

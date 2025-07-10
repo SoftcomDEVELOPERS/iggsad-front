@@ -78,12 +78,20 @@ export function useUserDashboard() {
     }
   })
   
+  // const dashboardLayout = computed(() => {
+  //   return dashboardConfig.value.layout || defaultLayout
+  // })
+  
+  // const cardsConfig = computed(() => {
+  //   return dashboardConfig.value.cardsConfig || defaultCardsConfig
+  // })
+
   const dashboardLayout = computed(() => {
-    return dashboardConfig.value.layout || defaultLayout
+    return authStore.userProfile?.dashboard?.layout || defaultLayout
   })
   
   const cardsConfig = computed(() => {
-    return dashboardConfig.value.cardsConfig || defaultCardsConfig
+    return authStore.userProfile?.dashboard?.cardsConfig || defaultCardsConfig
   })
   
   // Definición de cards disponibles
@@ -155,95 +163,130 @@ export function useUserDashboard() {
   ])
   
   // Métodos de gestión del layout
-  const updateDashboardLayout = async (newLayout) => {
-    try {
-      const updatedConfig = {
-        ...dashboardConfig.value,
-        layout: newLayout,
-        lastModified: new Date().toISOString()
-      }
+  // const updateDashboardLayout = async (newLayout) => {
+  //   try {
+  //     const updatedConfig = {
+  //       ...dashboardConfig.value,
+  //       layout: newLayout,
+  //       lastModified: new Date().toISOString()
+  //     }
       
-      // Usar el método del store para actualizar el perfil
+  //     // Usar el método del store para actualizar el perfil
+  //     await authStore.updateDashboardConfig({
+  //       dashboard: updatedConfig
+  //     })
+      
+  //     console.log('✅ Layout actualizado correctamente')
+  //     return true
+  //   } catch (error) {
+  //     console.error('❌ Error al actualizar layout:', error)
+  //     throw error
+  //   }
+  // }
+
+   const updateDashboardLayout = async (newLayout) => {
+    try {
       await authStore.updateDashboardConfig({
-        dashboard: updatedConfig
+        layout: newLayout
       })
       
-      console.log('✅ Layout actualizado correctamente')
+      console.log('📊 Dashboard layout actualizado')
       return true
     } catch (error) {
-      console.error('❌ Error al actualizar layout:', error)
+      console.error('❌ Error actualizando layout:', error)
       throw error
     }
   }
   
-  const updateCardConfig = async (cardId, newConfig) => {
+  // const updateCardConfig = async (cardId, newConfig) => {
+  //   try {
+  //     const updatedCardsConfig = {
+  //       ...cardsConfig.value,
+  //       [cardId]: {
+  //         ...cardsConfig.value[cardId],
+  //         ...newConfig
+  //       }
+  //     }
+      
+  //     const updatedDashboardConfig = {
+  //       ...dashboardConfig.value,
+  //       cardsConfig: updatedCardsConfig,
+  //       lastModified: new Date().toISOString()
+  //     }
+      
+  //     // Usar el método del store para actualizar el perfil
+  //     await authStore.updateDashboardConfig({
+  //       dashboard: updatedDashboardConfig
+  //     })
+      
+  //     console.log(`✅ Configuración de card ${cardId} actualizada`)
+  //     return true
+  //   } catch (error) {
+  //     console.error(`❌ Error al actualizar configuración de card ${cardId}:`, error)
+  //     throw error
+  //   }
+  // }
+
+  const updateCardConfig = async (cardId, config) => {
     try {
-      const updatedCardsConfig = {
+      const newCardsConfig = {
         ...cardsConfig.value,
-        [cardId]: {
-          ...cardsConfig.value[cardId],
-          ...newConfig
-        }
+        [cardId]: config
       }
       
-      const updatedDashboardConfig = {
-        ...dashboardConfig.value,
-        cardsConfig: updatedCardsConfig,
-        lastModified: new Date().toISOString()
-      }
-      
-      // Usar el método del store para actualizar el perfil
       await authStore.updateDashboardConfig({
-        dashboard: updatedDashboardConfig
+        cardsConfig: newCardsConfig
       })
       
-      console.log(`✅ Configuración de card ${cardId} actualizada`)
+      console.log(`🎛️ Configuración de ${cardId} actualizada`)
       return true
     } catch (error) {
-      console.error(`❌ Error al actualizar configuración de card ${cardId}:`, error)
+      console.error(`❌ Error actualizando config de ${cardId}:`, error)
       throw error
     }
   }
   
-  const addCard = async (cardId, position = null) => {
-    try {
-      const cardDefinition = availableCards.value.find(card => card.id === cardId)
-      if (!cardDefinition) {
-        throw new Error(`Card ${cardId} no encontrada`)
-      }
+  // const addCard = async (cardId, position = null) => {
+  //   try {
+  //     const cardDefinition = availableCards.value.find(card => card.id === cardId)
+  //     if (!cardDefinition) {
+  //       throw new Error(`Card ${cardId} no encontrada`)
+  //     }
       
-      // Calcular posición automática si no se proporciona
-      const finalPosition = position || findOptimalPosition(cardDefinition.defaultSize)
+  //     // Calcular posición automática si no se proporciona
+  //     const finalPosition = position || findOptimalPosition(cardDefinition.defaultSize)
       
-      const newLayoutItem = {
-        i: cardId,
-        x: finalPosition.x,
-        y: finalPosition.y,
-        w: finalPosition.w || cardDefinition.defaultSize.w,
-        h: finalPosition.h || cardDefinition.defaultSize.h
-      }
+  //     const newLayoutItem = {
+  //       i: cardId,
+  //       x: finalPosition.x,
+  //       y: finalPosition.y,
+  //       w: finalPosition.w || cardDefinition.defaultSize.w,
+  //       h: finalPosition.h || cardDefinition.defaultSize.h
+  //     }
       
-      const newLayout = [...dashboardLayout.value, newLayoutItem]
+  //     const newLayout = [...dashboardLayout.value, newLayoutItem]
       
-      // Asegurar que la card tenga configuración por defecto
-      if (!cardsConfig.value[cardId]) {
-        await updateCardConfig(cardId, defaultCardsConfig[cardId] || {})
-      }
+  //     // Asegurar que la card tenga configuración por defecto
+  //     if (!cardsConfig.value[cardId]) {
+  //       await updateCardConfig(cardId, defaultCardsConfig[cardId] || {})
+  //     }
       
-      await updateDashboardLayout(newLayout)
-      console.log(`✅ Card ${cardId} añadida al dashboard`)
-      return true
-    } catch (error) {
-      console.error(`❌ Error al añadir card ${cardId}:`, error)
-      throw error
-    }
+  //     await updateDashboardLayout(newLayout)
+  //     console.log(`✅ Card ${cardId} añadida al dashboard`)
+  //     return true
+  //   } catch (error) {
+  //     console.error(`❌ Error al añadir card ${cardId}:`, error)
+  //     throw error
+  //   }
+  // }
+  const addCard = async (cardConfig) => {
+    const newLayout = [...dashboardLayout.value, cardConfig]
+    return updateDashboardLayout(newLayout)
   }
-  
   const removeCard = async (cardId) => {
     try {
       const newLayout = dashboardLayout.value.filter(item => item.i !== cardId)
       await updateDashboardLayout(newLayout)
-      console.log(`✅ Card ${cardId} eliminada del dashboard`)
       return true
     } catch (error) {
       console.error(`❌ Error al eliminar card ${cardId}:`, error)

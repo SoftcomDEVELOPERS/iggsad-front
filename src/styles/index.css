@@ -14,6 +14,9 @@
 
 
 /* ===== CLASES UTILITARIAS GLOBALES ===== */
+body {
+  font-family: var(--iggsad-font-primary) !important;
+}
 
 /* Contenedores de página estándar */
 .page-container {

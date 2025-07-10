@@ -1,33 +1,22 @@
-// stores/auth.js
+// src/stores/auth.js
 import { defineStore } from 'pinia'
 import * as authService from '@/services/auth.services.js'
 import { getDefaultUserProfile } from '@/utils/defaultUserProfile.js'
-import Cookies from 'js-cookie'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null,
     frontPermissions: [],
-    userProfile: getDefaultUserProfile(), // ✨ Configuración personalizada del usuario
+    userProfile: getDefaultUserProfile(),
     isLoading: false
   }),
-  
+
   getters: {
-    isAuthenticated: (s) => !!s.user,
-    /**
-     * Comprueba si el usuario tiene este permiso
-     * - Comodín '*'
-     * - Permiso exacto ('user-readView')
-     * - Permiso 'entity-allView' cubre cualquier acción de esa entidad
-     */
-    canAccess: (s) => (permission) => {
+    isAuthenticated: s => !!s.user,
+    canAccess: s => permission => {
       const fps = s.frontPermissions || []
-      if (fps.includes('*')) {
-        return true
-      }
-      if (fps.includes(permission)) {
-        return true
-      }
+      if (fps.includes('*')) return true
+      if (fps.includes(permission)) return true
       const [entity] = permission.split('-')
       return fps.some(fp => {
         const [fpEntity, fpAction] = fp.split('-')
@@ -35,280 +24,196 @@ export const useAuthStore = defineStore('auth', {
       })
     }
   },
-  
+
   actions: {
-    /**
-     * Realiza el login completo:
-     * 1) POST /auth/login  → cookie HttpOnly  
-     * 2) GET /me          → datos y permisos  
-     * 3) guardarlos en el store
-     */
-    async doLogin(payload) {
-      
-      // Validar payload
-      if (!payload || !payload.email || !payload.password) {
-        throw new Error('Email y contraseña son requeridos')
-      }
-      
+    // — Helpers para localStorage —
+    _getStorageKey(key) {
+      const uid = this.user?.id || 'guest'
+      return `userProfile_${uid}_${key}`
+    },
+    _saveToLocalStorage() {
+      if (!this.user || !this.user.id) return
       try {
-        this.isLoading = true
-        
-        // Paso 1: Hacer login (las cookies se establecen automáticamente)
-        console.log('Enviando credenciales al servidor...')
-        const loginResponse = await authService.login(payload)
-
-        const fullUser = loginResponse?.data?.user;
-        console.log('Datos completos del usuario al hacer login: ', fullUser);
-        
-        // Paso 2: Obtener datos del usuario
-        console.log('Obteniendo datos del usuario...')
-
-        const { frontPermissions, user, userProfile } = await authService.fetchMe()
-        
-        console.log('Datos del usuario obtenidos:', { user, frontPermissions, userProfile });
-        
-        // Paso 3: Guardar en el store
-        this.user = {
-          ...fullUser,
-          ...user // Combinar datos completos del login con los obtenidos
+        localStorage.setItem(
+          this._getStorageKey('profile'),
+          JSON.stringify(this.userProfile)
+        )
+        localStorage.setItem(
+          this._getStorageKey('lastSync'),
+          new Date().toISOString()
+        )
+        console.log('💾 userProfile guardado en localStorage')
+      } catch (err) {
+        console.error('❌ Error guardando userProfile en LS:', err)
+      }
+    },
+    _loadFromLocalStorage() {
+      if (!this.user || !this.user.id) return false
+      try {
+        const raw = localStorage.getItem(this._getStorageKey('profile'))
+        if (raw) {
+          this.userProfile = JSON.parse(raw)
+          console.log('📱 userProfile cargado desde localStorage')
+          return true
         }
-
-        this.frontPermissions = frontPermissions
-        this.userProfile = userProfile || getDefaultUserProfile() // ✨ NUEVO
-        
-        console.log('Login exitoso:', { user: this.user, frontPermissions, userProfile: this.userProfile })
-        return loginResponse
-        
-      } catch (error) {
-        console.error('Error en doLogin:', error)
-        // Limpiar estado en caso de error
-        this.user = null
-        this.frontPermissions = []
-        throw error // Re-lanzar para que el componente lo maneje
-        
-      } finally {
-        this.isLoading = false
+      } catch (err) {
+        console.error('❌ Error cargando userProfile desde LS:', err)
+      }
+      return false
+    },
+    _clearLocalStorage() {
+      if (!this.user || !this.user.id) return
+      try {
+        localStorage.removeItem(this._getStorageKey('profile'))
+        localStorage.removeItem(this._getStorageKey('lastSync'))
+        console.log('🧹 userProfile eliminado de localStorage')
+      } catch (err) {
+        console.error('❌ Error limpiando localStorage:', err)
       }
     },
 
-    async saveDashboardConfig(dashboardConfig) {
-      try {
-        // Actualizar localmente primero (UX inmediata)
-        userProfile.value.dashboard = {
-          ...userProfile.value.dashboard,
-          ...dashboardConfig
-        }
-        console.log('✅ Dashboard actualizado localmente:', userProfile.value.dashboard);
-        
-        // Enviar al backend (en background)
-        // await fetch(`${VITE_SSO_URL}/user/profile`, {
-        //   method: 'PUT',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   credentials: 'include',
-        //   body: JSON.stringify(dashboardConfig)
-        // })
-        
-        console.log('✅ Dashboard guardado en servidor')
-      } catch (error) {
-        console.error('❌ Error guardando dashboard:', error)
-        // Opcional: mostrar toast de error
-      }
+    // —— Método genérico de parcheo de perfil ——
+    async updateUserProfile(patch) {
+      // patch es un objeto parcial, ej { dashboard: {...} }
+      this.userProfile = { ...this.userProfile, ...patch }
+      this._saveToLocalStorage()
+      // TODO: disparar llamada a backend cuando esté implementado
+      console.log('📝 userProfile parcheado:', patch)
+      return true
     },
 
-    /**
-     * ✨ Actualizar configuración del dashboard
-     */
-    async updateDashboardConfig(config) {
-      try {
-        this.isLoading = true
-        
-        // Actualizar localmente
-        if (this.userProfile) {
-          this.userProfile.dashboard = { ...this.userProfile.dashboard, ...config }
-        }
-        
-        // TODO: Guardar en backend cuando esté listo
-        // await userSettingsService.updateDashboard(config)
-        
-        console.log('Configuración del dashboard actualizada:', config)
-        return true
-        
-      } catch (error) {
-        console.error('Error al actualizar configuración del dashboard:', error)
-        throw error
-      } finally {
-        this.isLoading = false
-      }
-    },
-    
-    /**
-     * Cierra la sesión del usuario
-     */
-    async logout() {
-      try {
-        this.isLoading = true
-        
-        // Llamar a /auth/logout para limpiar cookie del servidor
-        await authService.logout()
-        
-        // Limpiar estado local
-        this.user = null
-        this.frontPermissions = []
-        this.userProfile = null // ✨ NUEVO
-        
-        console.log('Logout exitoso')
-        
-      } catch (error) {
-        console.error('Error en logout:', error)
-        // Limpiar estado local aunque falle la llamada al servidor
-        this.user = null
-        this.frontPermissions = []
-        this.userProfile = null // ✨ NUEVO
-        
-      } finally {
-        this.isLoading = false
-      }
-    },
-    
-    /**
-     * Verifica si el usuario está autenticado (útil al iniciar la app)
-     */
-    async checkAuth() {
-      
+    // —— Login / carga inicial ——
+    async doLogin({ email, password }) {
+      if (!email || !password) throw new Error('Email y contraseña son requeridos')
       this.isLoading = true
       try {
-        
+        console.log('🔐 Enviando credenciales…')
+        const loginResp = await authService.login({ email, password })
+        console.log('👤 Fetching perfil…')
         const { user, frontPermissions, userProfile } = await authService.fetchMe()
         this.user = user
         this.frontPermissions = frontPermissions
-        this.userProfile = userProfile || getDefaultUserProfile() // ✨ NUEVO
-        
-        console.log('Usuario autenticado:', user)
-        return true
-        
-      } catch (error) {
-        console.log('Error al verificar autenticación:', error);
-        
-        if (error.response?.status === 401) {
-          const refreshed = await authService.refreshToken().catch(() => false)
-          if (refreshed) {
-            const { user, frontPermissions, userProfile } = await authService.fetchMe()
-            this.user = user
-            this.frontPermissions = frontPermissions
-            this.userProfile = userProfile || getDefaultUserProfile() // ✨ NUEVO
-            return true
-          }
-        }
-        // demás errores o refresh fallido
+        this.userProfile = userProfile || getDefaultUserProfile()
+
+        // Priorizar LS si existe
+        const usedLocal = this._loadFromLocalStorage()
+        if (!usedLocal) this._saveToLocalStorage()
+        console.log('✅ Login completado:', this.user)
+        return loginResp
+      } catch (err) {
+        console.error('❌ Error en doLogin:', err)
         this.user = null
         this.frontPermissions = []
-        this.userProfile = null // ✨ NUEVO
-        return false
-        
+        this.userProfile = getDefaultUserProfile()
+        throw err
       } finally {
         this.isLoading = false
       }
     },
 
-    /**
-     * Intenta refrescar el token automáticamente
-     */
+    // —— Verificar token vivo al refrescar página ——
+    async checkAuth() {
+      this.isLoading = true
+      try {
+        const { user, frontPermissions, userProfile } = await authService.fetchMe()
+        this.user = user
+        this.frontPermissions = frontPermissions
+        this.userProfile = userProfile || getDefaultUserProfile()
+        const usedLocal = this._loadFromLocalStorage()
+        if (!usedLocal) this._saveToLocalStorage()
+        console.log('🔄 Auth verificado:', user)
+        return true
+      } catch (err) {
+        console.warn('⚠️ No autenticado:', err)
+        // Si era 401, limpiar todo
+        if (err.response?.status === 401) {
+          this.user = null
+          this.frontPermissions = []
+          this.userProfile = getDefaultUserProfile()
+          this._clearLocalStorage()
+          return false
+        }
+        throw err
+      } finally {
+        this.isLoading = false
+      }
+    },
+
+    // —— Logout limpio ——
+    async logout() {
+      this.isLoading = true
+      try {
+        this._clearLocalStorage()
+        await authService.logout()
+        this.user = null
+        this.frontPermissions = []
+        this.userProfile = getDefaultUserProfile()
+        console.log('🚪 Logout exitoso')
+      } catch (err) {
+        console.error('❌ Error en logout:', err)
+        this.user = null
+        this.frontPermissions = []
+        this.userProfile = getDefaultUserProfile()
+      } finally {
+        this.isLoading = false
+      }
+    },
+
+    // —— Refresh token automático ——
     async tryRefreshToken() {
       try {
-        const refreshed = await authService.refreshToken()
-        
-        if (refreshed) {
-          // Recargar datos del usuario
+        const ok = await authService.refreshToken()
+        if (ok) {
           const { user, frontPermissions, userProfile } = await authService.fetchMe()
           this.user = user
           this.frontPermissions = frontPermissions
-          this.userProfile = userProfile || getDefaultUserProfile() // ✨ NUEVO
+          this.userProfile = userProfile || getDefaultUserProfile()
+          this._saveToLocalStorage()
           return true
         }
-        
-        return false
-        
-      } catch (error) {
-        console.error('Error al refrescar token:', error)
-        return false
+      } catch (err) {
+        console.error('❌ Error refrescando token:', err)
       }
+      return false
     },
 
-    /**
-     * ✨ NUEVO: Solicita recuperación de contraseña
-     */
+    // —— Recuperación de contraseña ——
     async requestPasswordReset(email) {
+      this.isLoading = true
       try {
-        this.isLoading = true
-        
-        const response = await authService.requestPasswordReset(email)
-        
-        console.log('Solicitud de recuperación enviada para:', email)
-        return response // Retorna { success, message, data, statusCode }
-        
-      } catch (error) {
-        console.error('Error en requestPasswordReset:', error)
-        throw error
+        const resp = await authService.requestPasswordReset(email)
+        console.log('✉️ Reset solicitado para:', email)
+        return resp
       } finally {
         this.isLoading = false
       }
     },
-
-    /**
-     * ✨ NUEVO: Verifica token de recuperación
-     */
     async verifyResetToken(token) {
+      this.isLoading = true
       try {
-        this.isLoading = true
-        
-        const response = await authService.verifyResetToken(token)
-        
-        console.log('Token verificado:', token)
-        return response // Retorna { success, message, data, statusCode }
-        
-      } catch (error) {
-        console.error('Error en verifyResetToken:', error)
-        throw error
+        const resp = await authService.verifyResetToken(token)
+        console.log('🔏 Token verificado:', token)
+        return resp
       } finally {
         this.isLoading = false
       }
     },
-
-    /**
-     * ✨ NUEVO: Resetea contraseña con token
-     */
     async resetPassword(token, newPassword, confirmPassword) {
+      this.isLoading = true
       try {
-        this.isLoading = true
-        
-        const response = await authService.resetPassword(token, newPassword, confirmPassword)
-        
-        console.log('Contraseña reseteada exitosamente')
-        return response // Retorna { success, message, data, statusCode }
-        
-      } catch (error) {
-        console.error('Error en resetPassword:', error)
-        throw error
+        const resp = await authService.resetPassword(token, newPassword, confirmPassword)
+        console.log('🔄 Contraseña reseteada')
+        return resp
       } finally {
         this.isLoading = false
       }
     },
-
-    /**
-     * ✨ NUEVO: Cambia contraseña del usuario autenticado
-     */
     async changePassword(currentPassword, newPassword) {
+      this.isLoading = true
       try {
-        this.isLoading = true
-        
-        const response = await authService.changePassword(currentPassword, newPassword)
-        
-        console.log('Contraseña cambiada exitosamente')
-        return response // Retorna { success, message, data, statusCode }
-        
-      } catch (error) {
-        console.error('Error en changePassword:', error)
-        throw error
+        const resp = await authService.changePassword(currentPassword, newPassword)
+        console.log('🔒 Contraseña cambiada')
+        return resp
       } finally {
         this.isLoading = false
       }

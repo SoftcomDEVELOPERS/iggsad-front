@@ -123,6 +123,22 @@
   overflow: auto;
 }
 
+.iggsad-user-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--iggsad-surface-600);
+  margin-right: var(--iggsad-spacing-sm);
+  padding: var(--iggsad-spacing-xs) var(--iggsad-spacing-sm);
+  background: var(--iggsad-surface-100);
+  border-radius: var(--iggsad-radius-sm);
+  transition: var(--iggsad-transition-fast);
+}
+
+.iggsad-user-name:hover {
+  background: var(--iggsad-surface-200);
+  color: var(--iggsad-surface-700);
+}
+
 /* ===== RESPONSIVE ===== */
 
 /* Tablet */
@@ -134,6 +150,10 @@
 
 /* Mobile Grande */
 @media (max-width: 768px) {
+  .iggsad-user-name {
+    display: none;
+  }
+
   .iggsad-header-content {
     flex-direction: column;
     gap: var(--iggsad-spacing-md);
@@ -346,4 +366,34 @@
   .debug-layout .iggsad-user-controls {
     outline: 2px dashed orange;
   }
+}
+
+
+
+/* Cuando estamos en login, usar toda la altura */
+.iggsad-main-content:only-child {
+  min-height: 100vh;
+}
+
+/* ===== ESTADOS DE LA APLICACIÓN ===== */
+
+
+.app-loading .iggsad-main-content {
+  filter: blur(1px);
+}
+
+/* Estado offline */
+.app-offline .iggsad-header::after {
+  content: '⚠️ Sin conexión';
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--iggsad-warning-600, #f59e0b);
+  color: white;
+  padding: var(--iggsad-spacing-xs) var(--iggsad-spacing-md);
+  border-radius: 0 0 var(--iggsad-radius-sm) var(--iggsad-radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 1001;
 }
