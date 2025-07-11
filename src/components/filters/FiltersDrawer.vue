@@ -22,16 +22,6 @@
             class="fullscreen-btn"
             @click="toggleFullscreen"
           />
-          <Button
-            icon="pi pi-times"
-            text
-            rounded
-            size="small"
-            severity="secondary"
-            v-tooltip="'Cerrar'"
-            class="close-btn"
-            @click="closeDrawer"
-          />
         </div>
       </div>
     </template>

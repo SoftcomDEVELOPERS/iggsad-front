@@ -67,7 +67,9 @@
 
     <!-- Contenido principal -->
     <main class="iggsad-main-content">
-      <router-view />
+      <BreadcrumbWrapper>
+        <router-view />
+      </BreadcrumbWrapper>
     </main>
   </div>
 </template>
@@ -84,6 +86,7 @@ import Toast from 'primevue/toast'
 import ConfirmDialog from 'primevue/confirmdialog'
 
 import DarkModeToggle from '@/components/DarkModeToggle.vue'
+import BreadcrumbWrapper from '@/components/BreadcrumbWrapper.vue'
 import { useAppLayout } from '@/composables/useAppLayout'
 
 // ===== COMPOSABLES =====

@@ -112,11 +112,23 @@ router.isReady().then(async () => {
     console.log('✅ Router listo y estado de autenticación verificado')
 
     if (authStore.isAuthenticated) {
+      // 🔧 FIX: Cargar perfil correctamente sin getCurrentInstance
       const { loadProfile } = useUserProfile()
       console.log('🔐 Usuario autenticado, cargando perfil...')
-      await loadProfile()
-      router.push({ name: 'Dashboard' })
-     }
+      
+      try {
+        await loadProfile()
+        console.log('✅ Perfil de usuario cargado correctamente')
+      } catch (profileError) {
+        console.warn('⚠️ Error cargando perfil, usando defaults:', profileError)
+        // Continuar sin bloquear la aplicación
+      }
+      
+      // Solo redirigir si no estamos ya en una ruta específica
+      if (router.currentRoute.value.path === '/login') {
+        router.push({ name: 'Dashboard' })
+      }
+    }
   } catch (e) {
     console.error('❌ Error al verificar autenticación:', e)
   }

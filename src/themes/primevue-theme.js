@@ -231,6 +231,24 @@ export const GestionProcesalTheme = definePreset(Nora, {
       }
     },
 
+    // ===== TOOLTIP =====
+    tooltip: {
+      root: {
+        maxWidth: '12rem',
+        padding: 'var(--iggsad-spacing-sm) var(--iggsad-spacing-sm)',
+        background: 'var(--iggsad-surface-600) !important',
+        color: 'var(--iggsad-surface-white)',
+        borderRadius: 'var(--iggsad-radius-md)',
+        fontSize: 'var(--iggsad-text-xxs) !important',
+        fontWeight: 'var(--iggsad-font-normal)',
+        boxShadow: 'var(--iggsad-shadow-lg)',
+        zIndex: 'var(--iggsad-z-tooltip)'
+      },
+      arrow: {
+        color: 'var(--iggsad-surface-600) !important'
+      }
+    },
+
     // ===== TOAST =====
     toast: {
       root: {

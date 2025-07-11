@@ -93,6 +93,7 @@
   --iggsad-font-black: 900;
   
   /* Font sizes */
+  --iggsad-text-xxs: 0.25rem;          /* 7px */
   --iggsad-text-xs: 0.75rem;          /* 12px */
   --iggsad-text-sm: 0.875rem;         /* 14px - Para fontSize: '0.875rem' */
   --iggsad-text-base: 1rem;           /* 16px - Para fontSize: '1rem' */

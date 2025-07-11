@@ -21,147 +21,156 @@
             class="header-action-btn"
             @click="createNewExpediente"
           />
-          <Button
-            icon="pi pi-filter"
-            :label="`Filtros ${totalActiveFilters > 0 ? `(${totalActiveFilters})` : ''}`"
-            outlined
-            :severity="totalActiveFilters > 0 ? 'success' : 'secondary'"
-            class="header-action-btn"
-            @click="toggleFilters"
-          />
         </div>
       </div>
-      
-      <!-- Breadcrumb -->
-      <Breadcrumb 
-        :model="breadcrumbItems" 
-        class="page-breadcrumb"
-      />
     </div>
 
-    <!-- Barra de búsqueda principal -->
-    <div class="search-section">
-      <div class="search-container">
-        <div class="search-input-wrapper">
-          <SearchBar
-            v-model="searchQuery"
-            label="Búsqueda de Expedientes"
-            placeholder="Buscar por número, cliente, referencia..."
-            size="large"
-            :show-validation="true"
-            validation-message="Ingrese un criterio de búsqueda"
-            @search="handleSearch"
-            @clear="handleClearSearch"
-            class="main-search"
-          />
-        </div>
+    <!-- 🎯 SECCIÓN DE BÚSQUEDA Y ESTADÍSTICAS EN DOS COLUMNAS -->
+    <div class="search-and-stats-section">
+      <div class="search-and-stats-container">
         
-        <div class="search-actions">
-          <Button
-            icon="pi pi-search"
-            label="Buscar"
-            :loading="expedientesStore.isLoading"
-            @click="handleSearch"
-            class="search-btn"
-          />
-          <Button
-            icon="pi pi-times"
-            label="Limpiar"
-            outlined
-            severity="secondary"
-            @click="handleClearAll"
-            class="clear-btn"
-          />
-        </div>
-      </div>
-      
-      <!-- Filtros activos -->
-      <div class="active-filters" v-if="activeFiltersDisplay.length > 0">
-        <div class="filters-header">
-          <span class="filters-label">Filtros aplicados:</span>
-          <Button
-            icon="pi pi-times"
-            label="Limpiar todos"
-            text
-            size="small"
-            severity="secondary"
-            @click="clearAllFilters"
-            class="clear-all-btn"
-          />
-        </div>
-        
-        <div class="filters-list">
-          <Tag
-            v-for="filter in activeFiltersDisplay"
-            :key="filter.key"
-            :value="filter.display"
-            severity="info"
-            class="filter-tag"
-          >
-            <template #value>
-              <span class="filter-content">
-                <strong>{{ filter.label }}:</strong> {{ filter.value }}
+        <!-- ===== COLUMNA IZQUIERDA: BÚSQUEDA ===== -->
+        <div class="search-column">
+          <div class="search-area">
+            
+            <!-- Botón de filtros arriba -->
+            <div class="filters-button-container">
+              <Button
+                icon="pi pi-filter"
+                :label="`Filtros Avanzados ${totalActiveFilters > 0 ? `(${totalActiveFilters})` : ''}`"
+                outlined
+                :severity="totalActiveFilters > 0 ? 'success' : 'secondary'"
+                class="filters-button"
+                @click="toggleFilters"
+              />
+            </div>
+            
+            <!-- Barra de búsqueda -->
+            <div class="search-input-wrapper">
+              <SearchBar
+                v-model="searchQuery"
+                label="Búsqueda de Expedientes"
+                placeholder="Buscar por número, cliente, referencia..."
+                size="large"
+                :show-validation="true"
+                validation-message="Ingrese un criterio de búsqueda"
+                @search="handleSearch"
+                @clear="handleClearSearch"
+                class="main-search"
+              />
+            </div>
+            
+            <!-- Botones de acción -->
+            <div class="search-actions">
+              <Button
+                icon="pi pi-search"
+                label="Buscar"
+                :loading="expedientesStore.isLoading"
+                @click="handleSearch"
+                class="search-btn"
+              />
+              <Button
+                icon="pi pi-times"
+                label="Limpiar Todo"
+                outlined
+                severity="secondary"
+                @click="handleClearAll"
+                class="clear-btn"
+              />
+            </div>
+            
+            <!-- Filtros activos (MOVIDO ABAJO) -->
+            <div class="active-filters" v-if="activeFiltersDisplay.length > 0">
+              <div class="filters-header">
+                <span class="filters-label">Filtros aplicados:</span>
                 <Button
                   icon="pi pi-times"
+                  label="Limpiar todos"
                   text
-                  rounded
                   size="small"
-                  class="filter-remove-btn"
-                  @click="removeFilter(filter.key)"
+                  severity="secondary"
+                  @click="clearAllFilters"
+                  class="clear-all-btn"
                 />
-              </span>
-            </template>
-          </Tag>
+              </div>
+              
+              <div class="filters-list">
+                <Tag
+                  v-for="filter in activeFiltersDisplay"
+                  :key="filter.key"
+                  :value="filter.display"
+                  severity="info"
+                  class="filter-tag"
+                >
+                  <template #value>
+                    <span class="filter-content">
+                      <strong>{{ filter.label }}:</strong> {{ filter.value }}
+                      <Button
+                        icon="pi pi-times"
+                        text
+                        rounded
+                        size="small"
+                        class="filter-remove-btn"
+                        @click="removeFilter(filter.key)"
+                      />
+                    </span>
+                  </template>
+                </Tag>
+              </div>
+            </div>
+            
+          </div>
         </div>
+
+        <!-- ===== COLUMNA DERECHA: ESTADÍSTICAS COMPACTAS ===== -->
+        <div class="stats-column" v-if="expedientesStore.expedientes.length > 0">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon total">
+                <i class="pi pi-folder"></i>
+              </div>
+              <div class="stat-content">
+                <span class="stat-number">{{ expedientesStore.pagination.total }}</span>
+                <span class="stat-label">Total</span>
+              </div>
+            </div>
+            
+            <div class="stat-card">
+              <div class="stat-icon active">
+                <i class="pi pi-check-circle"></i>
+              </div>
+              <div class="stat-content">
+                <span class="stat-number">{{ activeExpedientesCount }}</span>
+                <span class="stat-label">Activos</span>
+              </div>
+            </div>
+            
+            <div class="stat-card">
+              <div class="stat-icon urgent">
+                <i class="pi pi-exclamation-triangle"></i>
+              </div>
+              <div class="stat-content">
+                <span class="stat-number">{{ urgentExpedientesCount }}</span>
+                <span class="stat-label">Urgentes</span>
+              </div>
+            </div>
+            
+            <div class="stat-card">
+              <div class="stat-icon money">
+                <i class="pi pi-euro"></i>
+              </div>
+              <div class="stat-content">
+                <span class="stat-number">{{ formatCurrency(totalAmount) }}</span>
+                <span class="stat-label">Importe</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
       </div>
     </div>
 
-    <!-- Estadísticas rápidas -->
-    <div class="stats-section" v-if="expedientesStore.expedientes.length > 0">
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon total">
-            <i class="pi pi-folder"></i>
-          </div>
-          <div class="stat-content">
-            <span class="stat-number">{{ expedientesStore.pagination.total }}</span>
-            <span class="stat-label">Total Expedientes</span>
-          </div>
-        </div>
-        
-        <div class="stat-card">
-          <div class="stat-icon active">
-            <i class="pi pi-check-circle"></i>
-          </div>
-          <div class="stat-content">
-            <span class="stat-number">{{ activeExpedientesCount }}</span>
-            <span class="stat-label">Activos</span>
-          </div>
-        </div>
-        
-        <div class="stat-card">
-          <div class="stat-icon urgent">
-            <i class="pi pi-exclamation-triangle"></i>
-          </div>
-          <div class="stat-content">
-            <span class="stat-number">{{ urgentExpedientesCount }}</span>
-            <span class="stat-label">Urgentes</span>
-          </div>
-        </div>
-        
-        <div class="stat-card">
-          <div class="stat-icon money">
-            <i class="pi pi-euro"></i>
-          </div>
-          <div class="stat-content">
-            <span class="stat-number">{{ formatCurrency(totalAmount) }}</span>
-            <span class="stat-label">Importe Total</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tabla principal - REUTILIZANDO EL COMPONENTE EXISTENTE -->
+    <!-- Tabla principal -->
     <div class="table-section">
       <ExpedientesTable
         :expedientes="expedientesStore.expedientes"
@@ -172,62 +181,30 @@
       />
     </div>
 
-    <!-- Panel lateral de filtros - REUTILIZANDO FILTERPANEL -->
-     <FiltersDrawer
-    v-model:visible="showFilters"
-    title="Filtros de Búsqueda de Expedientes"
-    :persistent-filters="persistentFilters"
-    :persistent-expediente-search="persistentExpedienteSearch"
-    @apply-filters="handleApplyFilters"
-    @clear-filters="handleClearFilters"
-    @filter-change="handleFilterChange"
-    @search-expediente="handleExpedienteSearch"
-    @toggle-fullscreen="handleToggleFullscreen"
-  >
-    <template #default="{ persistentFilters, persistentExpedienteSearch }">
-      <FilterPanel
-        :persistent-filters="persistentFilters"
-        :persistent-expediente-search="persistentExpedienteSearch"
-        @apply-filters="handleApplyFilters"
-        @clear-filters="handleClearFilters"
-        @filter-change="handleFilterChange"
-        @search-expediente="handleExpedienteSearch"
-        @toggle-fullscreen="handleToggleFullscreen"
-      />
-    </template>
-  </FiltersDrawer>
-    <!-- <Drawer
-        v-model:visible="showFilters"
-        header="Filtros de Búsqueda"
-        position="right"
-        class="filters-drawer"
-        :style="{ width: drawerWidth }"
-        >
-      <template #header>
-        <div class="flex items-center justify-between w-full">
-          <h2 class="text-lg font-semibold text-slate-800">Filtros de Búsqueda de Expedientes</h2>
-          <div class="flex gap-2">
-            <Button
-              :icon="drawerFullScreen ? 'pi pi-compress' : 'pi pi-expand'"
-              :label="drawerFullScreen ? 'Ventana' : 'Pantalla Completa'"
-              outlined
-              size="small"
-              @click="toggleDrawerFullscreen"
-            />
-          </div>
-        </div>
+    <!-- USAR SOLO EL FILTERSDRAWER COMPONENT -->
+    <FiltersDrawer
+      v-model:visible="showFilters"
+      title="Filtros de Búsqueda de Expedientes"
+      :persistent-filters="persistentFilters"
+      :persistent-expediente-search="persistentExpedienteSearch"
+      @apply-filters="handleApplyFilters"
+      @clear-filters="handleClearFilters"
+      @filter-change="handleFilterChange"
+      @search-expediente="handleExpedienteSearch"
+      @toggle-fullscreen="handleToggleFullscreen"
+    >
+      <template #default="{ persistentFilters, persistentExpedienteSearch }">
+        <FilterPanel
+          :persistent-filters="persistentFilters"
+          :persistent-expediente-search="persistentExpedienteSearch"
+          @apply-filters="handleApplyFilters"
+          @clear-filters="handleClearFilters"
+          @filter-change="handleFilterChange"
+          @search-expediente="handleExpedienteSearch"
+          @toggle-fullscreen="handleToggleFullscreen"
+        />
       </template>
-
-      <FilterPanel
-        :persistent-filters="persistentFilters"
-        :persistent-expediente-search="persistentExpedienteSearch"
-        @apply-filters="handleApplyFilters"
-        @clear-filters="handleClearFilters"
-        @filter-change="handleFilterChange"
-        @search-expediente="handleExpedienteSearch"
-        @toggle-fullscreen="handleToggleFullscreen"
-      />
-    </Drawer> -->
+    </FiltersDrawer>
 
     <!-- Dialog de detalles del expediente -->
     <Dialog
@@ -239,76 +216,84 @@
     >
       <div class="expediente-detail-content" v-if="selectedExpediente">
         <div class="detail-tabs">
-          <TabView>
-            <TabPanel header="Información General">
-              <div class="detail-section">
-                <div class="detail-grid">
-                  <div class="detail-item">
-                    <label>Número de Expediente:</label>
-                    <span class="expediente-code">{{ selectedExpediente.numero }}</span>
-                  </div>
-                  <div class="detail-item">
-                    <label>Cartera:</label>
-                    <span>{{ selectedExpediente.cartera }}</span>
-                  </div>
-                  <div class="detail-item">
-                    <label>Nombre Titular:</label>
-                    <span>{{ selectedExpediente.nombreTitular }}</span>
-                  </div>
-                  <div class="detail-item">
-                    <label>Principal:</label>
-                    <span class="money-amount">{{ formatCurrency(selectedExpediente.principal) }}</span>
-                  </div>
-                </div>
-              </div>
-            </TabPanel>
+          <Tabs value="0">
+            <TabList>
+              <Tab value="0">Información General</Tab>
+              <Tab value="1">Fechas</Tab>
+              <Tab value="2">Importes</Tab>
+            </TabList>
             
-            <TabPanel header="Fechas">
-              <div class="detail-section">
-                <div class="detail-grid">
-                  <div class="detail-item">
-                    <label>Fecha de Envío:</label>
-                    <span>{{ formatDate(selectedExpediente.fechaEnvio) }}</span>
-                  </div>
-                  <div class="detail-item">
-                    <label>Fecha de Presentación:</label>
-                    <span>{{ formatDate(selectedExpediente.fechaPresentacion) }}</span>
-                  </div>
-                  <div class="detail-item">
-                    <label>Fecha de Admisión:</label>
-                    <span>{{ formatDate(selectedExpediente.fechaAdmision) }}</span>
-                  </div>
-                  <div class="detail-item">
-                    <label>Última Gestión:</label>
-                    <span>{{ formatDate(selectedExpediente.ultFechaGesExp) }}</span>
-                  </div>
-                </div>
-              </div>
-            </TabPanel>
-            
-            <TabPanel header="Importes">
-              <div class="detail-section">
-                <div class="detail-grid">
-                  <div class="detail-item">
-                    <label>Principal:</label>
-                    <span class="money-amount">{{ formatCurrency(selectedExpediente.principal) }}</span>
-                  </div>
-                  <div class="detail-item">
-                    <label>Intereses:</label>
-                    <span class="money-amount">{{ formatCurrency(selectedExpediente.intereses) }}</span>
-                  </div>
-                  <div class="detail-item">
-                    <label>Costas:</label>
-                    <span class="money-amount">{{ formatCurrency(selectedExpediente.costas) }}</span>
-                  </div>
-                  <div class="detail-item">
-                    <label>Ingresos Judiciales:</label>
-                    <span class="money-amount">{{ formatCurrency(selectedExpediente.ingJud) }}</span>
+            <TabPanels>
+              <TabPanel value="0">
+                <div class="detail-section">
+                  <div class="detail-grid">
+                    <div class="detail-item">
+                      <label>Número de Expediente:</label>
+                      <span class="expediente-code">{{ selectedExpediente.numero }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <label>Cartera:</label>
+                      <span>{{ selectedExpediente.cartera }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <label>Nombre Titular:</label>
+                      <span>{{ selectedExpediente.nombreTitular }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <label>Principal:</label>
+                      <span class="money-amount">{{ formatCurrency(selectedExpediente.principal) }}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </TabPanel>
-          </TabView>
+              </TabPanel>
+              
+              <TabPanel value="1">
+                <div class="detail-section">
+                  <div class="detail-grid">
+                    <div class="detail-item">
+                      <label>Fecha de Envío:</label>
+                      <span>{{ formatDate(selectedExpediente.fechaEnvio) }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <label>Fecha de Presentación:</label>
+                      <span>{{ formatDate(selectedExpediente.fechaPresentacion) }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <label>Fecha de Admisión:</label>
+                      <span>{{ formatDate(selectedExpediente.fechaAdmision) }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <label>Última Gestión:</label>
+                      <span>{{ formatDate(selectedExpediente.ultFechaGesExp) }}</span>
+                    </div>
+                  </div>
+                </div>
+              </TabPanel>
+              
+              <TabPanel value="2">
+                <div class="detail-section">
+                  <div class="detail-grid">
+                    <div class="detail-item">
+                      <label>Principal:</label>
+                      <span class="money-amount">{{ formatCurrency(selectedExpediente.principal) }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <label>Intereses:</label>
+                      <span class="money-amount">{{ formatCurrency(selectedExpediente.intereses) }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <label>Costas:</label>
+                      <span class="money-amount">{{ formatCurrency(selectedExpediente.costas) }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <label>Ingresos Judiciales:</label>
+                      <span class="money-amount">{{ formatCurrency(selectedExpediente.ingJud) }}</span>
+                    </div>
+                  </div>
+                </div>
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
         </div>
       </div>
       
@@ -332,13 +317,14 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import Button from 'primevue/button'
-import Drawer from 'primevue/drawer'
-import Breadcrumb from 'primevue/breadcrumb'
 import Dialog from 'primevue/dialog'
-import TabView from 'primevue/tabview'
+import Tabs from 'primevue/tabs'
+import TabList from 'primevue/tablist'
+import Tab from 'primevue/tab'
+import TabPanels from 'primevue/tabpanels'
 import TabPanel from 'primevue/tabpanel'
 import Tag from 'primevue/tag'
 import SearchBar from '@/components/SearchBar.vue'
@@ -346,9 +332,9 @@ import ExpedientesTable from '@/components/expedientes/ExpedientesTable.vue'
 import FilterPanel from '@/components/filters/FilterPanel.vue'
 import FiltersDrawer from '@/components/filters/FiltersDrawer.vue'
 import { useExpedientesStore } from '@/stores/expedientes'
-import { useFilterPanel } from '@/composables/useFilterPanel'
 import { useFiltersDrawer } from '@/composables/useFiltersDrawer'
 import { useToast } from '@/composables/useToast'
+import { usePersistentView } from '@/composables/usePersistentView'
 
 // Composables
 const router = useRouter()
@@ -356,91 +342,53 @@ const route = useRoute()
 const expedientesStore = useExpedientesStore()
 const { showSuccess, showWarn, showError } = useToast()
 
-// Estado local - SIMILAR AL DASHBOARD
-const searchQuery = ref('')
-const showFilters = ref(false)
-const showExpedienteDetail = ref(false)
-const selectedExpediente = ref(null)
-const drawerFullScreen = ref(false)
-
-// Estado persistente de filtros - IGUAL QUE EN DASHBOARD
-const persistentFilters = ref({})
-const persistentExpedienteSearch = ref('')
-
-// Filtros usando el mismo composable
+// 🎯 USAR SOLO EL COMPOSABLE FILTERSDRAWER - SIN DUPLICACIONES
 const {
-  filters,
-  activeFilters,
-  getFilterLabel,
-  getFilterValue,
-  clearFilter: clearSingleFilter,
-  clearAllFilters: clearAllFiltersLogic,
-  applyFilters: applyFiltersLogic,
-  normalizeFilters
-} = useFilterPanel()
-
-const {
+  // Estado del drawer
   showFilters,
   persistentFilters,
   persistentExpedienteSearch,
+  
+  // Computed
   totalActiveFilters,
   activeFiltersDisplay,
+  
+  // Métodos del drawer
   toggleFilters,
+  
+  // Métodos de filtros
   handleApplyFilters,
   handleClearFilters,
   handleFilterChange,
   handleExpedienteSearch,
   handleToggleFullscreen,
+  
+  // Métodos de filtros individuales
   removeFilter,
   clearAllFilters,
+  
+  // Métodos de configuración
   loadFiltersFromQuery
 } = useFiltersDrawer({
   enableRedirection: false // Sin redirección en ExpedientesView
 })
 
-// Computed
-const drawerWidth = computed(() => drawerFullScreen.value ? '100vw' : '50rem')
-
-const breadcrumbItems = ref([
-  { label: 'Inicio', route: '/dashboard' },
-  { label: 'Expedientes', route: '/expedientes' }
-])
-
-const totalActiveFilters = computed(() => {
-  let count = 0
-  Object.entries(persistentFilters.value).forEach(([key, value]) => {
-    if (value !== null && value !== '' && value !== undefined) {
-      if (Array.isArray(value)) {
-        const validItems = value.filter(v => v !== null && v !== '' && v !== undefined)
-        if (validItems.length > 0) {
-          count++
-        }
-      } else {
-        count++
-      }
-    }
-  })
-  return count
+// 🎯 PERSISTENCIA USANDO EL PATRÓN SIMPLIFICADO
+const {
+  searchQuery,
+  setupUrlSync,
+  restoreState,
+  markAsInitialized
+} = usePersistentView({
+  searchStore: expedientesStore,
+  searchMethod: 'searchExpedientes',
+  enableAutoSearch: true,
+  debugName: 'ExpedientesView'
 })
 
-const activeFiltersDisplay = computed(() => {
-  const filters = []
-  Object.entries(activeFilters.value).forEach(([key, value]) => {
-    if (value !== null && value !== '' && value !== undefined) {
-      const label = getFilterLabel(key)
-      const displayValue = getFilterValue(key, value)
-      if (displayValue) {
-        filters.push({
-          key,
-          label,
-          value: displayValue,
-          display: `${label}: ${displayValue}`
-        })
-      }
-    }
-  })
-  return filters
-})
+// Estado local ESPECÍFICO de esta vista (NO duplicar filtros)
+const showExpedienteDetail = ref(false)
+const selectedExpediente = ref(null)
 
 // Estadísticas computadas
 const activeExpedientesCount = computed(() => {
@@ -480,7 +428,7 @@ const formatDate = (date) => {
   })
 }
 
-// Métodos de eventos - MISMA LÓGICA QUE DASHBOARD
+// Métodos de búsqueda LOCALES (sincronizados con el composable)
 const handleSearch = async () => {
   if (!searchQuery.value.trim()) {
     showWarn('Búsqueda vacía', 'Por favor ingrese un criterio de búsqueda')
@@ -490,7 +438,7 @@ const handleSearch = async () => {
   try {
     console.log('🔍 Búsqueda desde ExpedientesView:', searchQuery.value.trim())
     
-    // Sincronizar con persistentExpedienteSearch
+    // Sincronizar con el composable
     persistentExpedienteSearch.value = searchQuery.value.trim()
     
     // Usar el store para buscar
@@ -514,100 +462,12 @@ const handleClearSearch = () => {
 const handleClearAll = () => {
   searchQuery.value = ''
   persistentExpedienteSearch.value = ''
-  persistentFilters.value = {}
-  clearAllFiltersLogic()
+  clearAllFilters()
   expedientesStore.clearResults()
   showSuccess('Filtros limpiados', 'Se han eliminado todos los filtros y criterios de búsqueda')
 }
 
-const toggleFilters = () => {
-  showFilters.value = !showFilters.value
-  if (showFilters.value) {
-    drawerFullScreen.value = false
-  }
-}
-
-const toggleDrawerFullscreen = () => {
-  drawerFullScreen.value = !drawerFullScreen.value
-}
-
-// Métodos de filtros - IGUAL QUE DASHBOARD
-// const handleApplyFilters = async (filterData) => {
-//   console.log('📋 Aplicando filtros desde FilterPanel:', filterData)
-  
-//   // Guardar filtros persistentemente
-//   persistentFilters.value = { ...filterData }
-  
-//   // Cerrar panel de filtros
-//   showFilters.value = false
-  
-//   // Sincronizar con resultados del store si existen
-//   if (expedientesStore.hasExpedientes) {
-//     console.log('🔄 Filtros aplicados y sincronizados')
-//   }
-  
-//   console.log('✅ Filtros guardados correctamente')
-// }
-
-// const handleClearFilters = () => {
-//   console.log('Limpiando todos los filtros')
-  
-//   // Limpiar estado persistente
-//   persistentFilters.value = {}
-//   persistentExpedienteSearch.value = ''
-  
-//   // Limpiar búsquedas
-//   searchQuery.value = ''
-//   expedientesStore.clearResults()
-  
-//   console.log('✅ Filtros y búsquedas limpiados completamente')
-// }
-
-// const handleFilterChange = (filterData) => {
-//   console.log('Filtros cambiados:', filterData)
-  
-//   // Actualizar filtros persistentes en tiempo real
-//   persistentFilters.value = { ...filterData }
-// }
-
-// const handleExpedienteSearch = async (expediente) => {
-//   console.log('🔍 Búsqueda desde FilterPanel:', expediente)
-  
-//   // Sincronizar estados
-//   persistentExpedienteSearch.value = expediente || ''
-  
-//   if (expediente !== searchQuery.value) {
-//     searchQuery.value = expediente || ''
-//   }
-  
-//   // Los resultados ya están en el store desde FilterPanel
-//   if (expedientesStore.hasExpedientes) {
-//     console.log('🔄 Resultados sincronizados desde FilterPanel')
-//   }
-// }
-
-// const handleToggleFullscreen = (isFullscreen) => {
-//   drawerFullScreen.value = isFullscreen
-//   console.log('Sidebar fullscreen desde FilterPanel:', isFullscreen)
-// }
-
-// const removeFilter = (filterKey) => {
-//   clearSingleFilter(filterKey)
-//   // Re-aplicar búsqueda automáticamente si hay búsqueda activa
-//   if (searchQuery.value) {
-//     handleSearch()
-//   }
-// }
-
-// const clearAllFilters = () => {
-//   clearAllFiltersLogic()
-//   persistentFilters.value = {}
-//   if (searchQuery.value) {
-//     handleSearch()
-//   }
-// }
-
-// Métodos de tabla - USANDO EL COMPONENTE EXISTENTE
+// Métodos de tabla
 const handlePageChange = async (page) => {
   await expedientesStore.changePage(page)
 }
@@ -625,36 +485,26 @@ const createNewExpediente = () => {
 
 const editExpediente = () => {
   if (selectedExpediente.value) {
-    router.push(`/expedientes/${selectedExpediente.value.id}/edit`)
+    showWarn(
+      'Funcionalidad en desarrollo',
+      `Edición del expediente ${selectedExpediente.value.numero} no está implementada aún`
+    )
   }
 }
 
-// Lifecycle - CARGAR DATOS DESDE URL COMO EN DASHBOARD
+// 🔧 LIFECYCLE SIMPLIFICADO Y CORREGIDO
 onMounted(async () => {
   console.log('ExpedientesView cargado')
   
-  // Cargar filtros desde la URL
-  loadFiltersFromQuery(route.query)
+  // Restaurar estado desde URL automáticamente
+  await restoreState(persistentFilters, persistentExpedienteSearch, loadFiltersFromQuery)
   
-  // Realizar búsqueda inicial si hay parámetros
-  const hasSearchParams = route.query.search || Object.keys(route.query).length > 1
-  if (hasSearchParams) {
-    await handleExpedienteSearch(route.query.search)
-  }
+  // Configurar sincronización automática
+  setupUrlSync(persistentFilters)
   
-  console.log('✅ ExpedientesView inicializado')
+  // Marcar como inicializado
+  markAsInitialized()
 })
-
-// Watchers para sincronizar con la URL - IGUAL QUE DASHBOARD
-watch([searchQuery, persistentFilters], ([newSearch, newFilters]) => {
-  const query = { ...newFilters }
-  if (newSearch) {
-    query.search = newSearch
-  }
-  
-  // Actualizar URL sin recargar la página
-  router.replace({ query })
-}, { deep: true })
 </script>
 
 <style scoped>
@@ -668,7 +518,7 @@ watch([searchQuery, persistentFilters], ([newSearch, newFilters]) => {
 
 /* ===== HEADER DE LA PÁGINA ===== */
 .page-header {
-  margin-bottom: var(--iggsad-spacing-2xl);
+  margin-bottom: var(--iggsad-spacing-md);
 }
 
 .header-content {
@@ -677,7 +527,7 @@ watch([searchQuery, persistentFilters], ([newSearch, newFilters]) => {
   align-items: flex-start;
   margin-bottom: var(--iggsad-spacing-lg);
   background: var(--iggsad-surface-white);
-  padding: var(--iggsad-spacing-xl);
+  padding: var(--iggsad-spacing-lg);
   border-radius: var(--iggsad-radius-lg);
   box-shadow: var(--iggsad-shadow-md);
 }
@@ -724,53 +574,96 @@ watch([searchQuery, persistentFilters], ([newSearch, newFilters]) => {
   box-shadow: var(--iggsad-shadow-lg);
 }
 
-.page-breadcrumb {
+/* ===== SECCIÓN DE BÚSQUEDA Y ESTADÍSTICAS EN DOS COLUMNAS ===== */
+.search-and-stats-section {
   background: var(--iggsad-surface-white);
-  padding: var(--iggsad-spacing-md) var(--iggsad-spacing-lg);
-  border-radius: var(--iggsad-radius-md);
-  border: 1px solid var(--iggsad-surface-200);
-}
-
-/* ===== SECCIÓN DE BÚSQUEDA ===== */
-.search-section {
-  background: var(--iggsad-surface-white);
-  padding: var(--iggsad-spacing-xl);
   border-radius: var(--iggsad-radius-lg);
   box-shadow: var(--iggsad-shadow-md);
   margin-bottom: var(--iggsad-spacing-xl);
+  overflow: visible;
+  position: relative;
+  z-index: 1;
 }
 
-.search-container {
+.search-and-stats-container {
+  display: grid;
+  grid-template-columns: 1fr 800px;
+  gap: var(--iggsad-spacing-2xl);
+  padding: var(--iggsad-spacing-xl);
+  align-items: start;
+  width: 100%; /* 🔧 FIX: Asegurar que usa todo el ancho disponible */
+}
+
+/* ===== COLUMNA IZQUIERDA: BÚSQUEDA ALINEADA A LA IZQUIERDA ===== */
+.search-column {
+  min-width: 0;
   display: flex;
+  flex-direction: column;
+  /* 🔧 FIX: Contenido alineado a la izquierda */
+  align-items: flex-start;
+}
+
+.search-area {
+  display: flex;
+  flex-direction: column;
   gap: var(--iggsad-spacing-lg);
-  align-items: flex-end;
-  margin-bottom: var(--iggsad-spacing-lg);
+  width: 100%; /* 🔧 FIX: Usar todo el ancho disponible */
+  /* 🔧 FIX: Contenido alineado a la izquierda */
+  align-items: flex-start;
+}
+
+.filters-button-container {
+  /* 🔧 FIX: Botón alineado a la izquierda */
+  align-self: flex-start;
+}
+
+.filters-button {
+  transition: all var(--iggsad-transition-fast);
+}
+
+.filters-button:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--iggsad-shadow-md);
 }
 
 .search-input-wrapper {
-  flex: 1;
+  width: 100%;
 }
 
 .search-actions {
   display: flex;
-  gap: var(--iggsad-spacing-sm);
+  gap: var(--iggsad-spacing-md);
+  /* 🔧 FIX: Botones alineados a la izquierda */
+  align-self: flex-start;
 }
 
 .search-btn {
   background: var(--iggsad-primary-600);
   border-color: var(--iggsad-primary-600);
+  transition: all var(--iggsad-transition-fast);
 }
 
-.search-btn:hover {
+.search-btn:hover:not(:disabled) {
   background: var(--iggsad-primary-700);
   border-color: var(--iggsad-primary-700);
   transform: translateY(-2px);
+  box-shadow: var(--iggsad-shadow-lg);
 }
 
-/* Filtros activos */
+.clear-btn {
+  transition: all var(--iggsad-transition-fast);
+}
+
+.clear-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--iggsad-shadow-md);
+}
+
+/* Filtros activos (sin border-top, ya está integrado) */
 .active-filters {
-  border-top: 1px solid var(--iggsad-surface-200);
-  padding-top: var(--iggsad-spacing-lg);
+  /* 🔧 FIX: Sin border-top para integración más fluida */
+  padding-top: 0;
+  margin-top: var(--iggsad-spacing-md);
 }
 
 .filters-header {
@@ -814,42 +707,51 @@ watch([searchQuery, persistentFilters], ([newSearch, newFilters]) => {
   opacity: 1;
 }
 
-/* ===== ESTADÍSTICAS ===== */
-.stats-section {
-  margin-bottom: var(--iggsad-spacing-xl);
+/* ===== COLUMNA DERECHA: ESTADÍSTICAS BALANCEADAS ===== */
+.stats-column {
+  width: 100%; /* 🔧 FIX: Usar todo el ancho asignado */
+  flex-shrink: 0;
 }
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
   gap: var(--iggsad-spacing-lg);
+  height: fit-content;
 }
 
 .stat-card {
   background: var(--iggsad-surface-white);
   padding: var(--iggsad-spacing-lg);
-  border-radius: var(--iggsad-radius-lg);
-  box-shadow: var(--iggsad-shadow-md);
+  border-radius: var(--iggsad-radius-md);
+  border: 1px solid var(--iggsad-surface-200);
   display: flex;
   align-items: center;
   gap: var(--iggsad-spacing-md);
   transition: all var(--iggsad-transition-fast);
+  /* 🔧 FIX: Altura fija para que todas las cards sean iguales */
+  height: 90px;
+  /* 🔧 FIX: Ancho fijo para que todas sean iguales */
+  min-width: 0;
 }
 
 .stat-card:hover {
   transform: translateY(-2px);
-  box-shadow: var(--iggsad-shadow-lg);
+  box-shadow: var(--iggsad-shadow-md);
+  border-color: var(--iggsad-surface-300);
 }
 
 .stat-icon {
-  width: 3rem;
+  width: 3rem; /* 🔧 FIX: Iconos más grandes */
   height: 3rem;
   border-radius: var(--iggsad-radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
+  font-size: 1.25rem; /* 🔧 FIX: Iconos más grandes */
   color: white;
+  flex-shrink: 0;
 }
 
 .stat-icon.total { background: var(--iggsad-primary-600); }
@@ -859,6 +761,9 @@ watch([searchQuery, persistentFilters], ([newSearch, newFilters]) => {
 
 .stat-content {
   flex: 1;
+  min-width: 0;
+  /* 🔧 FIX: Evitar que el contenido afecte el tamaño de las cards */
+  overflow: hidden;
 }
 
 .stat-number {
@@ -868,12 +773,20 @@ watch([searchQuery, persistentFilters], ([newSearch, newFilters]) => {
   color: var(--iggsad-surface-800);
   line-height: 1;
   margin-bottom: 0.25rem;
+  /* 🔧 FIX: Manejo de texto largo mejorado */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .stat-label {
   color: var(--iggsad-surface-600);
   font-size: 0.875rem;
   font-weight: 500;
+  line-height: 1.2;
+  /* 🔧 FIX: Permitir wrap en labels para que se vean completas */
+  white-space: normal;
+  word-wrap: break-word;
 }
 
 /* ===== SECCIÓN DE TABLA ===== */
@@ -881,55 +794,14 @@ watch([searchQuery, persistentFilters], ([newSearch, newFilters]) => {
   background: var(--iggsad-surface-white);
   border-radius: var(--iggsad-radius-lg);
   box-shadow: var(--iggsad-shadow-md);
+  overflow: visible;
+  position: relative;
+}
+
+/* 🔧 FIX: Solo aplicar overflow hidden al contenido interno de la tabla */
+.table-section :deep(.p-datatable-wrapper) {
   overflow: hidden;
-}
-
-/* ===== SIDEBAR DE FILTROS ===== */
-/* :deep(.filters-sidebar) {
-  .p-sidebar-header {
-    background: linear-gradient(135deg, var(--iggsad-surface-50) 0%, var(--iggsad-surface-100) 100%);
-    border-bottom: 2px solid var(--iggsad-surface-200);
-    padding: var(--iggsad-spacing-lg);
-  }
-
-  .p-sidebar-content {
-    padding: 0;
-  }
-}
-
-.sidebar-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-}
-
-.sidebar-title {
-  display: flex;
-  align-items: center;
-  gap: var(--iggsad-spacing-sm);
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--iggsad-surface-800);
-  margin: 0;
-}
-
-.sidebar-actions {
-  display: flex;
-  gap: var(--iggsad-spacing-sm);
-} */
-
-/* ===== DRAWER DE FILTROS ===== */
-:deep(.filters-drawer) {
-  .p-drawer-header {
-    background: linear-gradient(135deg, var(--iggsad-surface-50) 0%, var(--iggsad-surface-100) 100%);
-    border-bottom: 2px solid var(--iggsad-surface-200);
-    padding: var(--iggsad-spacing-lg);
-  }
-
-  .p-drawer-content {
-    padding: 0;
-  }
+  border-radius: var(--iggsad-radius-lg);
 }
 
 /* ===== DIALOG DE DETALLES ===== */
@@ -1019,22 +891,38 @@ watch([searchQuery, persistentFilters], ([newSearch, newFilters]) => {
     justify-content: center;
   }
 
-  .search-container {
-    flex-direction: column;
-    gap: var(--iggsad-spacing-md);
+  .search-and-stats-container {
+    grid-template-columns: 1fr;
+    gap: var(--iggsad-spacing-lg);
   }
 
-  .search-actions {
-    justify-content: stretch;
-  }
-
-  .search-actions .search-btn,
-  .search-actions .clear-btn {
-    flex: 1;
+  .stats-column {
+    width: 100%;
+    order: -1; /* Mostrar estadísticas arriba en tablet */
   }
 
   .stats-grid {
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--iggsad-spacing-sm);
+  }
+
+  .stat-card {
+    padding: var(--iggsad-spacing-sm);
+    min-height: 60px;
+  }
+
+  .stat-icon {
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.875rem;
+  }
+
+  .stat-number {
+    font-size: 1.125rem;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
   }
 }
 
@@ -1049,18 +937,48 @@ watch([searchQuery, persistentFilters], ([newSearch, newFilters]) => {
   }
 
   .header-content,
-  .search-section,
+  .search-and-stats-section,
   .table-section {
     border-radius: var(--iggsad-radius-md);
   }
 
-  .stats-grid {
-    grid-template-columns: 1fr;
+  .search-and-stats-container {
+    padding: var(--iggsad-spacing-lg);
+  }
+
+  .search-area {
     gap: var(--iggsad-spacing-md);
   }
 
+  .search-actions {
+    flex-direction: column;
+    gap: var(--iggsad-spacing-sm);
+  }
+
+  .search-btn,
+  .clear-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: var(--iggsad-spacing-sm);
+  }
+
   .stat-card {
-    padding: var(--iggsad-spacing-md);
+    flex-direction: column;
+    text-align: center;
+    padding: var(--iggsad-spacing-sm);
+    gap: var(--iggsad-spacing-xs);
+    min-height: auto;
+  }
+
+  .stat-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   .filters-list {
@@ -1086,6 +1004,41 @@ watch([searchQuery, persistentFilters], ([newSearch, newFilters]) => {
 
   .page-subtitle {
     font-size: 1rem;
+  }
+
+  .search-and-stats-container {
+    padding: var(--iggsad-spacing-md);
+  }
+
+  .filters-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: var(--iggsad-spacing-xs);
+  }
+
+  .stat-card {
+    flex-direction: row;
+    text-align: left;
+    justify-content: flex-start;
+    min-height: 50px;
+  }
+
+  .stat-icon {
+    width: 1.75rem;
+    height: 1.75rem;
+    font-size: 0.75rem;
+  }
+
+  .stat-number {
+    font-size: 1rem;
+  }
+
+  .stat-label {
+    font-size: 0.6875rem;
   }
 
   .detail-grid {
@@ -1152,5 +1105,4 @@ watch([searchQuery, persistentFilters], ([newSearch, newFilters]) => {
 .stat-card:nth-child(2) { animation-delay: 0.2s; }
 .stat-card:nth-child(3) { animation-delay: 0.3s; }
 .stat-card:nth-child(4) { animation-delay: 0.4s; }
-
 </style>

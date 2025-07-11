@@ -1,5 +1,5 @@
 // src/composables/useUserProfile.js
-import { reactive, computed, watch, onMounted } from 'vue'
+import { reactive, computed, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { getDefaultUserProfile } from '@/utils/defaultUserProfile'
 
@@ -62,12 +62,7 @@ export function useUserProfile() {
     await saveProfile()
   }
 
-  // 6. Auto‐load al montar el layout
-  onMounted(() => {
-    loadProfile()
-  })
-
-  // 7. Auto‐save al cambiar layout (útil para que "se registre automáticamente")
+  // 6. Auto‐save al cambiar layout (útil para que "se registre automáticamente")
   watch(
     () => profile.dashboard?.layout,
     () => {

@@ -31,18 +31,18 @@
 
     <!-- Barra de búsqueda principal -->
     <div class="">
-      <div class="flex gap-6">  <!-- Cambiar gap-3 por gap-6 -->
+      <div class="flex gap-6">
         <div class="flex-1">
           <SearchBar
             v-model="searchQuery"
             placeholder="Buscar expedientes por número, cliente, tipo..."
             :show-validation="true"
             validation-message="Ingrese un número de expediente"
-            @search="performSearch"
-            @clear="clearSearchFromBothSources"
+            @search="performSearchAndRedirect"
+            @clear="clearSearch"
           />
         </div>
-        <div class="flex gap-3">  <!-- Agrupar botones en su propio contenedor -->
+        <div class="flex gap-3">
           <Button 
             icon="pi pi-filter" 
             label="Filtros"
@@ -66,7 +66,6 @@
 
     <!-- Grid Dashboard Intuitivo -->
     <div class="mb-8 mt-6">
-
       <!-- Grid Principal -->
       <div class="dashboard-grid-section" :class="{ 'config-mode-active': isConfigMode }">
         <!-- Banner de modo configuración -->
@@ -100,7 +99,7 @@
       </div>
     </div>
 
-    <!-- Componente Dock personalizado ORIGINAL -->
+    <!-- Componente Dock personalizado -->
     <Dock 
       :items="dockItems"
       @item-click="handleDockClick"
@@ -111,61 +110,53 @@
       :auto-hide="false"
     />
 
-    <!-- Drawer de filtros avanzado ORIGINAL -->
-    <Drawer 
-      v-model:visible="showFilters" 
-      header="Filtros de Búsqueda"
-      position="right" 
-      class="filters-drawer" 
-      :style="{ width: drawerWidth }"
+    <!-- USAR SOLO EL FILTERSDRAWER COMPONENT -->
+    <FiltersDrawer
+      v-model:visible="showFilters"
+      title="Filtros de Búsqueda de Expedientes"
+      :persistent-filters="persistentFilters"
+      :persistent-expediente-search="persistentExpedienteSearch"
+      @apply-filters="handleApplyFilters"
+      @clear-filters="handleClearFilters"
+      @filter-change="handleFilterChange"
+      @search-expediente="handleExpedienteSearchAndRedirect"
+      @toggle-fullscreen="handleToggleFullscreen"
     >
-      <template #header>
-        <div class="flex items-center justify-between w-full">
-          <h2 class="text-lg font-semibold text-slate-800">Filtros de Búsqueda de Expedientes</h2>
-          <div class="flex gap-2">
-            <Button 
-              :icon="drawerFullscreen ? 'pi pi-compress' : 'pi pi-expand'"
-              :label="drawerFullscreen ? 'Ventana' : 'Pantalla Completa'"
-              outlined 
-              size="small"
-              class="text-xs"
-              @click="toggleDrawerFullscreen"
-            />
-          </div>
-        </div>
+      <template #default="{ persistentFilters, persistentExpedienteSearch }">
+        <FilterPanel
+          :persistent-filters="persistentFilters"
+          :persistent-expediente-search="persistentExpedienteSearch"
+          @apply-filters="handleApplyFilters"
+          @clear-filters="handleClearFilters"
+          @filter-change="handleFilterChange"
+          @search-expediente="handleExpedienteSearchAndRedirect"
+          @toggle-fullscreen="handleToggleFullscreen"
+        />
       </template>
-
-      <FilterPanel 
-        :persistent-filters="persistentFilters"
-        :persistent-expediente-search="persistentExpedienteSearch"
-        @apply-filters="handleApplyFilters"
-        @clear-filters="handleClearFilters"
-        @filter-change="handleFilterChange"
-        @search-expediente="handleExpedienteSearchAndRedirect"
-        @toggle-fullscreen="handleToggleFullscreen"
-      />
-    </Drawer>
+    </FiltersDrawer>
 
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Button from 'primevue/button'
-import Drawer from 'primevue/drawer'
 import Dock from '@/components/Dock.vue'
 import FilterPanel from '@/components/filters/FilterPanel.vue'
+import FiltersDrawer from '@/components/filters/FiltersDrawer.vue'
 import SearchBar from '@/components/SearchBar.vue'
 import { useExpedientesStore } from '@/stores/expedientes'
 import { useToast } from '@/composables/useToast'
 import { useUserProfile } from '@/composables/useUserProfile'
 
-
-//Componente del grid intuitivo
+// Componente del grid intuitivo
 import DashboardGrid from '@/components/dashboard/DashboardGrid.vue'
 import { useUserDashboard } from '@/composables/useUserDashboard'
 import { useAuthStore } from '@/stores/auth'
+
+// 🎯 USAR SOLO EL COMPOSABLE FILTERSDRAWER - SIN DUPLICACIONES
+import { useFiltersDrawer } from '@/composables/useFiltersDrawer'
 
 const router = useRouter()
 const { showWarn, showError, showSuccess } = useToast()
@@ -185,26 +176,77 @@ const {
 } = useUserDashboard()
 
 const { addRecentSearch } = useUserProfile()
-
-const drawerWidth = computed(() => drawerFullScreen.value ? '100vw' : '50rem')
-// Estado reactivo ORIGINAL
-const searchQuery = ref('')
-const showFilters = ref(false)
-const searchResults = ref([])
-const lastAccess = ref('14 Jun 2025, 09:30')
-const showExpedientesDrawer = ref(false)
-
-// Estado persistente de filtros ORIGINAL
-const persistentFilters = ref({})
-const persistentExpedienteSearch = ref('')
-const drawerFullscreen = ref(false)
-
 const expedientesStore = useExpedientesStore()
 
-// Mensaje global del sistema ORIGINAL
+// 🎯 USAR SOLO EL COMPOSABLE FILTERSDRAWER CON REDIRECCIÓN
+const {
+  // Estado del drawer
+  showFilters,
+  persistentFilters,
+  persistentExpedienteSearch,
+  
+  // Computed
+  totalActiveFilters,
+  
+  // Métodos del drawer
+  toggleFilters,
+  
+  // Métodos de filtros
+  handleApplyFilters,
+  handleClearFilters,
+  handleFilterChange,
+  handleExpedienteSearch,
+  handleToggleFullscreen
+} = useFiltersDrawer({
+  enableRedirection: true,
+  redirectCallback: async (filterData, expedienteQuery) => {
+    // Callback personalizado para Dashboard con redirección
+    console.log('🔍 Redirección desde FilterPanel:', { filterData, expedienteQuery })
+    
+    try {
+      // 🔄 COMPORTAMIENTO ESPECÍFICO DEL DASHBOARD:
+      // 1. Hacer búsqueda
+      await expedientesStore.searchExpedientes(filterData, expedienteQuery)
+      
+      // 2. Añadir a historial de búsquedas recientes
+      await addRecentSearch({
+        id: Date.now(),
+        expediente: expedienteQuery.trim(),
+        cliente: expedientesStore.expedientes[0]?.nombreTitular || 'Cliente no encontrado',
+        deuda: expedientesStore.expedientes[0]?.principal ? `€${expedientesStore.expedientes[0].principal}` : '€0',
+        timestamp: new Date().toISOString()
+      })
+      
+      // Preparar parámetros para la URL
+      const queryParams = {
+        search: expedienteQuery.trim(),
+        ...filterData
+      }
+      
+      // 3. 🚀 REDIRIGIR a la vista de Expedientes
+      router.push({
+        name: 'Expedientes',
+        query: queryParams
+      })
+      
+      showSuccess('Búsqueda completada', 'Mostrando resultados en la vista de expedientes')
+      
+    } catch (error) {
+      console.error('❌ Error en redirección desde FilterPanel:', error)
+      showError('Error en la búsqueda', 'No se pudieron cargar los expedientes')
+    }
+  }
+})
+
+// Estado local ESPECÍFICO del Dashboard (NO duplicar filtros)
+const searchQuery = ref('')
+const searchResults = ref([])
+const lastAccess = ref('14 Jun 2025, 09:30')
+
+// Mensaje global del sistema
 const globalMessage = ref('Estamos a 23. Has recuperado 0,00 €. Muy lejos del objetivo de 0,00 €. Estás dando pérdidas.')
 
-// Datos ORIGINALES
+// Datos del dashboard
 const stats = ref({
   totalCases: 147,
   upcomingHearings: 12,
@@ -212,8 +254,7 @@ const stats = ref({
   totalClients: 89
 })
 
-
-// Items del Dock ORIGINALES
+// Items del Dock
 const dockItems = ref([
   {
     id: 'casos',
@@ -253,7 +294,7 @@ const dockItems = ref([
 const currentDashboardLayout = computed(() => dashboardLayout.value)
 const currentCardsConfig = computed(() => cardsConfig.value)
 
-// Datos dinámicos de las cards (obtenidos del composable)
+// Datos dinámicos de las cards
 const currentCardsData = computed(() => {
   const data = {}
   currentDashboardLayout.value.forEach(item => {
@@ -262,37 +303,14 @@ const currentCardsData = computed(() => {
   return data
 })
 
-
-// Calcular filtros activos desde el estado persistente ORIGINAL
-const totalActiveFilters = computed(() => {
-  let count = 0
-  
-  // NO contar la búsqueda por expediente como filtro
-  // Solo contar filtros del objeto persistente (NO la búsqueda)
-  Object.entries(persistentFilters.value).forEach(([key, value]) => {
-    if (value !== null && value !== '' && value !== undefined) {
-      if (Array.isArray(value)) {
-        const validItems = value.filter(v => v !== null && v !== '' && v !== undefined)
-        if (validItems.length > 0) {
-          count++
-        }
-      } else {
-        count++
-      }
-    }
-  })
-  
-  return count
-})
-
-// Computed para validar si se puede buscar ORIGINAL
+// Computed para validar si se puede buscar
 const canPerformSearch = computed(() => {
   const hasExpediente = (searchQuery.value && searchQuery.value.trim()) || 
                        (persistentExpedienteSearch.value && persistentExpedienteSearch.value.trim())
   return hasExpediente
 })
 
-// NUEVO: Métodos del grid
+// Métodos del grid
 const handleLayoutUpdate = async (newLayout) => {
   try {
     await updateDashboardLayout(newLayout)
@@ -342,100 +360,13 @@ const handleToggleConfigMode = () => {
   }
 }
 
-// Métodos ORIGINALES (SIN CAMBIOS)
-const toggleFilters = () => {
-  showFilters.value = !showFilters.value
-  // Siempre abrir en modo minimizado
-  if (showFilters.value) {
-    drawerFullscreen.value = false
-  }
-}
-
-// const addToRecentSearches = (query) => {
-//   const newSearch = {
-//     id: Date.now(),
-//     expediente: query.includes('EXP-') ? query : `EXP-2024-${Math.floor(Math.random() * 999).toString().padStart(3, '0')}`,
-//     cliente: query.includes('EXP-') ? 'Cliente Ejemplo' : query,
-//     deuda: `€${(Math.random() * 100000).toFixed(0)}`
-//   }
-  
-//   const exists = recentSearches.value.find(s => s.expediente === newSearch.expediente)
-//   if (!exists) {
-//     recentSearches.value.unshift(newSearch)
-//     if (recentSearches.value.length > 5) {
-//       recentSearches.value = recentSearches.value.slice(0, 5)
-//     }
-//   }
-// }
-
-const addToRecentSearches = async (query) => {
-  const searchData = {
-    id: Date.now(),
-    expediente: query.includes('EXP-') ? query : `EXP-2024-${Math.floor(Math.random() * 999).toString().padStart(3, '0')}`,
-    cliente: query.includes('EXP-') ? 
-      expedientesStore.expedientes[0]?.nombreTitular || 'Cliente no encontrado' : 
-      `Cliente para ${query}`,
-    deuda: expedientesStore.expedientes[0]?.principal ? 
-      `€${expedientesStore.expedientes[0].principal}` : 
-      `€${(Math.random() * 50000 + 1000).toFixed(2)}`,
-    timestamp: new Date().toISOString()
-  }
-  
-  // Usar useUserProfile para persistir
-  await addRecentSearch(searchData)
-  
-  console.log('📝 Búsqueda añadida al historial:', searchData)
-}
-
-// Método para mostrar mensaje de validación ORIGINAL
+// Método para mostrar mensaje de validación
 const showSearchValidation = () => {
   console.warn('⚠️ Debe ingresar un número de expediente para realizar la búsqueda')
-   showWarn(
+  showWarn(
     'Búsqueda requerida',
     'Debe ingresar un número de expediente para realizar la búsqueda'
   )
-}
-
-const performSearch = async () => {
-  const expedienteQuery = searchQuery.value || persistentExpedienteSearch.value
-  
-  if (!expedienteQuery || !expedienteQuery.trim()) {
-    console.warn('⚠️ No se puede buscar sin número de expediente')
-    showSearchValidation()
-    return
-  }
-  
-  try {
-    console.log('🔍 Iniciando búsqueda desde Dashboard:', expedienteQuery.trim())
-    
-    // NO actualizar persistentExpedienteSearch aquí si ya está igual
-    if (persistentExpedienteSearch.value !== expedienteQuery.trim()) {
-      persistentExpedienteSearch.value = expedienteQuery.trim()
-    }
-    
-    await expedientesStore.searchExpedientes(persistentFilters.value, expedienteQuery.trim())
-    // Abrimos el Drawer de resultados
-    showExpedientesDrawer.value = true
-
-    console.log('📂 Drawer de expedientes abierto con resultados ->', expedientesStore.expedientes)
-    searchResults.value = expedientesStore.expedientes.map(exp => ({
-      id: exp.id,
-      number: exp.numero,
-      client: exp.nombreTitular,               // ← antes 'exp.cliente'
-      lastUpdate: 'Hace 2h',
-      priority: exp.embargos === 'Sí' ? 'high' : 'normal',    // ejemplo de prioridad
-      status: exp.embargos === 'Sí' ? 'embargado' : 'normal',
-      statusText: exp.embargos
-    }))
-    
-    addToRecentSearches(expedienteQuery.trim())
-    
-    console.log('✅ Búsqueda desde Dashboard completada:', searchResults.value.length)
-    
-  } catch (error) {
-    console.error('❌ Error en búsqueda desde Dashboard:', error)
-    searchResults.value = []
-  }
 }
 
 const performSearchAndRedirect = async () => {
@@ -450,15 +381,13 @@ const performSearchAndRedirect = async () => {
   try {
     console.log('🔍 Búsqueda CON redirección desde Dashboard:', expedienteQuery.trim())
     
-    // Actualizar estado persistente
-    if (persistentExpedienteSearch.value !== expedienteQuery.trim()) {
-      persistentExpedienteSearch.value = expedienteQuery.trim()
-    }
+    // Sincronizar con el composable
+    persistentExpedienteSearch.value = expedienteQuery.trim()
     
     // Realizar búsqueda
     await expedientesStore.searchExpedientes(persistentFilters.value, expedienteQuery.trim())
     
-    // Añadir a búsquedas recientes usando useUserProfile
+    // Añadir a búsquedas recientes
     await addRecentSearch({
       id: Date.now(),
       expediente: expedienteQuery.trim(),
@@ -489,93 +418,15 @@ const performSearchAndRedirect = async () => {
   }
 }
 
-const clearSearchFromBothSources = () => {
+const clearSearch = () => {
   searchQuery.value = ''
   persistentExpedienteSearch.value = ''
   searchResults.value = []
   expedientesStore.clearResults()
-  console.log('🧹 Búsqueda limpiada desde ambas fuentes')
+  console.log('🧹 Búsqueda limpiada')
 }
 
-// Manejar filtros de forma persistente ORIGINAL
-const handleApplyFilters = async (filterData) => {
-  console.log('📋 Aplicando filtros desde FilterPanel:', filterData)
-  
-  // Guardar filtros persistentemente
-  persistentFilters.value = { ...filterData }
-  
-  // No hacer búsqueda automática aquí, ya la hace el FilterPanel
-  // Solo actualizar el estado local
-  console.log('✅ Filtros guardados correctamente')
-  // 2) Cerrar panel de filtros y abrir drawer de expedientes
-  showFilters.value = false
-  showExpedientesDrawer.value = true
-  
-  // Si tenemos resultados en el store, sincronizarlos
-  if (expedientesStore.hasExpedientes) {
-    searchResults.value = expedientesStore.expedientes.map(exp => ({
-      id: exp.id,
-      number: exp.numero,
-      client: exp.nombreTitular,               // ← antes 'exp.cliente'
-      lastUpdate: 'Hace 2h',
-      priority: exp.embargos === 'Sí' ? 'high' : 'normal',    // ejemplo de prioridad
-      status: exp.embargos === 'Sí' ? 'embargado' : 'normal',
-      statusText: exp.embargos
-    }))
-    console.log('🔄 Resultados sincronizados desde store:', searchResults.value.length)
-  }
-}
-
-// Metodos para gestión de filtros ORIGINALES
-const handleClearFilters = () => {
-  console.log('Limpiando todos los filtros')
-  
-  // Limpiar estado persistente
-  persistentFilters.value = {}
-  persistentExpedienteSearch.value = ''
-  
-  // Limpiar resultados y búsquedas
-  clearSearchFromBothSources()
-  
-  console.log('✅ Filtros y búsquedas limpiados completamente')
-}
-
-const handleFilterChange = (filterData) => {
-  console.log('Filtros cambiados:', filterData)
-  
-  // Actualizar filtros persistentes en tiempo real
-  persistentFilters.value = { ...filterData }
-}
-
-// const handleExpedienteSearch = async (expediente) => {
-//   console.log('🔍 Búsqueda desde FilterPanel:', expediente)
-  
-//   // Solo actualizar sin disparar watchers
-//   persistentExpedienteSearch.value = expediente || ''
-  
-//   // Sincronizar searchQuery directamente
-//   if (expediente !== searchQuery.value) {
-//     searchQuery.value = expediente || ''
-//   }
-  
-//   // Los resultados ya están en el store desde FilterPanel
-//   if (expedientesStore.hasExpedientes) {
-//     searchResults.value = expedientesStore.expedientes.map(exp => ({
-//       id: exp.id,
-//       number: exp.numero,
-//       client: exp.nombreTitular,               // ← antes 'exp.cliente'
-//       lastUpdate: 'Hace 2h',
-//       priority: exp.embargos === 'Sí' ? 'high' : 'normal',    // ejemplo de prioridad
-//       status: exp.embargos === 'Sí' ? 'embargado' : 'normal',
-//       statusText: exp.embargos
-//     }))
-    
-//     if (expediente) {
-//       addToRecentSearches(expediente)
-//     }
-//   }
-// }
-
+// Método personalizado para búsqueda con redirección desde FilterPanel
 const handleExpedienteSearchAndRedirect = async (expediente) => {
   console.log('🔍 Búsqueda desde FilterPanel CON redirección:', expediente)
   
@@ -584,57 +435,11 @@ const handleExpedienteSearchAndRedirect = async (expediente) => {
     return
   }
   
-  try {
-    // Sincronizar estados
-    persistentExpedienteSearch.value = expediente.trim()
-    searchQuery.value = expediente.trim()
-    
-    // Realizar búsqueda
-    await expedientesStore.searchExpedientes(persistentFilters.value, expediente.trim())
-    
-    // Añadir a búsquedas recientes usando useUserProfile
-    await addRecentSearch({
-      id: Date.now(),
-      expediente: expediente.trim(),
-      cliente: expedientesStore.expedientes[0]?.nombreTitular || 'Cliente no encontrado',
-      deuda: expedientesStore.expedientes[0]?.principal ? `€${expedientesStore.expedientes[0].principal}` : '€0',
-      timestamp: new Date().toISOString()
-    })
-    
-    // Preparar parámetros para la URL
-    const queryParams = {
-      search: expediente.trim(),
-      ...persistentFilters.value
-    }
-    
-    // Redirigir a ExpedientesView
-    router.push({
-      name: 'Expedientes',
-      query: queryParams
-    })
-    
-    showSuccess('Búsqueda completada', 'Mostrando resultados en la vista de expedientes')
-    
-    console.log('✅ Búsqueda desde FilterPanel y redirección completada')
-    
-  } catch (error) {
-    console.error('❌ Error en búsqueda desde FilterPanel:', error)
-    showError('Error en la búsqueda', 'No se pudieron cargar los expedientes')
-  }
+  // Usar el callback de redirección configurado en el composable
+  await handleExpedienteSearch(expediente)
 }
 
-// Método para alternar pantalla completa del drawer ORIGINAL
-const toggleDrawerFullscreen = () => {
-  drawerFullscreen.value = !drawerFullscreen.value
-}
-
-// Mantener este método para recibir eventos del FilterPanel ORIGINAL
-const handleToggleFullscreen = (isFullscreen) => {
-  drawerFullscreen.value = isFullscreen
-  console.log('Drawer fullscreen desde FilterPanel:', isFullscreen)
-}
-
-// Métodos del Dock ORIGINALES
+// Métodos del Dock
 const handleDockClick = (item) => {
   console.log('Dock item clicked:', item)
   
@@ -665,15 +470,65 @@ onMounted(() => {
 </script>
 
 <style scoped>
-:deep(.filters-drawer) {
-  .p-drawer-header {
-    background: linear-gradient(135deg, var(--iggsad-surface-50) 0%, var(--iggsad-surface-100) 100%);
-    border-bottom: 2px solid var(--iggsad-surface-200);
-    padding: var(--iggsad-spacing-lg);
-  }
+.config-mode-banner {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border: 1px solid #93c5fd;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
 
-  .p-drawer-content {
-    padding: 0;
+.banner-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.banner-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.banner-text strong {
+  color: #1e40af;
+  font-weight: 600;
+}
+
+.banner-text span {
+  color: #1e3a8a;
+  font-size: 0.875rem;
+}
+
+.config-mode-active {
+  position: relative;
+}
+
+.search-button {
+  transition: all 0.2s ease;
+}
+
+.search-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.dashboard-grid-section {
+  transition: all 0.3s ease;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .banner-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+  
+  .banner-text {
+    text-align: center;
   }
 }
 </style>
