@@ -177,7 +177,9 @@
         :loading="expedientesStore.isLoading"
         :pagination="expedientesStore.pagination"
         @page="handlePageChange"
-        @row-click="handleRowClick"
+        @sort="handleSort"
+        @view-expediente="handleViewExpediente"
+        @selection-change="handleSelectionChange"
       />
     </div>
 
@@ -207,128 +209,23 @@
     </FiltersDrawer>
 
     <!-- Dialog de detalles del expediente -->
-    <Dialog
+    <ExpedientesDetailDialog
       v-model:visible="showExpedienteDetail"
-      :header="`Expediente ${selectedExpediente?.numero}`"
-      :modal="true"
-      :style="{ width: '90vw', maxWidth: '1200px' }"
-      class="expediente-detail-dialog"
-    >
-      <div class="expediente-detail-content" v-if="selectedExpediente">
-        <div class="detail-tabs">
-          <Tabs value="0">
-            <TabList>
-              <Tab value="0">Información General</Tab>
-              <Tab value="1">Fechas</Tab>
-              <Tab value="2">Importes</Tab>
-            </TabList>
-            
-            <TabPanels>
-              <TabPanel value="0">
-                <div class="detail-section">
-                  <div class="detail-grid">
-                    <div class="detail-item">
-                      <label>Número de Expediente:</label>
-                      <span class="expediente-code">{{ selectedExpediente.numero }}</span>
-                    </div>
-                    <div class="detail-item">
-                      <label>Cartera:</label>
-                      <span>{{ selectedExpediente.cartera }}</span>
-                    </div>
-                    <div class="detail-item">
-                      <label>Nombre Titular:</label>
-                      <span>{{ selectedExpediente.nombreTitular }}</span>
-                    </div>
-                    <div class="detail-item">
-                      <label>Principal:</label>
-                      <span class="money-amount">{{ formatCurrency(selectedExpediente.principal) }}</span>
-                    </div>
-                  </div>
-                </div>
-              </TabPanel>
-              
-              <TabPanel value="1">
-                <div class="detail-section">
-                  <div class="detail-grid">
-                    <div class="detail-item">
-                      <label>Fecha de Envío:</label>
-                      <span>{{ formatDate(selectedExpediente.fechaEnvio) }}</span>
-                    </div>
-                    <div class="detail-item">
-                      <label>Fecha de Presentación:</label>
-                      <span>{{ formatDate(selectedExpediente.fechaPresentacion) }}</span>
-                    </div>
-                    <div class="detail-item">
-                      <label>Fecha de Admisión:</label>
-                      <span>{{ formatDate(selectedExpediente.fechaAdmision) }}</span>
-                    </div>
-                    <div class="detail-item">
-                      <label>Última Gestión:</label>
-                      <span>{{ formatDate(selectedExpediente.ultFechaGesExp) }}</span>
-                    </div>
-                  </div>
-                </div>
-              </TabPanel>
-              
-              <TabPanel value="2">
-                <div class="detail-section">
-                  <div class="detail-grid">
-                    <div class="detail-item">
-                      <label>Principal:</label>
-                      <span class="money-amount">{{ formatCurrency(selectedExpediente.principal) }}</span>
-                    </div>
-                    <div class="detail-item">
-                      <label>Intereses:</label>
-                      <span class="money-amount">{{ formatCurrency(selectedExpediente.intereses) }}</span>
-                    </div>
-                    <div class="detail-item">
-                      <label>Costas:</label>
-                      <span class="money-amount">{{ formatCurrency(selectedExpediente.costas) }}</span>
-                    </div>
-                    <div class="detail-item">
-                      <label>Ingresos Judiciales:</label>
-                      <span class="money-amount">{{ formatCurrency(selectedExpediente.ingJud) }}</span>
-                    </div>
-                  </div>
-                </div>
-              </TabPanel>
-            </TabPanels>
-          </Tabs>
-        </div>
-      </div>
-      
-      <template #footer>
-        <div class="dialog-footer">
-          <Button
-            label="Editar"
-            icon="pi pi-pencil"
-            @click="editExpediente"
-          />
-          <Button
-            label="Cerrar"
-            icon="pi pi-times"
-            outlined
-            @click="showExpedienteDetail = false"
-          />
-        </div>
-      </template>
-    </Dialog>
+      :expediente="selectedExpediente"
+      @edit-expediente="editExpediente"
+      @print-expediente="printExpediente"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 import Button from 'primevue/button'
-import Dialog from 'primevue/dialog'
-import Tabs from 'primevue/tabs'
-import TabList from 'primevue/tablist'
-import Tab from 'primevue/tab'
-import TabPanels from 'primevue/tabpanels'
-import TabPanel from 'primevue/tabpanel'
 import Tag from 'primevue/tag'
 import SearchBar from '@/components/SearchBar.vue'
 import ExpedientesTable from '@/components/expedientes/ExpedientesTable.vue'
+import ExpedientesDetailDialog from '@/components/expedientes/ExpedientesDetailDialog.vue'
 import FilterPanel from '@/components/filters/FilterPanel.vue'
 import FiltersDrawer from '@/components/filters/FiltersDrawer.vue'
 import { useExpedientesStore } from '@/stores/expedientes'
@@ -338,7 +235,6 @@ import { usePersistentView } from '@/composables/usePersistentView'
 
 // Composables
 const router = useRouter()
-const route = useRoute()
 const expedientesStore = useExpedientesStore()
 const { showSuccess, showWarn, showError } = useToast()
 
@@ -419,21 +315,8 @@ const formatCurrency = (amount) => {
   }).format(amount)
 }
 
-const formatDate = (date) => {
-  if (!date) return '-'
-  return new Date(date).toLocaleDateString('es-ES', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  })
-}
-
 // Métodos de búsqueda LOCALES (sincronizados con el composable)
 const handleSearch = async () => {
-  if (!searchQuery.value.trim()) {
-    showWarn('Búsqueda vacía', 'Por favor ingrese un criterio de búsqueda')
-    return
-  }
   
   try {
     console.log('🔍 Búsqueda desde ExpedientesView:', searchQuery.value.trim())
@@ -472,10 +355,58 @@ const handlePageChange = async (page) => {
   await expedientesStore.changePage(page)
 }
 
-const handleRowClick = (expediente) => {
+const handleViewExpediente = (expediente) => {
   console.log('Fila seleccionada:', expediente)
   selectedExpediente.value = expediente
   showExpedienteDetail.value = true
+}
+
+const handleSort = (sortEvent) => {
+  if (sortEvent.sortedData) {
+    // Actualizar los datos en el store con los datos ordenados
+    expedientesStore.expedientes = sortEvent.sortedData
+    console.log('📊 Expedientes ordenados en el store')
+  }
+}
+
+const handleSelectionChange = (selectedExpedientes) => {
+  console.log('🎯 Selección actualizada en Expedientes.vue:', selectedExpedientes.length)
+  
+  // Preparado para trabajar con múltiples selecciones
+  exportSelectedToExcel()
+  sendMassiveEmail()
+  generateMassiveReport()
+}
+
+const exportSelectedToExcel = () => {
+  const selected = getSelectionSummary()
+  if (selected === 'No hay expedientes seleccionados') {
+    showWarn('Sin selección', 'Selecciona al menos un expediente para exportar')
+    return
+  }
+  console.log('📊 Exportando expedientes:', selected.numeros)
+  // Implementar export...
+}
+
+const sendMassiveEmail = () => {
+  const selected = getSelectionSummary()
+  if (selected === 'No hay expedientes seleccionados') {
+    showWarn('Sin selección', 'Selecciona al menos un expediente')
+    return
+  }
+  console.log('📧 Enviando emails masivos a:', selected.numeros)
+  // Implementar envío masivo...
+}
+
+const generateMassiveReport = () => {
+  const selected = getSelectionSummary()
+  if (selected === 'No hay expedientes seleccionados') {
+    showWarn('Sin selección', 'Selecciona al menos un expediente')
+    return
+  }
+  console.log('📋 Generando reporte para:', selected.numeros)
+  console.log('💰 Deuda total:', selected.totalDeuda)
+  // Implementar reporte...
 }
 
 // Métodos de navegación
@@ -490,6 +421,10 @@ const editExpediente = () => {
       `Edición del expediente ${selectedExpediente.value.numero} no está implementada aún`
     )
   }
+}
+
+const printExpediente = () => {
+  showWarn('Funcionalidad en desarrollo', 'La impresión del expediente estará disponible próximamente')
 }
 
 // 🔧 LIFECYCLE SIMPLIFICADO Y CORREGIDO
@@ -507,602 +442,4 @@ onMounted(async () => {
 })
 </script>
 
-<style scoped>
-/* ===== CONTENEDOR PRINCIPAL ===== */
-.expedientes-view {
-  min-height: 100vh;
-  background: var(--iggsad-surface-25, #fefefe);
-  padding: var(--iggsad-spacing-lg);
-  font-family: var(--iggsad-font-primary);
-}
-
-/* ===== HEADER DE LA PÁGINA ===== */
-.page-header {
-  margin-bottom: var(--iggsad-spacing-md);
-}
-
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: var(--iggsad-spacing-lg);
-  background: var(--iggsad-surface-white);
-  padding: var(--iggsad-spacing-lg);
-  border-radius: var(--iggsad-radius-lg);
-  box-shadow: var(--iggsad-shadow-md);
-}
-
-.title-section {
-  flex: 1;
-}
-
-.page-title {
-  display: flex;
-  align-items: center;
-  gap: var(--iggsad-spacing-md);
-  font-size: 2.25rem;
-  font-weight: 700;
-  color: var(--iggsad-surface-800);
-  margin: 0 0 var(--iggsad-spacing-sm) 0;
-  line-height: 1.2;
-}
-
-.title-icon {
-  color: var(--iggsad-primary-600);
-  font-size: 2rem;
-}
-
-.page-subtitle {
-  color: var(--iggsad-surface-600);
-  font-size: 1.125rem;
-  line-height: 1.5;
-  margin: 0;
-}
-
-.header-actions {
-  display: flex;
-  gap: var(--iggsad-spacing-md);
-  align-items: center;
-}
-
-.header-action-btn {
-  transition: all var(--iggsad-transition-fast);
-}
-
-.header-action-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--iggsad-shadow-lg);
-}
-
-/* ===== SECCIÓN DE BÚSQUEDA Y ESTADÍSTICAS EN DOS COLUMNAS ===== */
-.search-and-stats-section {
-  background: var(--iggsad-surface-white);
-  border-radius: var(--iggsad-radius-lg);
-  box-shadow: var(--iggsad-shadow-md);
-  margin-bottom: var(--iggsad-spacing-xl);
-  overflow: visible;
-  position: relative;
-  z-index: 1;
-}
-
-.search-and-stats-container {
-  display: grid;
-  grid-template-columns: 1fr 800px;
-  gap: var(--iggsad-spacing-2xl);
-  padding: var(--iggsad-spacing-xl);
-  align-items: start;
-  width: 100%; /* 🔧 FIX: Asegurar que usa todo el ancho disponible */
-}
-
-/* ===== COLUMNA IZQUIERDA: BÚSQUEDA ALINEADA A LA IZQUIERDA ===== */
-.search-column {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  /* 🔧 FIX: Contenido alineado a la izquierda */
-  align-items: flex-start;
-}
-
-.search-area {
-  display: flex;
-  flex-direction: column;
-  gap: var(--iggsad-spacing-lg);
-  width: 100%; /* 🔧 FIX: Usar todo el ancho disponible */
-  /* 🔧 FIX: Contenido alineado a la izquierda */
-  align-items: flex-start;
-}
-
-.filters-button-container {
-  /* 🔧 FIX: Botón alineado a la izquierda */
-  align-self: flex-start;
-}
-
-.filters-button {
-  transition: all var(--iggsad-transition-fast);
-}
-
-.filters-button:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--iggsad-shadow-md);
-}
-
-.search-input-wrapper {
-  width: 100%;
-}
-
-.search-actions {
-  display: flex;
-  gap: var(--iggsad-spacing-md);
-  /* 🔧 FIX: Botones alineados a la izquierda */
-  align-self: flex-start;
-}
-
-.search-btn {
-  background: var(--iggsad-primary-600);
-  border-color: var(--iggsad-primary-600);
-  transition: all var(--iggsad-transition-fast);
-}
-
-.search-btn:hover:not(:disabled) {
-  background: var(--iggsad-primary-700);
-  border-color: var(--iggsad-primary-700);
-  transform: translateY(-2px);
-  box-shadow: var(--iggsad-shadow-lg);
-}
-
-.clear-btn {
-  transition: all var(--iggsad-transition-fast);
-}
-
-.clear-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--iggsad-shadow-md);
-}
-
-/* Filtros activos (sin border-top, ya está integrado) */
-.active-filters {
-  /* 🔧 FIX: Sin border-top para integración más fluida */
-  padding-top: 0;
-  margin-top: var(--iggsad-spacing-md);
-}
-
-.filters-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--iggsad-spacing-md);
-}
-
-.filters-label {
-  font-weight: 600;
-  color: var(--iggsad-surface-700);
-  font-size: 0.875rem;
-}
-
-.filters-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--iggsad-spacing-sm);
-}
-
-.filter-tag {
-  background: var(--iggsad-primary-50);
-  border: 1px solid var(--iggsad-primary-200);
-  color: var(--iggsad-primary-700);
-}
-
-.filter-content {
-  display: flex;
-  align-items: center;
-  gap: var(--iggsad-spacing-xs);
-}
-
-.filter-remove-btn {
-  color: var(--iggsad-primary-600);
-  opacity: 0.7;
-  transition: opacity var(--iggsad-transition-fast);
-}
-
-.filter-remove-btn:hover {
-  opacity: 1;
-}
-
-/* ===== COLUMNA DERECHA: ESTADÍSTICAS BALANCEADAS ===== */
-.stats-column {
-  width: 100%; /* 🔧 FIX: Usar todo el ancho asignado */
-  flex-shrink: 0;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: var(--iggsad-spacing-lg);
-  height: fit-content;
-}
-
-.stat-card {
-  background: var(--iggsad-surface-white);
-  padding: var(--iggsad-spacing-lg);
-  border-radius: var(--iggsad-radius-md);
-  border: 1px solid var(--iggsad-surface-200);
-  display: flex;
-  align-items: center;
-  gap: var(--iggsad-spacing-md);
-  transition: all var(--iggsad-transition-fast);
-  /* 🔧 FIX: Altura fija para que todas las cards sean iguales */
-  height: 90px;
-  /* 🔧 FIX: Ancho fijo para que todas sean iguales */
-  min-width: 0;
-}
-
-.stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--iggsad-shadow-md);
-  border-color: var(--iggsad-surface-300);
-}
-
-.stat-icon {
-  width: 3rem; /* 🔧 FIX: Iconos más grandes */
-  height: 3rem;
-  border-radius: var(--iggsad-radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem; /* 🔧 FIX: Iconos más grandes */
-  color: white;
-  flex-shrink: 0;
-}
-
-.stat-icon.total { background: var(--iggsad-primary-600); }
-.stat-icon.active { background: #16a34a; } /* green-600 */
-.stat-icon.urgent { background: #ea580c; } /* orange-600 */
-.stat-icon.money { background: #7c3aed; } /* violet-600 */
-
-.stat-content {
-  flex: 1;
-  min-width: 0;
-  /* 🔧 FIX: Evitar que el contenido afecte el tamaño de las cards */
-  overflow: hidden;
-}
-
-.stat-number {
-  display: block;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--iggsad-surface-800);
-  line-height: 1;
-  margin-bottom: 0.25rem;
-  /* 🔧 FIX: Manejo de texto largo mejorado */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.stat-label {
-  color: var(--iggsad-surface-600);
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1.2;
-  /* 🔧 FIX: Permitir wrap en labels para que se vean completas */
-  white-space: normal;
-  word-wrap: break-word;
-}
-
-/* ===== SECCIÓN DE TABLA ===== */
-.table-section {
-  background: var(--iggsad-surface-white);
-  border-radius: var(--iggsad-radius-lg);
-  box-shadow: var(--iggsad-shadow-md);
-  overflow: visible;
-  position: relative;
-}
-
-/* 🔧 FIX: Solo aplicar overflow hidden al contenido interno de la tabla */
-.table-section :deep(.p-datatable-wrapper) {
-  overflow: hidden;
-  border-radius: var(--iggsad-radius-lg);
-}
-
-/* ===== DIALOG DE DETALLES ===== */
-:deep(.expediente-detail-dialog) {
-  .p-dialog-header {
-    background: linear-gradient(135deg, var(--iggsad-surface-50) 0%, var(--iggsad-surface-100) 100%);
-    border-bottom: 2px solid var(--iggsad-surface-200);
-  }
-
-  .p-dialog-content {
-    padding: 0;
-  }
-}
-
-.expediente-detail-content {
-  padding: var(--iggsad-spacing-lg);
-}
-
-.detail-section {
-  padding: var(--iggsad-spacing-lg);
-}
-
-.detail-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: var(--iggsad-spacing-lg);
-}
-
-.detail-item {
-  display: flex;
-  flex-direction: column;
-  gap: var(--iggsad-spacing-xs);
-}
-
-.detail-item label {
-  font-weight: 600;
-  color: var(--iggsad-surface-700);
-  font-size: 0.875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.025em;
-}
-
-.detail-item span {
-  color: var(--iggsad-surface-800);
-  font-size: 0.9375rem;
-}
-
-.expediente-code {
-  font-family: var(--iggsad-font-mono);
-  background: var(--iggsad-primary-50);
-  color: var(--iggsad-primary-700);
-  padding: 0.25rem 0.5rem;
-  border-radius: var(--iggsad-radius-sm);
-  font-weight: 600;
-  border: 1px solid var(--iggsad-primary-200);
-  display: inline-block;
-}
-
-.money-amount {
-  font-family: var(--iggsad-font-mono);
-  font-weight: 600;
-  color: var(--iggsad-surface-800);
-}
-
-.dialog-footer {
-  display: flex;
-  gap: var(--iggsad-spacing-sm);
-  justify-content: flex-end;
-  padding: var(--iggsad-spacing-lg);
-  background: var(--iggsad-surface-50);
-  border-top: 1px solid var(--iggsad-surface-200);
-}
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 1024px) {
-  .expedientes-view {
-    padding: var(--iggsad-spacing-md);
-  }
-
-  .header-content {
-    flex-direction: column;
-    gap: var(--iggsad-spacing-md);
-    align-items: stretch;
-  }
-
-  .header-actions {
-    justify-content: center;
-  }
-
-  .search-and-stats-container {
-    grid-template-columns: 1fr;
-    gap: var(--iggsad-spacing-lg);
-  }
-
-  .stats-column {
-    width: 100%;
-    order: -1; /* Mostrar estadísticas arriba en tablet */
-  }
-
-  .stats-grid {
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--iggsad-spacing-sm);
-  }
-
-  .stat-card {
-    padding: var(--iggsad-spacing-sm);
-    min-height: 60px;
-  }
-
-  .stat-icon {
-    width: 2rem;
-    height: 2rem;
-    font-size: 0.875rem;
-  }
-
-  .stat-number {
-    font-size: 1.125rem;
-  }
-
-  .stat-label {
-    font-size: 0.75rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .expedientes-view {
-    padding: var(--iggsad-spacing-sm);
-    margin: 0 calc(-1 * var(--iggsad-spacing-sm));
-  }
-
-  .page-title {
-    font-size: 1.75rem;
-  }
-
-  .header-content,
-  .search-and-stats-section,
-  .table-section {
-    border-radius: var(--iggsad-radius-md);
-  }
-
-  .search-and-stats-container {
-    padding: var(--iggsad-spacing-lg);
-  }
-
-  .search-area {
-    gap: var(--iggsad-spacing-md);
-  }
-
-  .search-actions {
-    flex-direction: column;
-    gap: var(--iggsad-spacing-sm);
-  }
-
-  .search-btn,
-  .clear-btn {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .stats-grid {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: var(--iggsad-spacing-sm);
-  }
-
-  .stat-card {
-    flex-direction: column;
-    text-align: center;
-    padding: var(--iggsad-spacing-sm);
-    gap: var(--iggsad-spacing-xs);
-    min-height: auto;
-  }
-
-  .stat-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .filters-list {
-    flex-direction: column;
-  }
-
-  .filter-tag {
-    justify-content: space-between;
-  }
-}
-
-@media (max-width: 640px) {
-  .page-title {
-    font-size: 1.5rem;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--iggsad-spacing-sm);
-  }
-
-  .title-icon {
-    font-size: 1.5rem;
-  }
-
-  .page-subtitle {
-    font-size: 1rem;
-  }
-
-  .search-and-stats-container {
-    padding: var(--iggsad-spacing-md);
-  }
-
-  .filters-button {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .stats-grid {
-    grid-template-columns: 1fr;
-    gap: var(--iggsad-spacing-xs);
-  }
-
-  .stat-card {
-    flex-direction: row;
-    text-align: left;
-    justify-content: flex-start;
-    min-height: 50px;
-  }
-
-  .stat-icon {
-    width: 1.75rem;
-    height: 1.75rem;
-    font-size: 0.75rem;
-  }
-
-  .stat-number {
-    font-size: 1rem;
-  }
-
-  .stat-label {
-    font-size: 0.6875rem;
-  }
-
-  .detail-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* ===== ACCESIBILIDAD ===== */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  :deep(*) {
-    transition: none !important;
-    animation: none !important;
-  }
-}
-
-/* Focus visible para navegación por teclado */
-.header-action-btn:focus-visible,
-.search-btn:focus-visible,
-.clear-btn:focus-visible {
-  outline: 2px solid var(--iggsad-primary-600);
-  outline-offset: 2px;
-}
-
-.filter-remove-btn:focus-visible {
-  outline: 2px solid var(--iggsad-primary-600);
-  outline-offset: 1px;
-  border-radius: var(--iggsad-radius-sm);
-}
-
-/* ===== ANIMACIONES ===== */
-.expedientes-view {
-  animation: fadeIn 0.3s ease-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.stat-card {
-  animation: slideInUp 0.4s ease-out;
-}
-
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Escalonado de animaciones para las cards */
-.stat-card:nth-child(1) { animation-delay: 0.1s; }
-.stat-card:nth-child(2) { animation-delay: 0.2s; }
-.stat-card:nth-child(3) { animation-delay: 0.3s; }
-.stat-card:nth-child(4) { animation-delay: 0.4s; }
-</style>
+<style src="@/styles/expedientes.css"></style>

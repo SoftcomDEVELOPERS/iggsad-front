@@ -31,7 +31,7 @@ const breadcrumbItems = computed(() => {
   if (isPublicPage.value) return []
   
   const items = [
-    { label: 'Inicio', route: '/dashboard', icon: 'pi pi-home' }
+    { label: 'Inicio', route: '/', icon: 'pi pi-home' }
   ]
   
   const routeMap = {

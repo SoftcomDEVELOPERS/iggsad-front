@@ -60,9 +60,9 @@
         :lazy="true"
         @page="onPage"
         @sort="onSort"
-        @row-click="onRowClick"
         @row-expand="onRowExpand"
         @row-collapse="onRowCollapse"
+        @update:selection="onSelectionChange" 
         :totalRecords="pagination.total"
         :first="(pagination.page - 1) * pagination.pageSize"
         :rows="pagination.pageSize"
@@ -76,7 +76,7 @@
         removableSort
         stripedRows
         size="small"
-        selectionMode="multiple"
+        selectionMode="checkbox"
         dataKey="numero"
         resizableColumns
         :pt="{
@@ -466,7 +466,7 @@ const props = defineProps({
   pagination: { type: Object, required: true }
 })
 
-const emit = defineEmits(['page', 'sort', 'view-expediente', 'refresh', 'export', 'page-size-change', 'row-expand', 'row-collapse'])
+const emit = defineEmits(['page', 'sort', 'view-expediente', 'refresh', 'export', 'page-size-change', 'row-expand', 'row-collapse', 'selection-change'])
 
 // Composables
 const { showSuccess, showWarn, showError } = useToast()
@@ -759,28 +759,144 @@ const onPage = (e) => {
 
 const onSort = (e) => {
   multiSortMeta.value = e.multiSortMeta
-  emit('sort', e)
-}
-
-// Click en fila: expande y selecciona
-const onRowClick = (e) => {
-  // Expandir/colapsar
-  const isExpanded = expandedRows.value[e.data.numero]
-  if (isExpanded) {
-    delete expandedRows.value[e.data.numero]
-    onRowCollapse(e)
-  } else {
-    expandedRows.value[e.data.numero] = true
-    onRowExpand(e)
+  
+  // Si no hay datos que ordenar, emitir el evento y salir
+  if (!props.expedientes || props.expedientes.length === 0) {
+    emit('sort', e)
+    return
   }
   
-  // Seleccionar/deseleccionar
-  const isSelected = selectedExpedientes.value.find(item => item.numero === e.data.numero)
-  if (isSelected) {
-    selectedExpedientes.value = selectedExpedientes.value.filter(item => item.numero !== e.data.numero)
+  // Crear una copia de los expedientes para ordenar
+  const sortedExpedientes = [...props.expedientes].sort((a, b) => {
+    // Iterar por todos los criterios de ordenación
+    for (const sort of e.multiSortMeta) {
+      const field = sort.field
+      const order = sort.order // 1 para ASC, -1 para DESC
+      
+      let aValue = a[field]
+      let bValue = b[field]
+      
+      // Manejo de valores null/undefined
+      if (aValue == null && bValue == null) continue
+      if (aValue == null) return order
+      if (bValue == null) return -order
+      
+      // Conversión específica según el tipo de campo
+      if (field.includes('fecha') || field.includes('Fec')) {
+        // Campos de fecha
+        aValue = new Date(aValue)
+        bValue = new Date(bValue)
+      } else if (['principal', 'intereses', 'costas', 'ingJud', 'ingExj'].includes(field)) {
+        // Campos monetarios
+        aValue = parseFloat(aValue) || 0
+        bValue = parseFloat(bValue) || 0
+      } else if (typeof aValue === 'string' && typeof bValue === 'string') {
+        // Campos de texto - comparación insensible a mayúsculas
+        aValue = aValue.toLowerCase()
+        bValue = bValue.toLowerCase()
+      }
+      
+      // Realizar la comparación
+      let result = 0
+      if (aValue < bValue) {
+        result = -1
+      } else if (aValue > bValue) {
+        result = 1
+      }
+      
+      // Si hay diferencia, aplicar el orden y retornar
+      if (result !== 0) {
+        return result * order
+      }
+    }
+    
+    // Si todos los criterios son iguales, mantener orden original
+    return 0
+  })
+  
+  // Emitir evento con los datos ordenados
+  // IMPORTANTE: Esto actualiza los datos en el componente padre
+  emit('sort', {
+    originalEvent: e,
+    sortedData: sortedExpedientes,
+    multiSortMeta: e.multiSortMeta
+  })
+  
+  console.log('✅ Datos ordenados correctamente:', {
+    criterios: e.multiSortMeta.map(s => `${s.field}: ${s.order === 1 ? 'ASC' : 'DESC'}`),
+    totalFilas: sortedExpedientes.length
+  })
+}
+
+const onSelectionChange = (selection) => {
+  selectedExpedientes.value = selection
+  
+  console.log('📋 EXPEDIENTES SELECCIONADOS:')
+  console.log('Total seleccionados:', selection.length)
+  
+  if (selection.length > 0) {
+    console.log('Lista de números:', selection.map(exp => exp.numero))
+    console.log('Detalle completo:', selection)
+    
+    // Mostrar algunos datos útiles
+    const totalPrincipal = selection.reduce((sum, exp) => sum + (parseFloat(exp.principal) || 0), 0)
+    console.log('💰 Total principal seleccionado:', totalPrincipal.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' }))
+    
+    // Mostrar carteras
+    const carteras = [...new Set(selection.map(exp => exp.cartera))]
+    console.log('📁 Carteras involucradas:', carteras)
+    
+    // Mostrar embargos
+    const conEmbargos = selection.filter(exp => exp.embargos === 'Sí').length
+    console.log('🔒 Con embargos:', conEmbargos, 'de', selection.length)
+    
   } else {
-    selectedExpedientes.value = [...selectedExpedientes.value, e.data]
+    console.log('❌ No hay expedientes seleccionados')
   }
+  
+  // Emitir evento al componente padre si necesitas hacer algo allí
+  emit('selection-change', selection)
+}
+
+const getSelectionSummary = () => {
+  const selection = selectedExpedientes.value
+  
+  if (selection.length === 0) {
+    return 'No hay expedientes seleccionados'
+  }
+  
+  const totalPrincipal = selection.reduce((sum, exp) => sum + (parseFloat(exp.principal) || 0), 0)
+  const totalIntereses = selection.reduce((sum, exp) => sum + (parseFloat(exp.intereses) || 0), 0)
+  const conEmbargos = selection.filter(exp => exp.embargos === 'Sí').length
+  
+  return {
+    total: selection.length,
+    numeros: selection.map(exp => exp.numero),
+    totalPrincipal: totalPrincipal,
+    totalIntereses: totalIntereses,
+    totalDeuda: totalPrincipal + totalIntereses,
+    conEmbargos: conEmbargos,
+    carteras: [...new Set(selection.map(exp => exp.cartera))]
+  }
+}
+
+// Función para limpiar la selección
+const clearSelection = () => {
+  selectedExpedientes.value = []
+  console.log('🧹 Selección limpiada')
+}
+
+// Función para seleccionar todos los expedientes visibles
+const selectAll = () => {
+  selectedExpedientes.value = [...props.expedientes]
+  console.log('✅ Todos los expedientes seleccionados:', props.expedientes.length)
+}
+
+// Función para seleccionar solo expedientes urgentes
+const selectUrgent = () => {
+  const urgentExpedientes = props.expedientes.filter(exp => isUrgent(exp))
+  selectedExpedientes.value = urgentExpedientes
+  console.log('🚨 Expedientes urgentes seleccionados:', urgentExpedientes.length)
 }
 
 const onRowExpand = (e) => {
@@ -928,6 +1044,4 @@ watch(() => props.pagination.pageSize, (newSize) => {
 })
 </script>
 
-<style src="@/styles/expediente-table.css">
-
-</style>
+<style src="@/styles/expedientes-table.css"></style>

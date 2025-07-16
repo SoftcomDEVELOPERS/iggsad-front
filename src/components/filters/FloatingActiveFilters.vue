@@ -1,12 +1,12 @@
 <template>
-  <!-- Panel flotante de filtros activos -->
+  <!-- Panel flotante visible -->
   <div 
-    v-if="Object.keys(activeFilters).length > 0"
+    v-if="showActiveFilters && Object.keys(activeFilters).length > 0"
     class="floating-filters-panel fixed right-4 top-1/2 transform -translate-y-1/2 z-50"
     :class="{ 'mobile-floating': isMobile }"
   >
     <div class="bg-white/95 backdrop-blur-md rounded-lg shadow-xl border border-slate-200 p-3 min-w-80 max-w-96 max-h-96">
-      <!-- Header -->
+      <!-- Header con botón para ocultar -->
       <div class="flex items-center justify-between mb-3">
         <div class="flex items-center gap-2">
           <i class="pi pi-filter text-blue-600"></i>
@@ -16,9 +16,17 @@
           <span class="filter-counter text-xs text-white px-2 py-1 rounded-full">
             {{ Object.keys(activeFilters).length }}
           </span>
+          <!-- NUEVO: Botón para ocultar -->
+          <button 
+            @click="showActiveFilters = false"
+            class="text-xs text-slate-500 hover:text-slate-700 ml-2 p-1 rounded hover:bg-slate-100 transition-colors"
+            title="Ocultar filtros activos"
+          >
+            <i class="pi pi-eye-slash"></i>
+          </button>
           <button 
             @click="$emit('clear-all')"
-            class="text-xs text-red-500 hover:text-red-700 ml-2 px-2 py-1 rounded hover:bg-red-50 transition-colors"
+            class="text-xs text-red-500 hover:text-red-700 ml-1 px-2 py-1 rounded hover:bg-red-50 transition-colors"
             title="Limpiar todos los filtros"
           >
             <i class="pi pi-trash"></i>
@@ -79,6 +87,24 @@
       </div>
     </div>
   </div>
+
+  <!-- NUEVO: Botón compacto cuando está oculto -->
+  <div 
+    v-else-if="!showActiveFilters && Object.keys(activeFilters).length > 0"
+    class="compact-filters-indicator fixed right-4 top-1/2 transform -translate-y-1/2 z-50"
+    :class="{ 'mobile-floating': isMobile }"
+  >
+    <button
+      @click="showActiveFilters = true"
+      class="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 relative"
+      :title="`Mostrar ${Object.keys(activeFilters).length} filtros activos`"
+    >
+      <i class="pi pi-filter text-sm"></i>
+      <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
+        {{ Object.keys(activeFilters).length }}
+      </span>
+    </button>
+  </div>
 </template>
 
 <script setup>
@@ -102,6 +128,9 @@ defineProps({
 
 defineEmits(['clear-filter', 'clear-all', 'apply-filters'])
 
+// NUEVO: Estado para controlar visibilidad
+const showActiveFilters = ref(true)
+
 // Detectar si es móvil
 const isMobile = ref(false)
 
@@ -124,6 +153,19 @@ onUnmounted(() => {
 .floating-filters-panel {
   max-height: 80vh;
   animation: slideInRight 0.3s ease-out;
+}
+
+/* NUEVO: Botón compacto */
+.compact-filters-indicator {
+  animation: slideInRight 0.3s ease-out;
+}
+
+.compact-filters-indicator.mobile-floating {
+  position: fixed !important;
+  right: 16px !important;
+  bottom: 80px !important;
+  top: auto !important;
+  transform: none !important;
 }
 
 /* En móvil, posicionar diferente */
