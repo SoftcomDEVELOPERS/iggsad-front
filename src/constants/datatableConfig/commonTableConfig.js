@@ -191,6 +191,7 @@ export const COMMON_TABLE_TEMPLATES = {
 
 // Configuración de acciones comunes
 export const COMMON_TABLE_ACTIONS = {
+  // Acciones básicas
   view: {
     icon: 'pi pi-eye',
     tooltip: 'Ver detalles',
@@ -212,11 +213,91 @@ export const COMMON_TABLE_ACTIONS = {
     enabled: false,
     class: 'action-btn delete-btn'
   },
-  menu: {
-    icon: 'pi pi-ellipsis-v',
-    tooltip: 'Más opciones',
+  
+  // Acciones de gestión documental
+  duplicate: {
+    icon: 'pi pi-copy',
+    tooltip: 'Duplicar',
     severity: 'secondary',
     enabled: true,
-    class: 'action-btn menu-btn'
+    class: 'action-btn duplicate-btn'
+  },
+  archive: {
+    icon: 'pi pi-archive',
+    tooltip: 'Archivar',
+    severity: 'warning',
+    enabled: true,
+    class: 'action-btn archive-btn'
+  },
+  generateDocument: {
+    icon: 'pi pi-file-pdf',
+    tooltip: 'Generar documento',
+    severity: 'success',
+    enabled: true,
+    class: 'action-btn document-btn'
+  },
+  viewHistory: {
+    icon: 'pi pi-history',
+    tooltip: 'Ver historial',
+    severity: 'info',
+    enabled: true,
+    class: 'action-btn history-btn'
+  },
+  
+  // Acciones masivas
+  exportSelection: {
+    icon: 'pi pi-file-excel',
+    tooltip: 'Exportar selección',
+    severity: 'success',
+    enabled: true,
+    class: 'action-btn export-btn',
+    isBulkAction: true
+  },
+  bulkEmail: {
+    icon: 'pi pi-envelope',
+    tooltip: 'Envío masivo',
+    severity: 'info',
+    enabled: true,
+    class: 'action-btn email-btn',
+    isBulkAction: true
+  },
+  bulkSMS: {
+    icon: 'pi pi-mobile',
+    tooltip: 'SMS masivo',
+    severity: 'info',
+    enabled: false,
+    class: 'action-btn sms-btn',
+    isBulkAction: true
+  },
+  bulkPrint: {
+    icon: 'pi pi-print',
+    tooltip: 'Impresión masiva',
+    severity: 'secondary',
+    enabled: false,
+    class: 'action-btn print-btn',
+    isBulkAction: true
+  },
+  
+  // Acciones de tabla
+  refresh: {
+    icon: 'pi pi-refresh',
+    tooltip: 'Actualizar',
+    severity: 'secondary',
+    enabled: true,
+    class: 'action-btn refresh-btn'
+  },
+  exportAll: {
+    icon: 'pi pi-download',
+    tooltip: 'Exportar todo',
+    severity: 'success',
+    enabled: true,
+    class: 'action-btn export-all-btn'
+  },
+  configure: {
+    icon: 'pi pi-cog',
+    tooltip: 'Configurar',
+    severity: 'secondary',
+    enabled: true,
+    class: 'action-btn configure-btn'
   }
 }

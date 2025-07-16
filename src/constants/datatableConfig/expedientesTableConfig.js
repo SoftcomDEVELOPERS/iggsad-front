@@ -246,8 +246,6 @@ export const EXPEDIENTES_TABLE_CONFIG = {
   
   // Configuración de acciones usando las comunes + específicas
   actions: {
-    ...COMMON_TABLE_ACTIONS,
-    // Solo sobrescribir lo específico de expedientes
     view: {
       ...COMMON_TABLE_ACTIONS.view,
       tooltip: 'Ver expediente'

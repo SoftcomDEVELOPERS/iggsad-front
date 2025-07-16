@@ -1,30 +1,6 @@
 <template>
   <div class="expedientes-view">
     
-    <!-- Header de la página -->
-    <!-- <div class="page-header">
-      <div class="header-content">
-        <div class="title-section">
-          <h1 class="page-title">
-            <i class="pi pi-folder title-icon"></i>
-            Gestión de Expedientes
-          </h1>
-          <p class="page-subtitle">
-            Administra y consulta todos los expedientes del sistema
-          </p>
-        </div>
-        
-        <div class="header-actions">
-          <Button
-            icon="pi pi-plus"
-            label="Nuevo Expediente"
-            class="header-action-btn"
-            @click="createNewExpediente"
-          />
-        </div>
-      </div>
-    </div> -->
-
     <!-- 🎯 SECCIÓN DE BÚSQUEDA Y ESTADÍSTICAS EN DOS COLUMNAS -->
     <div class="search-and-stats-section">
       <div class="search-and-stats-container">
