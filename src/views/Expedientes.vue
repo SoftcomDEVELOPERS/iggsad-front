@@ -2,7 +2,7 @@
   <div class="expedientes-view">
     
     <!-- Header de la página -->
-    <div class="page-header">
+    <!-- <div class="page-header">
       <div class="header-content">
         <div class="title-section">
           <h1 class="page-title">
@@ -23,7 +23,7 @@
           />
         </div>
       </div>
-    </div>
+    </div> -->
 
     <!-- 🎯 SECCIÓN DE BÚSQUEDA Y ESTADÍSTICAS EN DOS COLUMNAS -->
     <div class="search-and-stats-section">
@@ -34,15 +34,17 @@
           <div class="search-area">
             
             <!-- Botón de filtros arriba -->
-            <div class="filters-button-container">
+            <div class="title-section">
+               <h1 class="page-title">
+                <i class="pi pi-folder title-icon"></i>
+                Gestión de Expedientes
+              </h1>
               <Button
-                icon="pi pi-filter"
-                :label="`Filtros Avanzados ${totalActiveFilters > 0 ? `(${totalActiveFilters})` : ''}`"
-                outlined
-                :severity="totalActiveFilters > 0 ? 'success' : 'secondary'"
-                class="filters-button"
-                @click="toggleFilters"
-              />
+                  icon="pi pi-plus"
+                  label="Nuevo Expediente"
+                  class="header-action-btn"
+                  @click="createNewExpediente"
+                />
             </div>
             
             <!-- Barra de búsqueda -->
@@ -76,6 +78,15 @@
                 severity="secondary"
                 @click="handleClearAll"
                 class="clear-btn"
+              />
+
+              <Button
+                icon="pi pi-filter"
+                :label="`Filtros Avanzados ${totalActiveFilters > 0 ? `(${totalActiveFilters})` : ''}`"
+                outlined
+                :severity="totalActiveFilters > 0 ? 'success' : 'secondary'"
+                class="filters-button"
+                @click="toggleFilters"
               />
             </div>
             
@@ -373,41 +384,36 @@ const handleSelectionChange = (selectedExpedientes) => {
   console.log('🎯 Selección actualizada en Expedientes.vue:', selectedExpedientes.length)
   
   // Preparado para trabajar con múltiples selecciones
-  exportSelectedToExcel()
-  sendMassiveEmail()
-  generateMassiveReport()
+    exportSelectedToExcel(selectedExpedientes)
+  sendMassiveEmail(selectedExpedientes)
+  generateMassiveReport(selectedExpedientes)
 }
 
-const exportSelectedToExcel = () => {
-  const selected = getSelectionSummary()
-  if (selected === 'No hay expedientes seleccionados') {
+const exportSelectedToExcel = (selectedExpedientes) => { // ✅ Recibe como parámetro
+  if (selectedExpedientes.length === 0) {
     showWarn('Sin selección', 'Selecciona al menos un expediente para exportar')
     return
   }
-  console.log('📊 Exportando expedientes:', selected.numeros)
-  // Implementar export...
+  console.log('📊 Exportando expedientes:', selectedExpedientes.map(exp => exp.numero))
 }
 
-const sendMassiveEmail = () => {
-  const selected = getSelectionSummary()
-  if (selected === 'No hay expedientes seleccionados') {
-    showWarn('Sin selección', 'Selecciona al menos un expediente')
+const sendMassiveEmail = (selectedExpedientes) => { // ✅ Recibe como parámetro
+  if (selectedExpedientes.length === 0) {
+    showWarn('Sin selección', 'Selecciona al menos un expediente para envío masivo')
     return
   }
-  console.log('📧 Enviando emails masivos a:', selected.numeros)
-  // Implementar envío masivo...
+  console.log('📧 Envío masivo a expedientes:', selectedExpedientes.length)
 }
 
-const generateMassiveReport = () => {
-  const selected = getSelectionSummary()
-  if (selected === 'No hay expedientes seleccionados') {
-    showWarn('Sin selección', 'Selecciona al menos un expediente')
+const generateMassiveReport = (selectedExpedientes) => { // ✅ Recibe como parámetro
+  if (selectedExpedientes.length === 0) {
+    showWarn('Sin selección', 'Selecciona al menos un expediente para generar reporte')
     return
   }
-  console.log('📋 Generando reporte para:', selected.numeros)
-  console.log('💰 Deuda total:', selected.totalDeuda)
-  // Implementar reporte...
+  console.log('📋 Generando reporte masivo:', selectedExpedientes.length)
 }
+
+
 
 // Métodos de navegación
 const createNewExpediente = () => {

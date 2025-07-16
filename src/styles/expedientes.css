@@ -15,15 +15,18 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: var(--iggsad-spacing-lg);
-  background: var(--iggsad-surface-white);
-  padding: var(--iggsad-spacing-lg);
-  border-radius: var(--iggsad-radius-lg);
+  margin-bottom: var(--iggsad-spacing-md);
+  background: var(--iggsad-surface-100);
+  padding: var(--iggsad-spacing-md);
+  border-radius: var(--iggsad-radius-md);
   box-shadow: var(--iggsad-shadow-md);
 }
 
 .title-section {
   flex: 1;
+  display: flex;
+  align-self: stretch;
+  justify-content: space-between;
 }
 
 .page-title {
@@ -66,10 +69,10 @@
 
 /* ===== SECCIÓN DE BÚSQUEDA Y ESTADÍSTICAS EN DOS COLUMNAS ===== */
 .search-and-stats-section {
-  background: var(--iggsad-surface-white);
+  background: var( --iggsad-surface-100);
   border-radius: var(--iggsad-radius-lg);
   box-shadow: var(--iggsad-shadow-md);
-  margin-bottom: var(--iggsad-spacing-xl);
+  margin-bottom: var(--iggsad-spacing-md);
   overflow: visible;
   position: relative;
   z-index: 1;
@@ -79,7 +82,7 @@
   display: grid;
   grid-template-columns: 1fr 800px;
   gap: var(--iggsad-spacing-2xl);
-  padding: var(--iggsad-spacing-xl);
+  padding: var(--iggsad-spacing-md);
   align-items: start;
   width: 100%; /* 🔧 FIX: Asegurar que usa todo el ancho disponible */
 }
@@ -96,7 +99,7 @@
 .search-area {
   display: flex;
   flex-direction: column;
-  gap: var(--iggsad-spacing-lg);
+  gap: var(--iggsad-spacing-md);
   width: 100%; /* 🔧 FIX: Usar todo el ancho disponible */
   /* 🔧 FIX: Contenido alineado a la izquierda */
   align-items: flex-start;

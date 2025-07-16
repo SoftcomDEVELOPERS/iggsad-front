@@ -8,6 +8,7 @@ import { useUserProfile } from '@/composables/useUserProfile'
 import './assets/tailwind.css'
 import './styles/index.css'
 import './styles/app-layout.css'  
+import './styles/datatable.css'
 
 // ===== TEMA MEJORADO =====
 import { GestionProcesalTheme } from './themes/primevue-theme.js'

@@ -207,8 +207,9 @@
   :root {
     /* Invertir superficie para modo oscuro */
     --iggsad-surface-white: #0f172a;
-    --iggsad-surface-50: #1e293b;
-    --iggsad-surface-100: #334155;
+    --iggsad-surface-50: #2d3691;
+    --iggsad-surface-100: #1e293b;
+    --iggsad-surface-200: #334155;
     --iggsad-surface-700: #cbd5e1;
     --iggsad-surface-800: #f1f5f9;
     --iggsad-surface-900: #f8fafc;
