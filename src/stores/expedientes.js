@@ -1,6 +1,7 @@
 // src/stores/expedientes.js
 import { defineStore } from 'pinia'
 import { expedientesService } from '@/services/expedientes.services.js'
+import { generateExpedientePage } from '@/utils/mockExpedientesGenerator'
 
 export const useExpedientesStore = defineStore('expedientes', {
   state: () => ({
@@ -38,7 +39,7 @@ export const useExpedientesStore = defineStore('expedientes', {
 
         if (import.meta.env.DEV) {
           // En dev leemos el mock que tengas en public/mock-expedientes.json
-          response = await fetch('/mock/expedientes.json').then(r => r.json())
+          response = generateExpedientePage(page, pageSize, filters, query)
         } else {
           // En producción llamamos a tu servicio real
           response = await expedientesService.search(params)

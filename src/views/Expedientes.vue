@@ -165,6 +165,7 @@
         :pagination="expedientesStore.pagination"
         @page="handlePageChange"
         @sort="handleSort"
+        @page-size-change="handlePageSizeChange"
         @view-expediente="handleViewExpediente"
         @selection-change="handleSelectionChange"
       />
@@ -293,6 +294,10 @@ const totalAmount = computed(() => {
   }, 0)
 })
 
+const handlePageSizeChange = async (newPageSize) => {
+  await expedientesStore.changePageSize(newPageSize)
+}
+
 // Métodos de formateo
 const formatCurrency = (amount) => {
   if (!amount) return '€0,00'
@@ -360,9 +365,9 @@ const handleSelectionChange = (selectedExpedientes) => {
   console.log('🎯 Selección actualizada en Expedientes.vue:', selectedExpedientes.length)
   
   // Preparado para trabajar con múltiples selecciones
-    exportSelectedToExcel(selectedExpedientes)
-  sendMassiveEmail(selectedExpedientes)
-  generateMassiveReport(selectedExpedientes)
+  //   exportSelectedToExcel(selectedExpedientes)
+  // sendMassiveEmail(selectedExpedientes)
+  // generateMassiveReport(selectedExpedientes)
 }
 
 const exportSelectedToExcel = (selectedExpedientes) => { // ✅ Recibe como parámetro

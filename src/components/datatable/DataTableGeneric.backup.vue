@@ -17,7 +17,7 @@
           <span class="stats-text">{{ config.meta.name }} encontrados</span>
         </div>
       </div>
-
+      
       <TableActions 
         :config="config"
         :loading="loading"
@@ -51,18 +51,16 @@
         @row-expand="$emit('row-expand', $event)"
         @row-collapse="$emit('row-collapse', $event)"
         @update:selection="$emit('selection-change', $event)"
-        @update:rows="onPageSizeChange"
         :pt="tablePassthrough"
         :class="datatableClass"
-
         :paginator="true"
-        :rows="currentPageSize"
-        :first="firstRowIndex"
-        :paginator-template="paginatorTemplate"
-        :current-page-report-template="currentPageReportTemplate"
+        :rows="selectedPageSize"
         :total-records="pagination.total || 0"
+        :first="((pagination.page || 1) - 1) * selectedPageSize"
+        :paginator-template="paginationConfig.template"
+        :current-page-report-template="paginationConfig.currentPageReportTemplate"
         :rows-per-page-options="pageSizeValues"
-        
+        @update:rows="handlePageSizeUpdate"
         :resizable-columns="config.meta.resizableColumns"
         :scrollable="config.meta.scrollable"
         :scroll-height="config.meta.scrollHeight"
@@ -311,14 +309,13 @@ const { multiSortMeta, onSort } = useTableSorting(props.config, props, emit)
 
 // ✅ Composable de paginación - ÚNICA FUENTE DE VERDAD
 const { 
-  currentPageSize,
-  firstRowIndex,
-  paginatorTemplate,
-  currentPageReportTemplate,
+  selectedPageSize,
+  paginationConfig,
+  paginationInfo,
   pageSizeValues,
   onPage,
   onPageSizeChange,
-  paginationInfo
+  handlePageSizeUpdate
 } = useTablePagination(props.config, props, emit)
 
 

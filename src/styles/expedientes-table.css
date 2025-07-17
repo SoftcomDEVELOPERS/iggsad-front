@@ -1,292 +1,124 @@
-/* ===== ExpedientesTable.styles.css - CSS CORREGIDO CON :pt ===== */
+/* ===== expedientes-table.css - SOLO ESTILOS ESPECÍFICOS DE EXPEDIENTES ===== */
+/* Los estilos genéricos están en datatable.css */
 
-/* ===== CONTENEDOR PRINCIPAL ===== */
-.expedientes-table-container {
-  background: var(--iggsad-surface-white);
-  border-radius: var(--iggsad-radius-lg);
-  box-shadow: var(--iggsad-shadow-md);
-  overflow: hidden;
-  font-family: var(--iggsad-font-primary);
-}
+/* ===== TIPOS DE CELDA ESPECÍFICOS DE EXPEDIENTES ===== */
 
-/* ===== HEADER MEJORADO ===== */
-.table-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--iggsad-spacing-lg);
-  background: linear-gradient(135deg, var(--iggsad-surface-50) 0%, var(--iggsad-surface-100) 100%);
-  border-bottom: 2px solid var(--iggsad-surface-200);
-}
-
-.table-title-section {
-  display: flex;
-  align-items: center;
-  gap: var(--iggsad-spacing-md);
-}
-
-.table-title {
-  display: flex;
-  align-items: center;
-  gap: var(--iggsad-spacing-sm);
-  font-size: var(--iggsad-text-xl);
-  font-weight: var(--iggsad-font-semibold);
-  color: var(--iggsad-surface-800);
-  margin: 0;
-}
-
-.table-title-icon {
-  color: var(--iggsad-primary-600);
-  font-size: 1.125rem;
-}
-
-.table-stats {
-  display: flex;
-  align-items: center;
-  gap: var(--iggsad-spacing-xs);
-}
-
-.total-badge {
-  font-weight: var(--iggsad-font-semibold);
-}
-
-.stats-text {
-  color: var(--iggsad-surface-600);
-  font-size: var(--iggsad-text-sm);
-}
-
-.table-actions {
-  display: flex;
-  gap: var(--iggsad-spacing-sm);
-}
-
-.action-button {
-  transition: all var(--iggsad-transition-fast);
-}
-
-.action-button:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--iggsad-shadow-md);
-}
-
-/* ===== WRAPPER Y TABLA ===== */
-.table-wrapper {
-  position: relative;
-  overflow: hidden;
-}
-
-/* ===== USANDO LAS CLASES :pt EN LUGAR DE :deep ===== */
-
-/* Clase root del :pt - Contenedor general de la tabla */
-.expedientes-table-root {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-/* Clase header del :pt - Headers con ordenación funcional */
-.expedientes-table-header {
-  /* Headers sticky que funcionan */
-  .p-datatable-thead > tr > th {
-    background: linear-gradient(135deg, var(--iggsad-surface-100) 0%, var(--iggsad-surface-150, #f1f4f7) 100%);
-    border-bottom: 2px solid var(--iggsad-surface-300);
-    color: var(--iggsad-surface-800);
-    font-weight: var(--iggsad-font-semibold);
-    font-size: var(--iggsad-text-xs);
-    padding: var(--iggsad-spacing-sm) var(--iggsad-spacing-md);
-    text-align: left;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    text-transform: uppercase;
-    letter-spacing: 0.025em;
-    transition: all var(--iggsad-transition-fast);
-    position: sticky;
-    top: 0;
-    z-index: 2;
-  }
-
-  /* Hover en headers */
-  .p-datatable-thead > tr > th:hover {
-    background: linear-gradient(135deg, var(--iggsad-surface-150, #f1f4f7) 0%, var(--iggsad-surface-200) 100%);
-  }
-
-  /* HEADERS ORDENADOS - Fondo completo azul, NO badge */
-  .p-datatable-thead > tr > th.p-sortable-column.p-sorted {
-    background: var(--iggsad-primary-600) !important;
-    color: var(--iggsad-surface-white) !important;
-    border-bottom-color: var(--iggsad-primary-300) !important;
-  }
-
-  .p-datatable-thead > tr > th.p-sortable-column.p-sorted:hover {
-    background: var(--iggsad-primary-500) !important;
-  }
-
-  /* Resizer de columnas */
-  .p-datatable-thead > tr > th:hover .p-datatable-column-resizer {
-    opacity: 1;
-  }
-}
-
-/* Clase body del :pt - Cuerpo de la tabla */
-.expedientes-table-body {
-  /* Filas mejoradas */
-  .p-datatable-tbody > tr {
-    transition: all var(--iggsad-transition-fast);
-    border-bottom: 1px solid var(--iggsad-surface-100);
-    cursor: pointer;
-  }
-
-  .p-datatable-tbody > tr:hover {
-    background: var(--iggsad-primary-25, #f0f7ff);
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
-  }
-
-  .p-datatable-tbody > tr.p-row-odd {
-    background: var(--iggsad-surface-25, #fefefe);
-  }
-
-  .p-datatable-tbody > tr.p-row-odd:hover {
-    background: var(--iggsad-primary-25, #f0f7ff);
-  }
-
-  /* Filas seleccionadas */
-  .p-datatable-tbody > tr.p-selected {
-    background: var(--iggsad-primary-50) !important;
-    border-left: 3px solid var(--iggsad-primary-600);
-  }
-
-  /* Celdas mejoradas */
-  .p-datatable-tbody > tr > td {
-    padding: var(--iggsad-spacing-xs) var(--iggsad-spacing-sm);
-    font-size: var(--iggsad-text-sm);
-    color: var(--iggsad-surface-700);
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    vertical-align: middle;
-    border-bottom: 1px solid var(--iggsad-surface-100);
-  }
-
-  /* Columnas congeladas */
-  .p-datatable-frozen-column {
-    background: inherit !important;
-    z-index: 1;
-    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
-  }
-}
-
-/* Clase row del :pt - Filas específicas */
-.expedientes-table-row {
-  /* Estilos específicos para filas si necesitas */
-}
-
-/* ===== PAGINADOR PERSONALIZADO ÚNICO ===== */
-.custom-paginator {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--iggsad-spacing-md) var(--iggsad-spacing-lg);
-  background: linear-gradient(135deg, var(--iggsad-surface-50) 0%, var(--iggsad-surface-100) 100%);
-  border-top: 1px solid var(--iggsad-surface-200);
-  border-bottom-left-radius: var(--iggsad-radius-lg);
-  border-bottom-right-radius: var(--iggsad-radius-lg);
-}
-
-.paginator-left {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: var(--iggsad-spacing-md);
-}
-
-.showing-text {
-  color: var(--iggsad-surface-600);
-  font-size: var(--iggsad-text-sm);
-  font-weight: var(--iggsad-font-medium);
-}
-
-.selection-info {
-  display: flex;
-  align-items: center;
-  gap: var(--iggsad-spacing-xs);
-  color: var(--iggsad-primary-600);
-  font-size: var(--iggsad-text-sm);
-  font-weight: var(--iggsad-font-medium);
-}
-
-.paginator-center {
-  display: flex;
-  align-items: center;
-  gap: var(--iggsad-spacing-sm);
-  flex: 0 0 auto;
-}
-
-.page-info {
-  color: var(--iggsad-surface-700);
-  font-size: var(--iggsad-text-sm);
-  font-weight: var(--iggsad-font-semibold);
-  margin: 0 var(--iggsad-spacing-md);
-  min-width: 120px;
-  text-align: center;
-}
-
-.paginator-btn {
-  min-width: var(--iggsad-width-lg);
-  height: var(--iggsad-width-lg);
-  transition: all var(--iggsad-transition-fast);
-}
-
-.paginator-btn:hover:not(:disabled) {
-  background: var(--iggsad-primary-50);
-  color: var(--iggsad-primary-600);
-  transform: translateY(-1px);
-}
-
-.paginator-right {
-  flex: 1;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.page-size-dropdown {
-  min-width: 6rem;
-}
-
-/* ===== COLUMNAS DE CONTROL ===== */
-.expand-column,
-.selection-column {
-  background: var(--iggsad-surface-25, #fefefe) !important;
-}
-
-.expedientes-table-header .expand-column .p-row-toggler {
-  color: var(--iggsad-primary-600);
-  transition: all var(--iggsad-transition-fast);
-}
-
-.expedientes-table-header .expand-column .p-row-toggler:hover {
+/* Código de expediente con badge urgente */
+.expediente-code {
+  font-family: var(--iggsad-font-mono, 'Monaco', 'Consolas', monospace);
+  font-size: var(--iggsad-text-xs);
   color: var(--iggsad-primary-700);
-  transform: scale(1.1);
+  background: var(--iggsad-primary-50);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--iggsad-radius-sm);
+  font-weight: var(--iggsad-font-medium);
+  letter-spacing: 0.025em;
 }
 
-/* ===== FILAS EXPANDIDAS ===== */
-.expanded-row-content {
-  padding: var(--iggsad-spacing-lg);
-  background: linear-gradient(135deg, var(--iggsad-surface-25, #fefefe) 0%, var(--iggsad-surface-50) 100%);
-  border-top: 2px solid var(--iggsad-primary-200);
+.urgente-badge {
+  font-size: 0.6rem;
+  font-weight: var(--iggsad-font-bold);
+  padding: 0.125rem 0.375rem;
+  margin-left: var(--iggsad-spacing-xs);
+  border-radius: var(--iggsad-radius-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
+
+/* Importes monetarios */
+.money-amount {
+  font-family: var(--iggsad-font-mono, 'Monaco', 'Consolas', monospace);
+  font-weight: var(--iggsad-font-semibold);
+  text-align: right;
+}
+
+.money-amount.positive {
+  color: var(--iggsad-success-600);
+}
+
+.money-amount.negative {
+  color: var(--iggsad-danger-600);
+}
+
+.money-amount.zero {
+  color: var(--iggsad-surface-500);
+}
+
+/* Fechas con indicadores de estado */
+.date-value {
+  font-size: var(--iggsad-text-sm);
+  color: var(--iggsad-surface-700);
+}
+
+.date-value.recent {
+  color: var(--iggsad-success-600);
+  font-weight: var(--iggsad-font-medium);
+}
+
+.date-value.old {
+  color: var(--iggsad-warning-600);
+}
+
+.date-value.overdue {
+  color: var(--iggsad-danger-600);
+  font-weight: var(--iggsad-font-semibold);
+}
+
+/* Tags de embargo */
+.embargo-tag.si {
+  background: var(--iggsad-success-100);
+  color: var(--iggsad-success-700);
+  border: 1px solid var(--iggsad-success-200);
+}
+
+.embargo-tag.no {
+  background: var(--iggsad-surface-100);
+  color: var(--iggsad-surface-600);
+  border: 1px solid var(--iggsad-surface-200);
+}
+
+/* Iconos de cartera */
+.cartera-icon {
+  margin-right: var(--iggsad-spacing-xs);
+}
+
+.cartera-icon.cartera-a {
+  color: var(--iggsad-primary-600);
+}
+
+.cartera-icon.cartera-b {
+  color: var(--iggsad-success-600);
+}
+
+.cartera-icon.cartera-c {
+  color: var(--iggsad-warning-600);
+}
+
+/* Nombres de titulares */
+.titular-name {
+  font-weight: var(--iggsad-font-medium);
+  color: var(--iggsad-surface-800);
+}
+
+.titular-icon {
+  margin-right: var(--iggsad-spacing-xs);
+  color: var(--iggsad-surface-500);
+}
+
+/* ===== EXPANSIÓN ESPECÍFICA DE EXPEDIENTES ===== */
 
 .expansion-header {
-  margin-bottom: var(--iggsad-spacing-lg);
-  padding-bottom: var(--iggsad-spacing-md);
+  background: var(--iggsad-surface-50);
+  padding: var(--iggsad-spacing-md);
   border-bottom: 1px solid var(--iggsad-surface-200);
+  margin-bottom: var(--iggsad-spacing-md);
 }
 
 .expansion-title {
   display: flex;
   align-items: center;
   gap: var(--iggsad-spacing-sm);
-  font-size: 1.125rem;
+  font-size: var(--iggsad-text-lg);
   font-weight: var(--iggsad-font-semibold);
   color: var(--iggsad-surface-800);
   margin: 0;
@@ -296,433 +128,87 @@
   color: var(--iggsad-primary-600);
 }
 
-.expansion-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: var(--iggsad-spacing-lg);
-}
-
-.detail-section {
-  background: var(--iggsad-surface-white);
-  padding: var(--iggsad-spacing-md);
-  border-radius: var(--iggsad-radius-md);
-  border: 1px solid var(--iggsad-surface-200);
-  box-shadow: var(--iggsad-shadow-sm);
-}
-
-.section-title {
-  font-size: var(--iggsad-text-sm);
-  font-weight: var(--iggsad-font-semibold);
-  color: var(--iggsad-surface-700);
-  margin: 0 0 var(--iggsad-spacing-md) 0;
-  padding-bottom: var(--iggsad-spacing-xs);
-  border-bottom: 1px solid var(--iggsad-surface-200);
-  text-transform: uppercase;
-  letter-spacing: 0.025em;
-}
-
-.detail-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--iggsad-spacing-sm);
-}
-
-.detail-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--iggsad-spacing-xs) 0;
-}
-
-.detail-label {
-  font-size: var(--iggsad-text-sm);
-  color: var(--iggsad-surface-600);
-  font-weight: var(--iggsad-font-medium);
-}
-
-.detail-value {
-  font-size: var(--iggsad-text-sm);
-  color: var(--iggsad-surface-700);
-  font-weight: var(--iggsad-font-semibold);
-  text-align: right;
-}
-
+/* Detalles específicos de expedientes */
 .detail-value.money {
-  font-family: var(--iggsad-font-mono);
-  color: var(--iggsad-primary-600);
-}
-
-/* ===== CELDAS ESPECÍFICAS ===== */
-
-/* Celda de expediente */
-.expediente-cell {
-  display: flex;
-  align-items: center;
-  gap: var(--iggsad-spacing-xs);
-}
-
-.expediente-code {
-  font-family: var(--iggsad-font-mono);
-  background: linear-gradient(135deg, var(--iggsad-primary-50) 0%, var(--iggsad-primary-100) 100%);
-  color: var(--iggsad-primary-700);
-  padding: 0.25rem 0.5rem;
-  border-radius: var(--iggsad-radius-sm);
-  font-size: var(--iggsad-text-xs);
+  font-family: var(--iggsad-font-mono, 'Monaco', 'Consolas', monospace);
   font-weight: var(--iggsad-font-semibold);
-  border: 1px solid var(--iggsad-primary-200);
+  color: var(--iggsad-success-600);
 }
 
-.urgente-badge {
-  font-size: 0.625rem;
-  padding: 0.125rem 0.375rem;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
-}
-
-/* Celdas de dinero */
-.money-cell {
-  text-align: right;
-  font-family: var(--iggsad-font-mono);
-}
-
-.money-amount {
-  font-weight: var(--iggsad-font-semibold);
-  font-size: var(--iggsad-text-sm);
-}
-
-.money-high {
-  color: #dc2626;
-  background: rgba(220, 38, 38, 0.1);
-  padding: 0.125rem 0.25rem;
-  border-radius: var(--iggsad-radius-sm);
-}
-
-.money-medium {
-  color: #ea580c;
-}
-
-.money-low {
-  color: #16a34a;
-}
-
-/* Celdas de fecha */
-.date-cell {
-  font-family: var(--iggsad-font-mono);
-}
-
-.date-value {
-  font-size: var(--iggsad-text-sm);
-}
-
-.date-recent {
-  color: var(--iggsad-surface-700);
-  font-weight: var(--iggsad-font-medium);
-}
-
-.date-medium {
-  color: #ea580c;
-}
-
-.date-old {
-  color: #dc2626;
-  font-weight: var(--iggsad-font-semibold);
-}
-
-.date-empty {
-  color: var(--iggsad-surface-400);
-  font-style: italic;
-}
-
-/* Tag de embargo */
-.embargo-tag {
-  font-size: var(--iggsad-text-xs);
-  font-weight: var(--iggsad-font-medium);
-}
-
-/* Celda de cartera */
-.cartera-cell {
-  display: flex;
-  align-items: center;
-  gap: var(--iggsad-spacing-xs);
-}
-
-.cartera-icon {
-  font-size: var(--iggsad-text-sm);
-}
-
-.cartera-icon.cartera-a { color: #2563eb; }
-.cartera-icon.cartera-b { color: #16a34a; }
-.cartera-icon.cartera-c { color: #ea580c; }
-.cartera-icon.cartera-default { color: var(--iggsad-surface-500); }
-
-.cartera-text {
-  font-size: var(--iggsad-text-sm);
-  color: var(--iggsad-surface-700);
-}
-
-/* Celda de titular */
-.titular-cell {
-  display: flex;
-  align-items: center;
-  gap: var(--iggsad-spacing-xs);
-}
-
-.titular-icon {
-  color: var(--iggsad-surface-500);
-  font-size: var(--iggsad-text-sm);
-}
-
-.titular-name {
-  font-size: var(--iggsad-text-sm);
-  color: var(--iggsad-surface-700);
-  font-weight: var(--iggsad-font-medium);
-}
-
-/* ===== ACCIONES DE FILA ===== */
-.acciones-cell {
-  display: flex;
-  gap: var(--iggsad-spacing-xs);
-  align-items: center;
-  justify-content: center;
-}
-
-.action-btn {
-  padding: var(--iggsad-spacing-xs);
-  min-width: var(--iggsad-height-md);
-  height: var(--iggsad-height-md);
-  transition: all var(--iggsad-transition-fast);
-}
-
-.action-btn:hover {
-  transform: translateY(-1px) scale(1.05);
-  box-shadow: var(--iggsad-shadow-md);
-}
-
-/* Estados de loading */
-.loading-overlay {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: var(--iggsad-spacing-xl);
-  gap: var(--iggsad-spacing-md);
-}
-
-.loading-spinner {
-  width: 3rem;
-  height: 3rem;
-}
-
-.loading-text {
-  color: var(--iggsad-surface-600);
-  font-size: var(--iggsad-text-sm);
-  font-weight: var(--iggsad-font-medium);
-}
-
-/* Estado vacío */
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: var(--iggsad-spacing-xl);
-  gap: var(--iggsad-spacing-md);
-  text-align: center;
-}
-
-.empty-icon {
-  font-size: 3rem;
-  color: var(--iggsad-surface-400);
-  margin-bottom: var(--iggsad-spacing-md);
-}
-
-.empty-title {
-  color: var(--iggsad-surface-700);
-  font-size: var(--iggsad-text-base);
-  font-weight: var(--iggsad-font-semibold);
-  margin: 0;
-}
-
-.empty-text {
-  color: var(--iggsad-surface-600);
-  font-size: var(--iggsad-text-sm);
-  margin: 0;
-}
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 1024px) {
-  .table-header {
-    flex-direction: column;
-    gap: var(--iggsad-spacing-md);
-    align-items: stretch;
-  }
-
-  .table-actions {
-    justify-content: center;
-  }
-
-  .custom-paginator {
-    flex-direction: column;
-    gap: var(--iggsad-spacing-sm);
-    text-align: center;
-  }
-
-  .paginator-center {
-    order: 1;
-  }
-
-  .paginator-left {
-    order: 2;
-    justify-content: center;
-  }
-
-  .paginator-right {
-    order: 3;
-    justify-content: center;
-  }
-
-  .expansion-grid {
-    grid-template-columns: 1fr;
-  }
-}
+/* ===== RESPONSIVE ESPECÍFICO DE EXPEDIENTES ===== */
 
 @media (max-width: 768px) {
-  .expedientes-table-container {
-    margin: 0 calc(-1 * var(--iggsad-spacing-sm));
-    border-radius: 0;
-  }
-
-  .table-header {
-    padding: var(--iggsad-spacing-md);
-  }
-
-  .table-title {
-    font-size: 1.125rem;
-  }
-
-  .custom-paginator {
-    padding: var(--iggsad-spacing-sm) var(--iggsad-spacing-md);
-  }
-
-  .acciones-cell {
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-
-  .action-btn {
-    font-size: var(--iggsad-text-xs);
-    padding: 0.25rem;
-  }
-
-  .expansion-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .detail-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .detail-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.25rem;
-  }
-}
-
-@media (max-width: 640px) {
-  .expedientes-table-body .p-datatable-tbody > tr > td {
-    padding: 0.25rem;
-    font-size: var(--iggsad-text-xs);
-  }
-
   .expediente-code {
     font-size: 0.675rem;
     padding: 0.125rem 0.25rem;
   }
 
-  .money-amount,
-  .date-value {
+  .money-amount {
     font-size: var(--iggsad-text-xs);
   }
 
-  .table-title-section {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--iggsad-spacing-sm);
+  .urgente-badge {
+    font-size: 0.5rem;
+    padding: 0.1rem 0.25rem;
   }
 }
 
-/* ===== ACCESIBILIDAD ===== */
+@media (max-width: 640px) {
+  .expediente-code {
+    font-size: 0.625rem;
+  }
+
+  .titular-name {
+    font-size: var(--iggsad-text-xs);
+  }
+
+  .money-amount,
+  .date-value {
+    font-size: 0.675rem;
+  }
+}
+
+/* ===== ANIMACIONES ESPECÍFICAS DE EXPEDIENTES ===== */
+
+.expediente-code {
+  transition: all var(--iggsad-transition-fast);
+}
+
+.expediente-code:hover {
+  background: var(--iggsad-primary-100);
+  color: var(--iggsad-primary-800);
+  transform: scale(1.02);
+}
+
+.money-amount {
+  transition: color var(--iggsad-transition-fast);
+}
+
+.urgente-badge {
+  animation: pulseUrgent 2s infinite;
+}
+
+@keyframes pulseUrgent {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* ===== ACCESIBILIDAD ESPECÍFICA ===== */
+
 @media (prefers-reduced-motion: reduce) {
-  *,
-  .expedientes-table-root *,
-  .expedientes-table-header *,
-  .expedientes-table-body *,
-  .expedientes-table-row * {
+  .expediente-code,
+  .money-amount,
+  .urgente-badge {
     transition: none !important;
     animation: none !important;
   }
 }
 
-.expedientes-table-body .p-datatable-tbody > tr:focus-within {
-  outline: 2px solid var(--iggsad-primary-600);
-  outline-offset: -2px;
-  z-index: 1;
-}
-
-.action-btn:focus-visible {
+.expediente-code:focus-visible {
   outline: 2px solid var(--iggsad-primary-600);
   outline-offset: 2px;
-}
-
-/* ===== MEJORAS DE PERFORMANCE ===== */
-.expedientes-table-root .p-datatable-scrollable-body {
-  will-change: transform;
-  transform: translateZ(0);
-}
-
-.expedientes-table-root .p-datatable-frozen-column {
-  will-change: transform;
-  transform: translateZ(0);
-}
-
-/* ===== ANIMACIONES SUTILES ===== */
-.expedientes-table-container {
-  animation: fadeIn 0.3s ease-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.expedientes-table-body .p-datatable-tbody > tr {
-  position: relative;
-}
-
-.expedientes-table-body .p-datatable-tbody > tr::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  background: linear-gradient(90deg, transparent 0%, var(--iggsad-primary-25, #f0f7ff) 50%, transparent 100%);
-  opacity: 0;
-  transition: opacity var(--iggsad-transition-fast);
-  pointer-events: none;
-}
-
-.expedientes-table-body .p-datatable-tbody > tr:hover::after {
-  opacity: 0.5;
 }
