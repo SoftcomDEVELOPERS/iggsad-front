@@ -1,28 +1,36 @@
 // composables/datatable/useTablePagination.js
-// Lógica de paginación extraída y generalizada
+// 🔧 UNIFICADO - Ahora maneja TODA la lógica de paginación
 
 import { ref, computed } from 'vue'
 import { COMMON_PAGINATION_CONFIG } from '@/constants/datatableConfig/commonTableConfig'
 
 export function useTablePagination(config, props, emit) {
-  // Estado local de paginación
-  const selectedPageSize = ref(config.pagination?.defaultPageSize || COMMON_PAGINATION_CONFIG.defaultPageSize)
+  // ✅ ÚNICA FUENTE DE VERDAD para el tamaño de página
+  const selectedPageSize = ref(
+    config.pagination?.defaultPageSize || 
+    COMMON_PAGINATION_CONFIG.defaultPageSize
+  )
   
-  // Opciones de tamaño de página como valores simples
+  // ✅ Opciones de tamaño de página como valores simples para PrimeVue
   const pageSizeValues = computed(() => 
     (config.pagination?.rowsPerPageOptions || COMMON_PAGINATION_CONFIG.rowsPerPageOptions)
       .map(option => option.value)
   )
   
-  // Configuración de paginación
+  // ✅ Opciones completas con labels para dropdowns
+  const pageSizeOptions = computed(() => 
+    config.pagination?.rowsPerPageOptions || COMMON_PAGINATION_CONFIG.rowsPerPageOptions
+  )
+  
+  // ✅ Configuración completa de paginación
   const paginationConfig = computed(() => ({
     ...COMMON_PAGINATION_CONFIG,
     ...config.pagination
   }))
   
-  // Información de paginación calculada
+  // ✅ Información calculada de paginación
   const paginationInfo = computed(() => {
-    const { page = 1, pageSize = 50, total = 0 } = props.pagination || {}
+    const { page = 1, pageSize = selectedPageSize.value, total = 0 } = props.pagination || {}
     const totalPages = Math.ceil(total / pageSize)
     const start = ((page - 1) * pageSize) + 1
     const end = Math.min(page * pageSize, total)
@@ -40,13 +48,29 @@ export function useTablePagination(config, props, emit) {
     }
   })
   
-  // Métodos de navegación de página (exactos del original)
-  const onPage = (e) => {
-    emit('page', e.page + 1)
+  // ✅ EVENTOS DE PAGINACIÓN - Métodos principales
+  
+  // Cambio de página desde el paginador de PrimeVue
+  const onPage = (event) => {
+    // PrimeVue envía el evento con page basado en 0, lo convertimos a 1
+    const pageNumber = event.page + 1
+    emit('page', pageNumber)
   }
   
-  const goToFirstPage = () => {
+  // Cambio de tamaño de página
+  const onPageSizeChange = (newSize) => {
+    selectedPageSize.value = newSize
+    emit('page-size-change', newSize)
+    // También resetear a la primera página
     emit('page', 1)
+  }
+  
+  // ✅ NAVEGACIÓN MANUAL - Métodos adicionales
+  
+  const goToFirstPage = () => {
+    if (paginationInfo.value.hasPrevious) {
+      emit('page', 1)
+    }
   }
   
   const goToPreviousPage = () => {
@@ -62,7 +86,9 @@ export function useTablePagination(config, props, emit) {
   }
   
   const goToLastPage = () => {
-    emit('page', paginationInfo.value.totalPages)
+    if (paginationInfo.value.hasNext) {
+      emit('page', paginationInfo.value.totalPages)
+    }
   }
   
   const goToPage = (pageNumber) => {
@@ -71,23 +97,27 @@ export function useTablePagination(config, props, emit) {
     }
   }
   
-  // Cambio de tamaño de página (exacto del original)
-  const onPageSizeChange = () => {
-    emit('page-size-change', selectedPageSize.value)
+  // ✅ HANDLER UNIFICADO para update:rows de PrimeVue
+  const handlePageSizeUpdate = (newSize) => {
+    onPageSizeChange(newSize)
   }
   
   return {
-    // Estado
+    // ✅ Estado reactivo
     selectedPageSize,
     
-    // Computed
+    // ✅ Computed properties
     pageSizeValues,
+    pageSizeOptions, 
     paginationConfig,
     paginationInfo,
     
-    // Métodos
+    // ✅ Eventos principales
     onPage,
     onPageSizeChange,
+    handlePageSizeUpdate,
+    
+    // ✅ Navegación manual
     goToFirstPage,
     goToPreviousPage,
     goToNextPage,

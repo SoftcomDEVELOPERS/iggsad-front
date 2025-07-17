@@ -1,4 +1,4 @@
-<!-- components/expedientes/ExpedientesTable.vue - ARREGLADO -->
+<!-- components/expedientes/ExpedientesTable.vue - ARREGLADO CON COMPOSABLES -->
 <template>
   <DataTableGeneric
     :config="tableConfig"
@@ -17,6 +17,7 @@
     @row-expand="$emit('row-expand', $event)"
     @row-collapse="$emit('row-collapse', $event)"
     @selection-change="$emit('selection-change', $event)"
+    @page-size-change="$emit('page-size-change', $event)"
   />
 </template>
 

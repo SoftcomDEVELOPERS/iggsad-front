@@ -1,5 +1,5 @@
 // constants/datatableConfig/expedientesTableConfig.js
-// Configuración exacta extraída del ExpedientesTable.vue actual
+// ✅ CONFIGURACIÓN ACTUALIZADA - Compatible con el nuevo sistema unificado
 
 import { 
   COMMON_PAGINATION_CONFIG, 
@@ -11,7 +11,7 @@ import {
 } from './commonTableConfig'
 
 export const EXPEDIENTES_TABLE_CONFIG = {
-  // Metadatos de la tabla
+  // ===== METADATOS DE LA TABLA =====
   meta: {
     name: 'expedientes',
     title: 'Expedientes',
@@ -28,10 +28,11 @@ export const EXPEDIENTES_TABLE_CONFIG = {
     resizableColumns: true,
     sortMode: 'multiple',
     removableSort: true,
-    dataKey: 'numero'
+    dataKey: 'numero',
+    selectionMode: 'multiple'
   },
   
-  // Configuración exacta de columnas del archivo original
+  // ===== CONFIGURACIÓN DE COLUMNAS =====
   columns: [
     { 
       field: 'numero', 
@@ -147,62 +148,6 @@ export const EXPEDIENTES_TABLE_CONFIG = {
       type: 'date'
     },
     {
-      field: 'ultFechaAgJud',
-      header: 'Últ. F. Ag. Jud.',
-      style: { 'min-width': '120px' },
-      visible: true,
-      sortable: true,
-      type: 'date'
-    },
-    {
-      field: 'ultFechaGesExp',
-      header: 'Últ. F. Ges. Exp.',
-      style: { 'min-width': '130px' },
-      visible: true,
-      sortable: true,
-      type: 'date'
-    },
-    { 
-      field: 'embargos', 
-      header: 'Embargos', 
-      style: { 'min-width': '80px' },
-      visible: true,
-      sortable: true,
-      type: 'embargo'
-    },
-    {
-      field: 'ultFecCobro',
-      header: 'Últ. F. Cobro',
-      style: { 'min-width': '110px' },
-      visible: false,
-      sortable: true,
-      type: 'date'
-    },
-    { 
-      field: 'lo', 
-      header: 'LO', 
-      style: { 'min-width': '50px' },
-      visible: false,
-      sortable: true,
-      type: 'text'
-    },
-    { 
-      field: 'gt', 
-      header: 'GT', 
-      style: { 'min-width': '50px' },
-      visible: false,
-      sortable: true,
-      type: 'text'
-    },
-    { 
-      field: 'oc', 
-      header: 'OC', 
-      style: { 'min-width': '50px' },
-      visible: false,
-      sortable: true,
-      type: 'text'
-    },
-    {
       field: 'principal',
       header: 'Principal',
       style: { 'min-width': '100px', 'text-align': 'right' },
@@ -213,18 +158,34 @@ export const EXPEDIENTES_TABLE_CONFIG = {
     {
       field: 'intereses',
       header: 'Intereses',
-      style: { 'min-width': '100px', 'text-align': 'right' },
-      visible: true,
+      style: { 'min-width': '90px', 'text-align': 'right' },
+      visible: false,
       sortable: true,
       type: 'money'
     },
     {
       field: 'costas',
       header: 'Costas',
-      style: { 'min-width': '90px', 'text-align': 'right' },
+      style: { 'min-width': '80px', 'text-align': 'right' },
       visible: false,
       sortable: true,
       type: 'money'
+    },
+    {
+      field: 'ultFecCobro',
+      header: 'Últ. F. Cobro',
+      style: { 'min-width': '110px' },
+      visible: false,
+      sortable: true,
+      type: 'date'
+    },
+    {
+      field: 'embargos',
+      header: 'Embargos',
+      style: { 'min-width': '90px' },
+      visible: true,
+      sortable: true,
+      type: 'embargo'
     },
     {
       field: 'ingJud',
@@ -244,11 +205,11 @@ export const EXPEDIENTES_TABLE_CONFIG = {
     }
   ],
   
-  // Configuración de acciones usando las comunes + específicas
+  // ===== CONFIGURACIÓN DE ACCIONES =====
   actions: {
     view: {
       ...COMMON_TABLE_ACTIONS.view,
-      tooltip: 'Ver expediente'
+      tooltip: 'Ver detalles del expediente'
     },
     edit: {
       ...COMMON_TABLE_ACTIONS.edit,
@@ -256,7 +217,7 @@ export const EXPEDIENTES_TABLE_CONFIG = {
     }
   },
   
-  // Configuración de expansión exacta
+  // ===== CONFIGURACIÓN DE EXPANSIÓN =====
   expansion: {
     enabled: true,
     sections: [
@@ -290,7 +251,7 @@ export const EXPEDIENTES_TABLE_CONFIG = {
     ]
   },
   
-  // Configuración del menú contextual exacta
+  // ===== CONFIGURACIÓN DEL MENÚ CONTEXTUAL =====
   contextMenu: [
     {
       label: 'Ver Detalles',
@@ -330,22 +291,22 @@ export const EXPEDIENTES_TABLE_CONFIG = {
     }
   ],
   
-  // Configuración de columnas - funciones de configuración específicas de expedientes
+  // ===== CONFIGURACIÓN DE COLUMNAS =====
   columnConfig: {
     showAllEnabled: true,
     basicFields: ['numero', 'cartera', 'nombreTitular', 'fechaEnvio', 'principal', 'embargos'],
     configurable: true
   },
 
-  // Usar configuraciones comunes
+  // ===== USAR CONFIGURACIONES COMUNES =====
   pagination: COMMON_PAGINATION_CONFIG,
   pt: COMMON_TABLE_PT,
   classes: COMMON_TABLE_CLASSES
 }
 
-// Funciones auxiliares específicas de expedientes (solo las que no están en common)
+// ===== FUNCIONES AUXILIARES ESPECÍFICAS DE EXPEDIENTES =====
 export const EXPEDIENTES_TABLE_HELPERS = {
-  // Función para detectar expedientes urgentes (exacta del original)
+  // Función para detectar expedientes urgentes
   isUrgent: (data) => {
     const principal = parseFloat(data.principal) || 0
     const daysSinceEnvio = data.fechaEnvio ? 
@@ -354,7 +315,7 @@ export const EXPEDIENTES_TABLE_HELPERS = {
     return principal > 5000 || daysSinceEnvio > 90
   },
   
-  // Función para obtener clase de cartera (específica de expedientes)
+  // Función para obtener clase de cartera
   getCarteraIconClass: (cartera) => {
     const iconMap = {
       'Cartera A': 'cartera-a',
@@ -362,6 +323,23 @@ export const EXPEDIENTES_TABLE_HELPERS = {
       'Cartera C': 'cartera-c'
     }
     return iconMap[cartera] || 'cartera-default'
+  },
+  
+  // Calcular estadísticas de expedientes
+  getExpedientesStats: (expedientes) => {
+    const total = expedientes.length
+    const urgentes = expedientes.filter(exp => EXPEDIENTES_TABLE_HELPERS.isUrgent(exp)).length
+    const conEmbargos = expedientes.filter(exp => exp.embargos === 'Sí').length
+    const totalPrincipal = expedientes.reduce((sum, exp) => sum + (parseFloat(exp.principal) || 0), 0)
+    
+    return {
+      total,
+      urgentes,
+      conEmbargos,
+      totalPrincipal,
+      porcentajeUrgentes: total > 0 ? Math.round((urgentes / total) * 100) : 0,
+      porcentajeEmbargos: total > 0 ? Math.round((conEmbargos / total) * 100) : 0
+    }
   }
 }
 
