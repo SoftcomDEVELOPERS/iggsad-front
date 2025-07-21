@@ -1,413 +1,525 @@
-Aquí tienes un resumen fiel de todo lo que contiene **iggsad-front**, tras explorar cada archivo y carpeta:
+# 📚 IGGSAD Frontend - Esquema Arquitectural Completo
+
+## 🎯 Resumen Ejecutivo
+
+**IGGSAD Gestión Procesal** es una aplicación frontend Vue 3 para gestión de casos legales que se conecta a un backend .NET. El sistema cuenta con dashboard personalizable, gestión avanzada de expedientes, sistema de filtros sofisticado y arquitectura modular escalable.
 
 ---
 
-## 📁 Estructura general
+## 📁 Estructura Real del Proyecto
 
 ```
-front/  
-├─ .env*                  # Variables de entorno (VITE_SSO_URL, etc.)  
-├─ Caddyfile              # Proxy local HTTPS → SSO/API  
-├─ package.json           # Dependencias: Vue 3, Vite, Tailwind, PrimeVue, Pinia, @tanstack/vue-query, Zod…  
-├─ vite.config.js         # Configuración de Vite + proxy a SSO en dev  
-├─ tailwind.config.js     # TailwindCSS  
-├─ public/                # index.html, favicon, estáticos  
-├─ src/                   # Código fuente  
-│  ├─ main.js             # Bootstrapping de la app: crea Vue, Pinia, PrimeVue, monta router, inicializa interceptor HTTP y checkAuth  
-│  ├─ assets/             # Tailwind imports y otros recursos  
-│  ├─ themes/             # primevue-theme.js: tema personalizado  
-│  ├─ router/             # index.js: definición de rutas y guards (login → landing + checks de permisos)  
-│  ├─ services/           #  
-│  │   ├─ httpInterceptor.js   #  
-│  │   │  – Sobrescribe window.fetch para:  
-│  │   │     • Incluir `credentials: 'include'` en todas las peticiones a `/api` o VITE_SSO_URL  
-│  │   │     • Gestionar refresh tokens (evitar bucles, 401 → redirige a login)  
-│  │   │     • Centralizar headers JSON y errores HTTP  
-│  │   ├─ auth.services.js     # login, logout, fetchMe(), refreshToken() usando fetch directo a `${VITE_SSO_URL}/auth/...`  
-│  │   └─ jwtServices.js       # parseJwt(token) para extraer payload y expiración  
-│  ├─ stores/             #  
-│  │   └─ auth.js             # Pinia store “auth”:  
-│  │       • state: `{ user, frontPermissions, isLoading }`  
-│  │       • getters: `isAuthenticated`, `canAccess(permission)`  
-│  │       • actions: `login()`, `logout()`, `checkAuth()` que llama a auth.services.fetchMe() y refreshToken()  
-│  ├─ composables/        # useFilterPanel.js: lógica reusable para paneles de filtros  
-│  ├─ constants/          # filterOptions.js: opciones de filtros en UI  
-│  ├─ components/         #  
-│  │   └─ filters/sections/FilterSection*.vue   # Secciones de filtro reutilizables  
-│  ├─ views/              #  
-│  │   ├─ Login.vue            # Formulario de login  
-│  │   └─ Dashboard.vue      # Dashboard / página principal  
-│  └─ style.css           # Estilos globales adicionales  
-└─ .git/                  # Control de versiones (hooks, configuración…)  
-```
+front/
+├── .env*                           # Variables de entorno (VITE_SSO_URL, VITE_COREAPI_URL, VITE_DEV_PORT)
+├── Caddyfile                       # Proxy HTTPS local → SSO/API
+├── package.json                    # Dependencias actualizadas (ver stack técnico)
+├── vite.config.js                  # Config Vite + proxy + alias
+├── tailwind.config.js              # Configuración Tailwind personalizada
+├── public/
+│   ├── index.html
+│   ├── images/logoBalanza.png
+│   └── mock/expedientes.json       # Datos mock para desarrollo
+├── doc/                            # Documentación completa del sistema
+│   ├── Schema_front.md
+│   ├── Sistema Dashboard.md
+│   ├── Sistema Datatable Generico.md
+│   ├── Sistema de Estilos Mejorados.md
+│   └── userProfile.md
+└── src/                            # Código fuente
+    ├── main.js                     # Punto de entrada de la aplicación
+    ├── App.vue                     # Layout principal con navegación
+    ├── assets/tailwind.css         # Importaciones Tailwind
+    ├── components/                 # Componentes reutilizables
+    │   ├── dashboard/              # Sistema dashboard completo
+    │   │   ├── DashboardGrid.vue          # Grid drag & drop
+    │   │   ├── GridCard.vue               # Wrapper universal
+    │   │   └── cards/
+    │   │       ├── StatCard.vue
+    │   │       ├── StatsDashboard.vue
+    │   │       ├── RecentSearchesCard.vue
+    │   │       ├── NotificationsCard.vue
+    │   │       ├── ChatCard.vue
+    │   │       ├── QuickActionsCard.vue
+    │   │       └── CustomCard.vue
+    │   ├── datatable/              # Sistema tabla genérico
+    │   │   ├── DataTableGeneric.vue       # Componente principal
+    │   │   ├── ColumnRenderer.vue         # Renderizado de columnas
+    │   │   └── TableActions.vue           # Acciones de fila
+    │   ├── expedientes/            # Gestión de casos legales
+    │   │   ├── ExpedientesTable.vue       # Tabla especializada
+    │   │   ├── ExpedientesDetailDialog.vue
+    │   │   └── ExpedientesDrawer.vue
+    │   ├── filters/                # Sistema filtros avanzado
+    │   │   ├── FilterPanel.vue            # Panel principal
+    │   │   ├── FiltersDrawer.vue          # Drawer lateral
+    │   │   ├── FloatingActiveFilters.vue  # Filtros activos
+    │   │   ├── FilterDate.vue
+    │   │   ├── FilterDateRange.vue
+    │   │   ├── FilterField.vue
+    │   │   ├── FilterMultiSelect.vue
+    │   │   ├── FilterNumber.vue
+    │   │   ├── FilterSelect.vue
+    │   │   ├── FilterText.vue
+    │   │   └── sections/                  # Secciones especializadas
+    │   │       ├── FilterSectionFechas.vue
+    │   │       ├── FilterSectionIntervinientes.vue
+    │   │       ├── FilterSectionProcedimiento.vue
+    │   │       ├── FilterSectionProcedimientoBasico.vue
+    │   │       └── FilterSectionAdicionales.vue
+    │   ├── AuthLayout.vue
+    │   ├── BreadcrumbWrapper.vue
+    │   ├── DarkModeToggle.vue
+    │   ├── Dock.vue                       # Dock personalizable
+    │   ├── LoginForm.vue
+    │   ├── ResetPasswordForm.vue
+    │   └── SearchBar.vue
+    ├── composables/                # Lógica reutilizable (17 composables)
+    │   ├── datatable/
+    │   │   ├── useTableActions.js
+    │   │   ├── useTablePagination.js
+    │   │   └── useTableSorting.js
+    │   ├── useAppLayout.js
+    │   ├── useFilterPanel.js
+    │   ├── useFiltersDrawer.js
+    │   ├── usePersistentView.js           # Persistencia URL
+    │   ├── useToast.js
+    │   ├── useUrlPersistence.js
+    │   ├── useUserDashboard.js            # Dashboard management (500+ líneas)
+    │   └── useUserProfile.js              # Gestión perfil usuario
+    ├── constants/
+    │   ├── datatableConfig/
+    │   │   ├── commonTableConfig.js
+    │   │   └── expedientesTableConfig.js
+    │   └── filterOptions.js
+    ├── router/index.js             # Rutas y guards de autenticación
+    ├── services/                   # Servicios API
+    │   ├── httpInterceptor.js             # Interceptor HTTP universal
+    │   ├── auth.services.js               # Servicios de autenticación
+    │   ├── expedientes.services.js        # API expedientes
+    │   └── jwtServices.js                 # Utilidades JWT
+    ├── stores/                     # Estado global Pinia
+    │   ├── auth.js                        # Autenticación y permisos
+    │   └── expedientes.js                 # Estado expedientes
+    ├── styles/                     # Estilos globales y componentes
+    │   ├── components/
+    │   ├── app-layout.css
+    │   ├── dashboard.css
+    │   ├── datatable.css
+    │   ├── expedientes.css
+    │   ├── expedientes-dialog.css
+    │   ├── expedientes-table.css
+    │   ├── index.css
+    │   ├── toast.config.js
+    │   ├── toast.styles.js
+    │   └── toast.variants.js
+    ├── themes/                     # Tematización personalizada
+    │   ├── custom-tokens.css              # 360+ líneas de tokens CSS
+    │   └── primevue-theme.js              # Tema PrimeVue personalizado
+    ├── types/vue-grid-layout.d.ts  # Tipos TypeScript
+    ├── utils/
+    │   ├── defaultUserProfile.js          # 260+ líneas configuración
+    │   └── mockExpedientesGenerator.js
+    ├── views/                      # Vistas principales
+    │   ├── Dashboard.vue                  # Dashboard principal
+    │   ├── Expedientes.vue               # Vista expedientes (430+ líneas)
+    │   ├── Login.vue
+    │   └── ResetPassword.vue
+    └── style.css                   # Estilos globales
 
 ---
 
-## 🔧 Herramientas y flujo de ejecución
+## 🛠️ Stack Tecnológico Completo
 
-1. **Arranque**
+### **Dependencias Principales (package.json)**
+- **Vue 3.5.13** - Framework reactivo con Composition API
+- **Vite 6.3.5** - Build tool y dev server
+- **PrimeVue 4.3.6** - Biblioteca UI principal
+- **@primeuix/themes 1.1.1** - Sistema de temas avanzado  
+- **@primevue/forms 4.3.5** - Sistema de formularios con validación
+- **Pinia 3.0.3** - Gestión de estado reactivo
+- **Vue Router 4.5.1** - Enrutado SPA
+- **Tailwind CSS 3.4.17** - Framework CSS utilitario
+- **grid-layout-plus 1.1.0** - Sistema grid drag & drop para dashboard
+- **Zod 3.25.64** - Validación de esquemas
+- **js-cookie 3.0.5** - Gestión de cookies
+- **PrimeIcons 7.0.0** - Iconografía
 
-   * `pnpm install`
-   * `npm run dev` → Vite levanta server + Caddy proxy a SSO/API
-2. **Autenticación**
-
-   * `main.js` inicializa el interceptor (`httpInterceptor.js`) y ejecuta `authStore.checkAuth()`.
-   * Si el usuario no está autenticado o expira el token, el interceptor/redirección de rutas lleva al login.
-3. **Peticiones HTTP**
-
-   * Toda llamada a API pasa por `httpInterceptor.js`, que:
-
-     * Añade JSON headers + `credentials: 'include'`.
-     * Intercepta 401 para refrescar el token o forzar login.
-     * Proporciona `httpClient.get/post/put/delete()` (aunque `auth.services.js` usa `fetch` directo para login/refresh).
-4. **Gestión de permisos**
-
-   * Después de login, `authStore.fetchMe()` recupera `{ user, frontPermissions }`.
-   * El guard de rutas (`router.beforeEach`) bloquea rutas según `meta.requiresAuth` y `meta.requiredPermission`.
-
----
-
-## ⚙️ Configuración y entornos
-
-* **.env** variables comunes
-* **.env.development** (ej. `VITE_SSO_URL=https://localhost:5116/api`)
-* **.env.production** (URLs reales)
-* **Caddyfile**: HTTPS local + proxy automático de cookies a backend
-* **vite.config.js**: integra alias (`@` → `src`), plugin de devtools y proxy de desarrollo a SSO/API
+### **DevDependencies**
+- **@vitejs/plugin-vue 5.2.3** - Plugin Vue para Vite
+- **vite-plugin-vue-devtools 7.7.6** - Herramientas desarrollo Vue
+- **@types/js-cookie 3.0.6** - Tipos TypeScript
+- **autoprefixer 10.4.21** - PostCSS autoprefixer
+- **postcss 8.5.4** - Procesador CSS
 
 ---
 
-## 🗂 Puntos clave a retener
+## 🔧 Comandos y Flujo de Desarrollo
 
-* **httpInterceptor.js** es la única fuente de verdad para todas las peticiones (`window.fetch` sobrescrito).
-* **auth.services.js** concentra login/refresh/logout/fetchMe pero usa `fetch` “a pelo” apuntando a `VITE_SSO_URL`.
-* **stores/auth.js** une servicios y router guards: controla estado de sesión, tokens, permisos y redirecciones.
-* La **UI** usa PrimeVue + Tailwind + Zod para validación (aunque por ahora Zod solo está instalado, no ampliamente usado).
-* Solo hay dos vistas activas (Login y Landing); el resto está comentado como ejemplo.
+### **Scripts Disponibles**
+```bash
+pnpm install              # Instalar dependencias (preferido)
+npm run dev               # Servidor desarrollo Vite
+npm run build             # Build producción
+npm run preview           # Preview build
+npm run start:caddy       # Proxy HTTPS local
+npm run tw:init           # Inicializar Tailwind
+```
+
+### **Flujo de Desarrollo Típico**
+1. **Instalación**: `pnpm install`
+2. **Desarrollo**: `npm run dev` (puerto VITE_DEV_PORT o 5173)
+3. **HTTPS Local**: `npm run start:caddy` (opcional para testing SSO)
+4. **Build**: `npm run build` para producción
+
+### **Bootstrap de la Aplicación** (`main.js`)
+1. **Configuración Vue**: createApp + plugins
+2. **PrimeVue**: Configuración con tema personalizado GestionProcesalTheme
+3. **Pinia**: Inicialización stores
+4. **HTTP Interceptor**: Configuración automática
+5. **Verificación Auth**: `authStore.checkAuth()` automático
+6. **Carga Perfil**: `useUserProfile().loadProfile()` si autenticado
+7. **Montaje**: App montada tras router.isReady()
 
 ---
 
-### **VERSION 2**
+## 🔐 Sistema de Autenticación Avanzado
 
-# 📚 Documentación del Sistema de Gestión Procesal
+### **Interceptor HTTP Universal** (`httpInterceptor.js`)
+- **Sobrescribe `window.fetch`** para TODAS las peticiones
+- **Cookies automáticas**: `credentials: 'include'` 
+- **Headers JSON**: `Content-Type: application/json` automático
+- **Gestión 401**: Refresh token automático o logout
+- **Gestión 403**: Redirección a página de error
+- **Prevención bucles**: Control de intentos de refresh
 
-## 🏗️ Arquitectura General
+### **Servicios de Autenticación** (`auth.services.js`)
+- `login(credentials)` - Autenticación con cookies
+- `logout()` - Cierre sesión completo
+- `fetchMe()` - Obtener datos usuario y permisos
+- `refreshToken()` - Renovación token automática
+- `requestPasswordReset()` - Solicitar reset password
+- `verifyResetToken()` - Verificar token reset
+- `resetPassword()` - Cambiar password con token
+- `changePassword()` - Cambio password autenticado
 
-### Stack Tecnológico
-- **Framework**: Vue 3 con Composition API
-- **Router**: Vue Router 4
-- **Estado**: Pinia
-- **Build Tool**: Vite
-- **UI Library**: PrimeVue 4
-- **Estilos**: Tailwind CSS + PrimeVue Theme personalizado
-- **Iconos**: PrimeIcons
-
-### Estructura del Proyecto
-```
-src/
-├── components/
-│   ├── Dashboard.vue (Dashboard principal)
-│   └── Dock.vue (Componente dock personalizado)
-├── stores/ (Pinia stores)
-├── App.vue (Layout principal con navegación)
-├── main.js (Configuración de la aplicación)
-└── primevue-theme.js (Tema personalizado)
-```
-
-## 🎨 Tema Personalizado (primevue-theme.js)
-
-### Paleta de Colores
-- **Primary**: Azules (#2563eb como principal)
-- **Surface**: Escala de grises slate
-- **Fondo**: Blanco y grises claros
-
-### Componentes Personalizados
-
-#### Menubar
-- **Root**: Fondo transparente, sin bordes
-- **Items**: 
-  - Normal: Texto gris oscuro (`{surface.700}`)
-  - Hover: Fondo azul sólido (`{primary.600}`) + texto blanco
-  - Padding: `0.5rem 1rem`, border-radius: `6px`
-
-#### Cards
-- Border-radius: `12px`
-- Sombra sutil
-- Padding: `1.5rem`
-
-#### Buttons
-- Border-radius: `8px`
-- Focus ring azul
-- Sombra en variante raised
-
-#### Toast
-- Width: `25rem`
-- Border-radius: `12px`
-- Sin bordes, solo sombra
-
-## 🏠 App.vue - Layout Principal
-
-### Header
-- **Logo**: `logoBalanza.png` (con fallback a icono)
-- **Título**: "Gestión Procesal" + "Sistema Jurídico Integral"
-- **Navegación**: Menubar con 4 secciones principales
-- **Usuario**: Botones de perfil y logout
-
-### Estructura del Menú
-```javascript
-menuItems = [
-  {
-    label: 'Casos',
-    items: ['Todos los Casos', 'Nuevo Caso', 'Casos Urgentes', 'Archivo']
-  },
-  {
-    label: 'Audiencias', 
-    items: ['Calendario', 'Próximas Citas', 'Historial']
-  },
-  {
-    label: 'Documentos',
-    items: ['Biblioteca', 'Plantillas', 'Subir Documento']
-  },
-  {
-    label: 'Clientes',
-    items: ['Lista de Clientes', 'Nuevo Cliente', 'Deudores']
-  }
-]
-```
-
-### Estilos CSS
-- Solo para botones del usuario en el header
-- Toast con z-index alto
-- Familia de fuentes: Inter
-
-## 📊 Dashboard.vue - Dashboard Principal
-
-### Layout (Grid 3 columnas)
-- **Columnas principales (2/3)**: Búsqueda, resultados, estadísticas
-- **Sidebar derecha (1/3)**: Notificaciones, chat, acciones rápidas
-
-### Componentes Principales
-
-#### Header Dashboard
-- Título + fecha actual
-- Último acceso
-
-#### Barra de Búsqueda
-- Input principal con icono
-- Botón "Filtros" con badge de conteo
-- Botón "Buscar"
-
-#### Búsquedas Recientes
-- Cards compactas con:
-  - Número expediente (font-mono, azul)
-  - Nombre cliente
-  - Cantidad deuda (verde)
-- Máximo 5 búsquedas
-- Botón limpiar historial
-
-#### Estadísticas (Grid 2x2)
-- Casos Activos (icono folder, azul)
-- Audiencias Próximas (icono calendar, verde)
-- Casos Urgentes (icono warning, ámbar)
-- Total Clientes (icono users, morado)
-
-#### Panel Derecho
-1. **Notificaciones**
-   - Badge con conteo no leídas
-   - Items con colores por tipo
-   - Botón "marcar todas como leídas"
-
-2. **Chat**
-   - Badge verde con mensajes no leídos
-   - Vista previa de mensajes
-   - Enlace a chat completo
-
-3. **Acciones Rápidas**
-   - Nuevo Caso
-   - Subir Documento
-   - Nuevo Cliente
-
-#### Drawer de Filtros
-- **Componente**: Drawer (no Sidebar - deprecado)
-- **Posición**: Izquierda
-- **Filtros básicos**: Tipo proceso, Estado, Fechas, Juzgado, Prioridad
-- **Filtros avanzados**: Cuantía, Abogado, Cliente (en Accordion)
-
-### Estado Reactivo
-```javascript
-// Búsqueda
-searchQuery, searchResults, showFilters
-
-// Datos simulados
-stats, recentSearches, notifications, recentMessages
-
-// Filtros
-filters: {
-  processType: [], status: null, dateRange: null,
-  court: null, priority: [], amountFrom: null,
-  amountTo: null, lawyer: null, clientName: ''
-}
-```
-
-## 🚢 Dock.vue - Componente Dock Personalizado
-
-### Características
-- **Posicionamiento**: Fijo en cualquier borde de pantalla
-- **Orientación**: Automática (horizontal/vertical según borde)
-- **Ocultable**: Con animaciones suaves
-- **Selector de posición**: Grid 3x3 visual
-
-### Props
+### **Store de Autenticación** (`stores/auth.js`)
+**Estado:**
 ```javascript
 {
-  items: Array (required),
-  hideTooltip: String,
-  showTooltip: String, 
-  autoHide: Boolean,
-  autoHideDelay: Number,
-  initialEdge: String ['top', 'right', 'bottom', 'left']
-}
-```
-
-### Items Structure
-```javascript
-{
-  id: String,
-  label: String,
-  icon: String (PrimeIcon),
-  active: Boolean,
-  badge: String,
-  command: Function
-}
-```
-
-### Estados Reactivos
-- `isHidden`: Visibilidad del dock
-- `showHideButton`: Mostrar botones de control
-- `showPositionSelector`: Mostrar selector de posición
-- `edge`: Borde actual ('top', 'right', 'bottom', 'left')
-
-### Botones de Control
-- **Azul**: Ocultar/mostrar (icono según borde)
-- **Verde**: Selector de posición (icono arrows-alt)
-- **Tamaño**: 28x28px, border-radius 8px
-- **Posición**: Centrados respecto al contenedor
-
-### Selector de Posición
-- Grid 3x3 con iconos direccionales
-- Posicionamiento inteligente (siempre visible)
-- Estado activo resaltado
-- Tooltips nativos (title)
-
-### Estilos
-- **Contenedor**: Fondo oscuro semi-transparente, blur
-- **Items**: 48x48px, fondo blanco, border-radius 12px
-- **Badges**: 14x14px, rojo, esquina superior derecha
-- **Animaciones**: Shimmer effect, scale en hover
-
-### Posicionamiento
-- **CSS positioning**: Basado en edge actual
-- **Transform**: Para centrado perfecto
-- **Márgenes**: 20px desde bordes de pantalla
-
-## 📋 Configuración main.js
-
-### PrimeVue Setup
-```javascript
-app.use(PrimeVue, {
-  theme: {
-    preset: GestionProcesalTheme, // Tema personalizado
-    options: {
-      prefix: 'p',
-      darkModeSelector: '.dark',
-      cssLayer: false
-    }
+  user: null,                    // Datos usuario logueado
+  frontPermissions: [],          // Permisos para frontend
+  isLoading: false,              // Estado carga
+  userProfile: {                 // Configuración personalizada completa
+    dashboard: { layout, cardsConfig },
+    dock: { items, position, preferences },
+    filters: { favoritos, configuracion },
+    preferences: { tema, idioma, notificaciones }
   }
-})
-
-// Tooltip directive
-app.directive('tooltip', TooltipDirective)
+}
 ```
 
-### Router
-- Hash o History mode
-- Rutas básicas para cada sección
+**Acciones:**
+- `doLogin()` - Login completo con redirección
+- `logout()` - Logout con limpieza estado  
+- `checkAuth()` - Verificación automática sesión
+- `updateUserProfile()` - Persistencia configuración usuario
 
-### Pinia
-- Store de autenticación (opcional)
-- Stores para estado global
-
-## 🎯 Características Clave
-
-### Responsive Design
-- Grid adaptativo en dashboard
-- Dock responsive (tamaños móvil)
-- Drawer full-width en móviles
-
-### Accesibilidad
-- Tooltips en todos los elementos interactivos
-- Focus rings en tema
-- Contraste apropiado
-- Navegación por teclado
-
-### Animaciones
-- Transiciones suaves (0.2s ease)
-- Cubic-bezier para movimientos naturales
-- Hover effects con scale y sombras
-- Fade in/out para elementos condicionales
-
-### Estados Visuales
-- Badges con contadores
-- Indicadores de prioridad (colores borde)
-- Estados activos en navegación
-- Loading states preparados
-
-## 🔧 Funcionalidades Implementadas
-
-### Dashboard
-✅ Búsqueda con filtros avanzados
-✅ Historial de búsquedas (5 últimas)
-✅ Estadísticas en tiempo real
-✅ Notificaciones con estados
-✅ Chat con vista previa
-✅ Acciones rápidas
-
-### Dock
-✅ Posicionamiento en 4 bordes
-✅ Selector visual de posición
-✅ Ocultación con animaciones
-✅ Badges dinámicos
-✅ Estados activos
-✅ Tooltips informativos
-
-### Navegación
-✅ Menú principal con submenús
-✅ Hover states apropiados
-✅ Router integration
-✅ Logout functionality
-
-## 📝 Notas de Desarrollo
-
-### Dependencias Clave
-- `@primeuix/themes`: Para tema personalizado
-- `primevue`: Componentes UI
-- `primeicons`: Iconografía
-- `vue-router`: Navegación
-- `pinia`: Estado global
-
-### Archivos Importantes
-- `primevue-theme.js`: Configuración visual completa
-- `App.vue`: Layout y navegación principal  
-- `Dashboard.vue`: Dashboard funcional
-- `Dock.vue`: Componente dock reutilizable
-
-### Convenciones
-- Composition API en todos los componentes
-- Props validation donde sea necesario
-- Emits declarados explícitamente
-- Estilos scoped cuando sea posible
-- Colores usando tokens del tema
+### **Guards de Rutas** (`router/index.js`)
+- **requiresAuth**: Requiere autenticación
+- **requiredPermission**: Requiere permiso específico
+- **public**: Rutas públicas (login, reset)
+- **Redirección automática**: Login ↔ Dashboard según estado auth
 
 ---
 
-Esta documentación cubre la estructura completa del sistema. Actualízala según evolucione el proyecto.
+## 🏗️ Arquitectura de Componentes
+
+### **Sistema Dashboard** (Documentado en Sistema Dashboard.md)
+- **DashboardGrid.vue**: Grid drag & drop con grid-layout-plus
+- **GridCard.vue**: Wrapper universal para todas las cards
+- **8 tipos de cards**: Stats, Recent Searches, Notifications, Chat, etc.
+- **Configuración visual**: Panel modal con selector de componentes
+- **Persistencia completa**: Layout guardado en userProfile
+
+### **Sistema DataTable Genérico** (Documentado en Sistema Datatable.md)
+- **DataTableGeneric.vue**: Componente base reutilizable
+- **ColumnRenderer.vue**: Renderizado especializado por tipo
+- **TableActions.vue**: Acciones de fila configurables
+- **Composables especializados**: Paginación, ordenación, acciones
+- **Configuración externa**: Archivos de configuración por tabla
+
+### **Sistema Filtros Avanzado**
+- **FilterPanel.vue**: Panel principal de filtros
+- **FiltersDrawer.vue**: Drawer lateral para filtros
+- **FloatingActiveFilters.vue**: Filtros activos flotantes
+- **5+ componentes de filtro**: Date, DateRange, MultiSelect, etc.
+- **5 secciones especializadas**: Fechas, Procedimiento, etc.
+- **Persistencia URL**: Estado filtros en parámetros URL
+
+### **Sistema Expedientes**
+- **Expedientes.vue**: Vista principal (430+ líneas)
+- **ExpedientesTable.vue**: Tabla especializada
+- **ExpedientesDetailDialog.vue**: Modal detalles
+- **ExpedientesDrawer.vue**: Drawer información
+- **Integración completa**: Filtros + Búsqueda + Estadísticas
+
+---
+
+## 🎨 Sistema de Estilos y Temas
+
+### **Tema PrimeVue Personalizado** (`themes/primevue-theme.js`)
+- **GestionProcesalTheme**: Tema completo personalizado
+- **Paleta profesional**: Azules corporativos + grises slate
+- **Componentes estilizados**: Cards, Buttons, Toast, DataTable
+- **Modo oscuro**: Soporte completo con `.p-dark`
+
+### **Tokens CSS Personalizados** (`themes/custom-tokens.css`)
+- **360+ líneas de tokens**: Spacing, typography, sizing
+- **Sistema de colores**: Primarios, secundarios, estados
+- **Variables específicas**: Componentes y layouts
+- **Responsive**: Breakpoints y adaptación
+
+### **Sistema Toast Especializado**
+- **8 variantes especializadas**: Critical, Legal, Financial, etc.
+- **Configuración avanzada**: toast.config.js
+- **Estilos profesionales**: toast.styles.js
+- **Contexto legal**: Adaptado a gestión procesal
+
+---
+
+## 💾 Gestión de Estado y Persistencia
+
+### **Stores Pinia**
+- **auth.js**: Autenticación, permisos, userProfile
+- **expedientes.js**: Estado expedientes, filtros, búsquedas
+
+### **Persistencia Múltiple**
+- **LocalStorage**: userProfile, preferencias
+- **URL Parameters**: Filtros, estado vistas
+- **Cookies**: Tokens autenticación (httpOnly)
+- **Backend**: Configuración usuario sincronizada
+
+### **Composables de Persistencia**
+- **usePersistentView.js**: Sincronización vista ↔ URL
+- **useUrlPersistence.js**: Gestión parámetros URL
+- **useUserProfile.js**: Gestión perfil usuario completo
+
+---
+
+## 🚀 Funcionalidades Implementadas
+
+### **Dashboard Personalizable**
+✅ Grid drag & drop con 12 columnas  
+✅ 8 tipos de cards disponibles  
+✅ Configuración modal visual  
+✅ Auto-guardado automático  
+✅ Responsive completo  
+✅ Persistencia usuario  
+
+### **Gestión Expedientes**
+✅ Búsqueda avanzada con validación  
+✅ Filtros flotantes activos  
+✅ Tabla con acciones múltiples  
+✅ Diálogo detalles completo  
+✅ Estadísticas tiempo real  
+✅ Exportación configurable  
+
+### **Sistema Filtros**
+✅ 10+ componentes de filtro  
+✅ 5 secciones especializadas  
+✅ Persistencia en URL  
+✅ Filtros favoritos  
+✅ Limpieza inteligente  
+
+### **Autenticación Robusta**
+✅ JWT con refresh automático  
+✅ Guards de rutas avanzados  
+✅ Reset password completo  
+✅ Gestión permisos granular  
+✅ Interceptor HTTP universal  
+
+---
+
+## 🔧 Configuración de Entorno
+
+### **Variables de Entorno**
+```bash
+VITE_SSO_URL=https://localhost:5116/api     # URL autenticación
+VITE_COREAPI_URL=https://localhost:5117/api # URL API core
+VITE_DEV_PORT=5173                          # Puerto desarrollo
+```
+
+### **Proxy de Desarrollo** (`vite.config.js`)
+- **Alias**: `@` → `src/`
+- **Proxy `/api`**: Redirige a VITE_SSO_URL
+- **CORS**: Configurado para desarrollo
+- **DevTools**: Vue DevTools integrado
+
+### **HTTPS Local** (`Caddyfile`)
+- **Proxy automático**: Frontend + Backend
+- **Gestión cookies**: Automática entre dominios
+- **Certificados**: Self-signed para desarrollo
+
+---
+
+## 📋 Puntos Arquitecturales Clave
+
+### **🔥 Críticos**
+1. **httpInterceptor.js** es la fuente única para TODAS las peticiones HTTP
+2. **userProfile** en auth store contiene TODA la configuración personalizada
+3. **Composables especializados** manejan lógica específica reutilizable
+4. **Configuración externa** permite tablas y filtros completamente configurables
+5. **Persistencia URL** mantiene estado entre recargas y navegación
+
+### **⚡ Importantes**
+- **PrimeVue + Tailwind**: Híbrido para máxima flexibilidad
+- **grid-layout-plus**: Dependencia crítica para dashboard
+- **Zod**: Validación esquemas (implementación parcial)
+- **Mock data**: Generadores para desarrollo sin backend
+- **Sistema toast**: Especializado para contexto procesal legal
+
+### **🎯 Arquitectónicos**
+- **Composables** > Mixins (Vue 3 Composition API)
+- **Pinia** > Vuex (gestión estado moderna)
+- **Configuración declarativa** > Código hardcodeado
+- **Persistencia múltiple** > Single source of truth
+- **Componentes genéricos** > Componentes específicos
+
+## 🔄 Composables y Lógica Reutilizable
+
+### **Composables de Dashboard**
+- **useUserDashboard.js** (500+ líneas): Gestión completa dashboard personalizable
+- **useUserProfile.js**: Carga y sincronización perfil usuario
+
+### **Composables de DataTable**
+- **useTablePagination.js**: Paginación adaptada a PrimeVue
+- **useTableSorting.js**: Ordenación múltiple
+- **useTableActions.js**: Gestión acciones de fila
+
+### **Composables de Filtros**
+- **useFilterPanel.js**: Lógica panel filtros avanzados
+- **useFiltersDrawer.js**: Gestión drawer filtros con persistencia URL
+
+### **Composables de Persistencia**
+- **usePersistentView.js**: Sincronización vista ↔ URL
+- **useUrlPersistence.js**: Gestión parámetros URL
+- **useAppLayout.js**: Gestión layout aplicación
+
+---
+
+## 🗺️ Rutas y Navegación
+
+### **Rutas Implementadas** (`router/index.js`)
+```javascript
+{
+  { path: '/login',           component: Login.vue,        meta: { public: true } },
+  { path: '/reset-password',  component: ResetPassword.vue, meta: { public: true } },
+  { path: '/',               component: Dashboard.vue,     meta: { requiresAuth: true } },
+  { path: '/expedientes',    component: Expedientes.vue,   meta: { requiresAuth: true } }
+}
+```
+
+### **Meta Propiedades**
+- **public**: Rutas accesibles sin autenticación
+- **requiresAuth**: Requiere usuario autenticado
+- **requiredPermission**: Permiso específico necesario
+
+---
+
+## 📊 Mock Data y Testing
+
+### **Generadores Mock** (`utils/mockExpedientesGenerator.js`)
+- Datos realistas para expedientes
+- Generación automática para testing
+- Estructura coherente con API backend
+
+### **Datos Mock Estáticos** (`public/mock/expedientes.json`)
+- Dataset fijo para desarrollo
+- Casos de prueba consistentes
+
+---
+
+## 🎨 Theming y Personalización Visual
+
+### **Sistema de Tokens Completo** (`themes/custom-tokens.css`)
+- 50+ variables spacing
+- 20+ variables typography  
+- 15+ variables sizing
+- Sistema z-index completo
+- Variables modo oscuro
+
+### **Tema PrimeVue Especializado**
+- **GestionProcesalTheme**: Optimizado para contexto legal
+- **Componentes personalizados**: DataTable, Cards, Toast
+- **Modo oscuro nativo**: Soporte completo `.p-dark`
+
+---
+
+## 🔧 Desarrollo y Herramientas
+
+### **Configuración Vite Avanzada**
+- **Proxy desarrollo**: Transparente a backend
+- **Vue DevTools**: Integrado automáticamente  
+- **Hot Module Replacement**: Optimizado
+- **Alias inteligentes**: `@` para src/
+
+### **PostCSS y Autoprefixer**
+- **Compatibilidad navegadores**: Automática
+- **Optimización CSS**: Build optimizado
+- **TailwindCSS**: Integración completa
+
+---
+
+## 📈 Rendimiento y Optimización
+
+### **Lazy Loading**
+- Componentes cargados bajo demanda
+- Rutas con carga diferida
+- Imágenes optimizadas
+
+### **Bundle Optimization**
+- **Code splitting**: Por rutas
+- **Tree shaking**: Eliminación código no usado
+- **Minificación**: Build optimizado
+
+---
+
+## 🛡️ Seguridad
+
+### **Sanitización y Validación**
+- **Escape HTML**: En contenido dinámico
+- **Validación Zod**: Esquemas de datos
+- **CSRF Protection**: Via cookies httpOnly
+
+### **Gestión Permisos**
+- **Guards granulares**: Por ruta y componente
+- **Permisos frontend**: Independientes del backend
+- **Estados de autenticación**: Consistentes
+
+---
+
+## 📚 Documentación Relacionada
+
+- **Sistema Dashboard.md**: Documentación detallada del dashboard
+- **Sistema Datatable Generico.md**: Guía completa del sistema de tablas
+- **Sistema de Estilos Mejorados.md**: Documentación de temas y estilos
+- **userProfile.md**: Estructura y gestión del perfil de usuario
+
+---
+
+## 🎯 Conclusión
+
+**IGGSAD Frontend** es una aplicación **robusta**, **escalable** y **altamente personalizable** que implementa las mejores prácticas de desarrollo Vue 3. Con más de **8,500+ líneas de código**, arquitectura modular y componentes reutilizables, proporciona una base sólida para un sistema de gestión procesal completo.
+
+### **Características Destacadas:**
+✅ **Dashboard 100% personalizable** con drag & drop  
+✅ **Sistema filtros avanzado** con persistencia URL  
+✅ **Gestión expedientes completa** con tabla especializada  
+✅ **Autenticación robusta** con refresh automático  
+✅ **Theming profesional** adaptado al contexto legal  
+✅ **Arquitectura escalable** con composables reutilizables  
+✅ **Documentación exhaustiva** para mantenimiento
+
+---
+
+*Documentación actualizada del esquema arquitectural completo | IGGSAD Gestión Procesal Frontend*

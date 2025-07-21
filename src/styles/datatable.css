@@ -542,4 +542,202 @@
   opacity: 0.5;
 }
 
+/* ===== PAGINADOR USANDO DATA-PC-NAME (MÁS SEGURO) ===== */
 
+/* Contenedor principal del paginador */
+.datatable-generic-root [data-pc-name="pcpaginator"] {
+  background: var(--iggsad-surface-white);
+  border-top: 1px solid var(--iggsad-surface-200);
+  padding: var(--iggsad-spacing-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--iggsad-spacing-md);
+}
+
+/* ===== LAYOUT: INFO IZQUIERDA | NAVEGADORES CENTRO | DROPDOWN DERECHA ===== */
+
+/* Información de registros - IZQUIERDA */
+.datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="current"] {
+  order: 1;
+  color: var(--iggsad-surface-700);
+  font-size: var(--iggsad-text-sm);
+  font-weight: var(--iggsad-font-medium);
+  margin-right: var(--iggsad-spacing-xl);
+}
+
+/* Navegadores - CENTRO */
+.datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="first"],
+.datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="prev"],
+.datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="pages"],
+.datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="next"],
+.datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="last"] {
+  order: 2;
+}
+
+/* Dropdown - DERECHA */
+.datatable-generic-root [data-pc-name="pcrowperpagedropdown"] {
+  order: 3;
+  margin-left: var(--iggsad-spacing-xl);
+}
+
+/* ===== BOTONES DE NAVEGACIÓN ===== */
+.datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="first"],
+.datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="prev"],
+.datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="next"],
+.datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="last"] {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--iggsad-radius-md);
+  color: var(--iggsad-surface-600);
+  width: 2.25rem;
+  height: 2.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--iggsad-transition-fast);
+  margin-right: var(--iggsad-spacing-xs);
+}
+
+.datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="first"]:not(.p-disabled):hover,
+.datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="prev"]:not(.p-disabled):hover,
+.datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="next"]:not(.p-disabled):hover,
+.datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="last"]:not(.p-disabled):hover {
+  background: var(--iggsad-surface-100);
+  border-color: var(--iggsad-surface-300);
+  color: var(--iggsad-surface-800);
+  transform: translateY(-1px);
+}
+
+.datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="first"].p-disabled,
+.datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="prev"].p-disabled,
+.datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="next"].p-disabled,
+.datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="last"].p-disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ===== CONTENEDOR DE PÁGINAS ===== */
+.datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="pages"] {
+  display: flex;
+  align-items: center;
+  gap: var(--iggsad-spacing-xs);
+  margin: 0 var(--iggsad-spacing-sm);
+}
+
+/* ===== BOTONES DE PÁGINA (NÚMEROS) ===== */
+.datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="page"] {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 50%; /* Círculos como PrimeVue estándar */
+  color: var(--iggsad-surface-700);
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: var(--iggsad-text-sm);
+  font-weight: var(--iggsad-font-medium);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--iggsad-transition-fast);
+  cursor: pointer;
+}
+
+.datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="page"]:hover {
+  background: var(--iggsad-surface-100);
+  border-color: var(--iggsad-surface-300);
+  color: var(--iggsad-surface-800);
+  transform: translateY(-1px);
+}
+
+.datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="page"][data-p-active="true"] {
+  background: var(--iggsad-primary-700);
+  border-color: var(--iggsad-primary-800);
+  color: #ffffff;
+  font-weight: var(--iggsad-font-semibold);
+}
+
+.datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="page"][data-p-active="true"]:hover {
+  background: var(--iggsad-primary-600);
+  border-color: var(--iggsad-primary-700);
+  transform: translateY(-1px);
+}
+
+/* ===== DROPDOWN DE FILAS POR PÁGINA ===== */
+.datatable-generic-root [data-pc-name="pcrowperpagedropdown"] {
+  background: var(--iggsad-surface-white);
+  border: 1px solid var(--iggsad-surface-300);
+  border-radius: var(--iggsad-radius-md);
+  font-size: var(--iggsad-text-sm);
+  min-width: 4rem;
+  height: 2.25rem;
+  transition: all var(--iggsad-transition-fast);
+}
+
+.datatable-generic-root [data-pc-name="pcrowperpagedropdown"]:hover {
+  border-color: var(--iggsad-primary-300);
+  box-shadow: var(--iggsad-shadow-sm);
+}
+
+.datatable-generic-root [data-pc-name="pcrowperpagedropdown"] [data-pc-section="label"] {
+  padding: var(--iggsad-spacing-xs) var(--iggsad-spacing-sm);
+  font-weight: var(--iggsad-font-medium);
+  color: var(--iggsad-surface-700);
+}
+
+.datatable-generic-root [data-pc-name="pcrowperpagedropdown"] [data-pc-section="dropdown"] {
+  color: var(--iggsad-surface-600);
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+  .datatable-generic-root [data-pc-name="pcpaginator"] {
+    flex-direction: column;
+    gap: var(--iggsad-spacing-sm);
+    padding: var(--iggsad-spacing-md) var(--iggsad-spacing-sm);
+  }
+
+  .datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="current"],
+  .datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="first"],
+  .datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="prev"],
+  .datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="pages"],
+  .datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="next"],
+  .datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="last"],
+  .datatable-generic-root [data-pc-name="pcrowperpagedropdown"] {
+    order: unset;
+  }
+
+  .datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="pages"] {
+    margin: 0;
+  }
+}
+
+/* ===== MODO OSCURO ===== */
+.p-dark .datatable-generic-root [data-pc-name="pcpaginator"] {
+  background: var(--iggsad-surface-800);
+  border-top-color: var(--iggsad-surface-600);
+}
+
+.p-dark .datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="current"] {
+  color: var(--iggsad-surface-200);
+}
+
+.p-dark .datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="page"] {
+  color: var(--iggsad-surface-200);
+}
+
+.p-dark .datatable-generic-root [data-pc-name="pcpaginator"] [data-pc-section="page"]:hover {
+  background: var(--iggsad-surface-700);
+  border-color: var(--iggsad-surface-500);
+  color: var(--iggsad-surface-100);
+}
+
+.p-dark .datatable-generic-root [data-pc-name="pcrowperpagedropdown"] {
+  background: var(--iggsad-surface-700);
+  border-color: var(--iggsad-surface-600);
+}
+
+.p-dark .datatable-generic-root [data-pc-name="pcrowperpagedropdown"] [data-pc-section="label"] {
+  color: var(--iggsad-surface-200);
+}

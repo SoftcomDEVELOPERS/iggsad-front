@@ -548,4 +548,40 @@ Este dashboard no es solo una interfaz, es una **plataforma de productividad** q
 
 ---
 
+---
+
+## 📦 Dependencias Críticas
+
+### **grid-layout-plus 1.1.0**
+**DEPENDENCIA CRÍTICA** para el funcionamiento del dashboard:
+- **Sistema drag & drop**: Motor principal del grid redimensionable
+- **Responsive automático**: Adaptación a diferentes breakpoints
+- **Persistencia layout**: Mantiene posiciones y tamaños
+- **Detección colisiones**: Evita superposición de cards
+- **Performance optimizada**: Renderizado eficiente para grids grandes
+
+**Instalación:**
+```bash
+npm install grid-layout-plus
+```
+
+**Configuración básica en DashboardGrid.vue:**
+```javascript
+import { GridLayout, GridItem } from 'grid-layout-plus'
+
+const layout = ref([
+  { i: 'card-1', x: 0, y: 0, w: 4, h: 3 },
+  { i: 'card-2', x: 4, y: 0, w: 4, h: 3 }
+])
+```
+
+### **Otras Dependencias Dashboard**
+- `@primeuix/themes 1.1.1`: Temas avanzados PrimeVue
+- `primevue 4.3.6`: Componentes UI base
+- `pinia 3.0.3`: Gestión estado global
+- `zod 3.25.64`: Validación configuraciones
+- `js-cookie 3.0.5`: Persistencia navegador
+
+---
+
 *Documentación generada para el Sistema de Gestión Procesal | Versión 1.0.0*

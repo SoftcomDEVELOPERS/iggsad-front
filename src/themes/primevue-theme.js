@@ -176,7 +176,7 @@ export const GestionProcesalTheme = definePreset(Nora, {
         light: {
           root: {
             primary: {
-              background: 'var(--iggsad-primary-600)',         
+              background: 'var(--iggsad-surface-900)',         
               hoverBackground: 'var(--iggsad-primary-700)',    
               activeBackground: 'var(--iggsad-primary-800)',   
               borderColor: 'var(--iggsad-primary-600)',        
@@ -365,6 +365,15 @@ export const GestionProcesalTheme = definePreset(Nora, {
         borderRadius: 'var(--iggsad-radius-sm)'         
       }
     },
+// Reemplaza completamente la configuración del paginador por esta:
+// ===== PAGINATOR (ESTRUCTURA CORRECTA) =====
+paginator: {
+  root: {
+    background: 'var(--iggsad-surface-white)',
+    padding: 'var(--iggsad-spacing-sm)',
+    gap: 'var(--iggsad-spacing-sm)'
+  }
+},
 
     // ===== PANEL =====
     panel: {

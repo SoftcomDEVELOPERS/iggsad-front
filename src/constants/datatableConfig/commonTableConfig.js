@@ -4,7 +4,7 @@
 // Configuración de paginación común
 export const COMMON_PAGINATION_CONFIG = {
   enabled: true,
-  template: "FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport",
+  template: "CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown",
   currentPageReportTemplate: "Mostrando {first} a {last} de {totalRecords} registros",
   rowsPerPageOptions: [
     { label: '25 filas', value: 25 },
@@ -20,7 +20,19 @@ export const COMMON_TABLE_PT = {
   root: 'datatable-generic-root',
   header: 'datatable-generic-header',
   body: 'datatable-generic-body',
-  row: 'datatable-generic-row'
+  row: 'datatable-generic-row',
+  // ===== AGREGAR CONFIGURACIÓN PT PARA PAGINADOR =====
+  paginatorContainer: 'custom-paginator-container',
+  paginator: {
+    root: 'custom-paginator-root',
+    current: 'custom-paginator-current',
+    first: 'custom-paginator-first',
+    prev: 'custom-paginator-prev',
+    next: 'custom-paginator-next',
+    last: 'custom-paginator-last',
+    pages: 'custom-paginator-pages',
+    page: 'custom-paginator-page'
+  }
 }
 
 // Clases CSS comunes
